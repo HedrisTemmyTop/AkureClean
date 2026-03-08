@@ -1,0 +1,30 @@
+# Standard ignores
+node_modules/
+.DS_Store
+*.pem
+.env*.local
+
+# Client (Expo/Mobile)
+client/.expo/
+client/dist/
+client/web-build/
+client/expo-env.d.ts
+client/.kotlin/
+client/*.orig.*
+client/*.jks
+client/*.p8
+client/*.p12
+client/*.key
+client/*.mobileprovision
+client/.metro-health-check*
+client/npm-debug.*
+client/yarn-debug.*
+client/yarn-error.*
+client/*.tsbuildinfo
+client/ios/
+client/android/
+
+# Server
+server/node_modules/
+server/dist/
+server/.env
