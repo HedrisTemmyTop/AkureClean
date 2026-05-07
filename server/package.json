@@ -21,7 +21,12 @@
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.1",
-    "node-cron": "^4.2.1"
+    "mongoose-geojson-schema": "^3.1.1",
+    "node-cron": "^4.2.1",
+    "pdf-parse": "^2.4.5",
+    "pdf2json": "^4.0.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

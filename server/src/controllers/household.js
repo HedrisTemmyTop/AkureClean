@@ -8,7 +8,7 @@ exports.createHousehold = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Validation error', data: errors.array() });
   }
 
-  const { address, coordinates, zoneId } = req.body;
+  const { address, location, houseDescription, localGovt, ward, zoneId } = req.body;
 
   const existingHousehold = await Household.findOne({ userId: req.user._id });
   if (existingHousehold) {
@@ -18,7 +18,10 @@ exports.createHousehold = asyncHandler(async (req, res) => {
   const household = await Household.create({
     userId: req.user._id,
     address,
-    coordinates,
+    location,
+    houseDescription,
+    localGovt,
+    ward,
     zoneId
   });
 

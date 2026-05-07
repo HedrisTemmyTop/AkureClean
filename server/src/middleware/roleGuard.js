@@ -1,9 +1,10 @@
 const roleGuard = (...roles) => {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
+      console.log("test", req.user);
       return res.status(403).json({
         success: false,
-        message: `User role ${req.user ? req.user.role : 'unknown'} is not authorized to access this route`
+        message: `User role ${req.user ? req.user.role : "unknown"} is not authorized to access this route`,
       });
     }
     next();
