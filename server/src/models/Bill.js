@@ -10,6 +10,10 @@ const billSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  month: {
+    type: Number,
+    required: true,
+  },
   amount: {
     type: Number,
     required: true,
@@ -29,8 +33,8 @@ const billSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Unique constraint: one bill per userId per year
-billSchema.index({ userId: 1, year: 1 }, { unique: true });
+// Basic index for performance
+billSchema.index({ userId: 1, status: 1 });
 
 const Bill = mongoose.model('Bill', billSchema);
 module.exports = Bill;

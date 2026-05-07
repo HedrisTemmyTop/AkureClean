@@ -1,0 +1,57 @@
+[
+  {
+    "userId": { "$oid": "6637a28e9b3a3c2000000001" },
+    "address": "15 Oba Adesida Road, Akure",
+    "coordinates": {
+      "lat": 7.2523,
+      "lng": 5.1931
+    },
+    "zoneId": { "$oid": "64abcdef1234567890abcdef" },
+    "createdAt": { "$date": "2026-05-05T00:00:00Z" },
+    "updatedAt": { "$date": "2026-05-05T00:00:00Z" }
+  },
+  {
+    "userId": { "$oid": "6637a28e9b3a3c2000000002" },
+    "address": "42 Alagbaka Extension, Akure",
+    "coordinates": {
+      "lat": 7.2571,
+      "lng": 5.2058
+    },
+    "zoneId": { "$oid": "64abcdef1234567890abcdef" },
+    "createdAt": { "$date": "2026-05-05T00:00:00Z" },
+    "updatedAt": { "$date": "2026-05-05T00:00:00Z" }
+  },
+  {
+    "userId": { "$oid": "6637a28e9b3a3c2000000003" },
+    "address": "8 Ijapo Estate, Akure",
+    "coordinates": {
+      "lat": 7.2612,
+      "lng": 5.2104
+    },
+    "zoneId": { "$oid": "64abcdef1234567890abcdef" },
+    "createdAt": { "$date": "2026-05-05T00:00:00Z" },
+    "updatedAt": { "$date": "2026-05-05T00:00:00Z" }
+  },
+  {
+    "userId": { "$oid": "6637a28e9b3a3c2000000004" },
+    "address": "112 FUTA South Gate Road, Akure",
+    "coordinates": {
+      "lat": 7.2985,
+      "lng": 5.1382
+    },
+    "zoneId": { "$oid": "64abcdef1234567890abcdef" },
+    "createdAt": { "$date": "2026-05-05T00:00:00Z" },
+    "updatedAt": { "$date": "2026-05-05T00:00:00Z" }
+  },
+  {
+    "userId": { "$oid": "6637a28e9b3a3c2000000005" },
+    "address": "22 Oda Road, Akure",
+    "coordinates": {
+      "lat": 7.2415,
+      "lng": 5.1998
+    },
+    "zoneId": { "$oid": "64abcdef1234567890abcdef" },
+    "createdAt": { "$date": "2026-05-05T00:00:00Z" },
+    "updatedAt": { "$date": "2026-05-05T00:00:00Z" }
+  }
+]

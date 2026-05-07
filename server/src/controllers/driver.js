@@ -1,61 +1,87 @@
-const CollectionLog = require('../models/CollectionLog');
-const asyncHandler = require('../utils/asyncHandler');
+const Assignment = require("../models/Assignment");
+const asyncHandler = require("../utils/asyncHandler");
 
 exports.getMyRoute = asyncHandler(async (req, res) => {
-  const log = await CollectionLog.findOne({
+  const assignment = await Assignment.findOne({
     driverId: req.user._id,
-    status: 'in_progress'
-  }).populate({
-    path: 'route.householdId',
-    populate: { path: 'userId', select: 'name phone' }
-  });
+    status: { $in: ["Pending", "InProgress"] },
+  }).populate("stops.userId", "name phone address houseDescription pollingUnit");
 
-  if (!log) {
-    return res.status(404).json({ success: false, message: 'No active route found for today' });
+  if (!assignment) {
+    return res
+      .status(404)
+      .json({ success: false, message: "No active assignment found" });
   }
+
+  // Keep frontend compatibility: expose stops also as 'route'
+  const result = assignment.toObject();
+  result.route = result.stops;
 
   res.json({
     success: true,
-    data: log
+    data: result,
   });
 });
 
 exports.collectHousehold = asyncHandler(async (req, res) => {
+  // Accepts either a userId or a householdId for backward compat
   const { householdId } = req.params;
 
-  const log = await CollectionLog.findOne({
+  const assignment = await Assignment.findOne({
     driverId: req.user._id,
-    status: 'in_progress'
+    status: { $in: ["Pending", "InProgress"] },
   });
 
-  if (!log) {
-    return res.status(404).json({ success: false, message: 'No active route found' });
+  if (!assignment) {
+    return res
+      .status(404)
+      .json({ success: false, message: "No active assignment found" });
   }
 
-  const routeStop = log.route.find(r => r.householdId.toString() === householdId);
-  if (!routeStop) {
-    return res.status(404).json({ success: false, message: 'Household not found in current route' });
+  // Match by userId first, then fall back to householdId
+  const stop =
+    assignment.stops.find(
+      (s) => s.userId && s.userId.toString() === householdId,
+    ) ||
+    assignment.stops.find(
+      (s) => s.householdId && s.householdId.toString() === householdId,
+    );
+
+  if (!stop) {
+    return res.status(404).json({
+      success: false,
+      message: "Stop not found in current assignment",
+    });
   }
 
-  if (routeStop.status === 'collected') {
-    return res.status(400).json({ success: false, message: 'Household already collected' });
+  if (stop.status === "Completed") {
+    return res
+      .status(400)
+      .json({ success: false, message: "Stop already collected" });
   }
 
-  routeStop.status = 'collected';
-  routeStop.collectedAt = new Date();
+  stop.status = "Completed";
+  stop.collectedAt = new Date();
 
-  // Check if all stops are collected
-  const allCollected = log.route.every(r => r.status === 'collected');
-  if (allCollected) {
-    log.status = 'completed';
-    log.completedAt = new Date();
+  if (assignment.status === "Pending") {
+    assignment.status = "InProgress";
   }
 
-  await log.save();
+  const allDone = assignment.stops.every(
+    (s) => s.status === "Completed" || s.status === "Skipped",
+  );
+  if (allDone) {
+    assignment.status = "Completed";
+  }
+
+  await assignment.save();
+
+  const result = assignment.toObject();
+  result.route = result.stops;
 
   res.json({
     success: true,
-    message: 'Household marked as collected',
-    data: log
+    message: "Stop marked as collected",
+    data: result,
   });
 });

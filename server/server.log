@@ -1,0 +1,7 @@
+
+> server@1.0.0 start
+> node index.js --no-dev --non-interactive
+
+◇ injected env (7) from .env // tip: ⌘ suppress logs { quiet: true }
+Server running in development mode on port 5001
+MongoDB Connected: localhost

@@ -9,11 +9,26 @@ const pickupRequestSchema = new mongoose.Schema({
   householdId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Household',
-    required: true,
+    default: null,
   },
+  type: {
+    type: String,
+    enum: ['General', 'Recyclables', 'Hazardous', 'Bulky'],
+    default: 'General',
+  },
+  notes: {
+    type: String,
+    default: '',
+  },
+  address: String,
+  localGovt: String,
+  ward: String,
+  pollingUnit: String,
+  scheduledDate: String,
+  scheduledTime: String,
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'declined'],
+    enum: ['pending', 'accepted', 'completed', 'cancelled'],
     default: 'pending',
   },
   driverId: {
@@ -24,15 +39,6 @@ const pickupRequestSchema = new mongoose.Schema({
   extraFee: {
     type: Number,
     required: true,
-  },
-  paystackReference: {
-    type: String,
-    default: null,
-  },
-  paymentStatus: {
-    type: String,
-    enum: ['unpaid', 'paid'],
-    default: 'unpaid',
   }
 }, { timestamps: true });
 

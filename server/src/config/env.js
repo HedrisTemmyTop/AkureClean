@@ -5,7 +5,8 @@ const requiredEnvs = [
   'MONGODB_URI',
   'JWT_ACCESS_SECRET',
   'JWT_REFRESH_SECRET',
-  'PAYSTACK_SECRET_KEY'
+  'PAYSTACK_SECRET_KEY',
+  'PAYSTACK_PUBLIC_KEY'
 ];
 
 requiredEnvs.forEach((envVar) => {
@@ -20,5 +21,6 @@ module.exports = {
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET || 'fallback_access_secret',
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'fallback_refresh_secret',
   PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY,
+  PAYSTACK_PUBLIC_KEY: process.env.PAYSTACK_PUBLIC_KEY,
   NODE_ENV: process.env.NODE_ENV || 'development'
 };
