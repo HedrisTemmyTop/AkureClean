@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Alert, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { CreditCard, CheckCircle, ShieldCheck } from 'lucide-react-native';
 
@@ -9,6 +9,8 @@ import { AppCard } from '../../components/AppCard';
 import { AppButton } from '../../components/AppButton';
 import { theme } from '../../theme';
 import { reportService } from '../../services/reportService';
+import { pickupService } from '../../services/pickupService';
+import { parseApiError } from '../../services/api';
 import { WasteRequest } from '../../types';
 import { ResidentStackParamList } from '../../navigation/RoleNavigator';
 
@@ -25,28 +27,55 @@ export const PaymentScreen: React.FC = () => {
 
   useEffect(() => {
     const loadReport = async () => {
-      const data = await reportService.getReportById(reportId);
-      setReport(data || null);
+      try {
+        const data = await pickupService.getPickupById(reportId);
+        setReport({
+          id: data.id,
+          street: data.address,
+          type: data.type,
+          cost: data.extraFee,
+          userId: data.userId?._id || data.userId,
+          status: data.status,
+          notes: data.notes,
+        } as any);
+      } catch (e) {
+        console.error("Error loading pickup for payment:", e);
+        Alert.alert("Error", "Could not load pickup details.");
+        navigation.goBack();
+      }
     };
     loadReport();
   }, [reportId]);
 
   const handlePayment = async () => {
-    setIsProcessing(true);
-    try {
-      await reportService.processPayment(reportId);
-      setPaymentSuccess(true);
-      setTimeout(() => {
-        navigation.goBack();
-      }, 2000);
-    } catch (e) {
-      Alert.alert('Payment Failed', 'Please try again.');
-    } finally {
-      setIsProcessing(false);
-    }
+    if (!report) return;
+    
+    navigation.navigate('PaystackCheckout', {
+      amount: report.cost || 2500,
+      metadata: {
+        type: 'pickup_fee',
+        pickupId: reportId,
+        userId: report.userId,
+      },
+      onSuccess: () => {
+        setPaymentSuccess(true);
+        setTimeout(() => {
+          navigation.navigate('ResidentTabs');
+        }, 2000);
+      },
+      onCancel: () => {
+        Alert.alert('Payment Cancelled', 'You cancelled the payment process.');
+      }
+    });
   };
 
-  if (!report) return null;
+  if (!report) {
+    return (
+      <ScreenContainer style={styles.centered}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </ScreenContainer>
+    );
+  }
 
   return (
     <ScreenContainer>
@@ -106,14 +135,14 @@ export const PaymentScreen: React.FC = () => {
         <TouchableOpacity style={styles.methodCard}>
           <CreditCard color={theme.colors.primary} size={24} />
           <AppText variant="body" weight="600" style={{ flex: 1, marginLeft: theme.spacing.md }}>
-            Pay with Card (Mock)
+            Pay with Paystack
           </AppText>
         </TouchableOpacity>
         
         <View style={styles.securityNote}>
           <ShieldCheck color={theme.colors.success} size={16} />
           <AppText variant="caption" color={theme.colors.textSecondary} style={{ marginLeft: 6 }}>
-            Mock secured transaction. Demo purposes only.
+            Secured transaction via Paystack.
           </AppText>
         </View>
       </View>
@@ -138,6 +167,11 @@ export const PaymentScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   header: {
     marginTop: theme.spacing.lg,
     marginBottom: theme.spacing.xl,

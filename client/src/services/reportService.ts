@@ -1,66 +1,66 @@
-import { WasteRequest, RequestStatus } from '../types';
-import { mockRequests } from '../data/mockData';
+/**
+ * reportService.ts — Waste Report / Pickup Request API service
+ * Maps to the backend Report model endpoints.
+ */
+import { apiClient } from './api';
+import { WasteRequest, RequestStatus, Severity } from '../types';
 
-let currentReports = [...mockRequests];
+export interface SubmitReportPayload {
+  street: string;
+  landmark?: string;
+  lga?: string;
+  ward?: string;
+  type?: WasteRequest['type'];
+  severity?: Severity;
+  notes?: string;
+  preferredDate?: string;
+  location?: { type: 'Point'; coordinates: [number, number] };
+}
+
+// ─── Normalise server → client shape ─────────────────────────────────────────
+function normaliseReport(raw: any): WasteRequest {
+  return {
+    id: raw._id ?? raw.id,
+    residentId: raw.residentId?._id ?? raw.residentId,
+    driverId: raw.driverId?._id ?? raw.driverId,
+    locationId: raw.ward ?? raw.lga ?? '',
+    street: raw.street,
+    landmark: raw.landmark,
+    status: raw.status as RequestStatus,
+    severity: raw.severity as Severity,
+    type: raw.type,
+    requestedDate: raw.requestedDate,
+    preferredDate: raw.preferredDate,
+    completedDate: raw.completedDate,
+    notes: raw.notes,
+    imageUrl: raw.imageUrl,
+    cost: raw.cost,
+  };
+}
 
 export const reportService = {
-  async getReportsByResident(residentId: string): Promise<WasteRequest[]> {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return currentReports.filter(r => r.residentId === residentId);
+  async submitReport(payload: SubmitReportPayload): Promise<WasteRequest> {
+    const { data } = await apiClient.post('/reports', payload);
+    return normaliseReport(data.data);
   },
 
-  async getAllReports(): Promise<WasteRequest[]> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    return [...currentReports].sort((a, b) => new Date(b.requestedDate).getTime() - new Date(a.requestedDate).getTime());
+  async getReportsByResident(_id?: string): Promise<WasteRequest[]> {
+    const { data } = await apiClient.get('/reports/mine');
+    return (data.data as any[]).map(normaliseReport);
   },
 
-  async getReportById(id: string): Promise<WasteRequest | undefined> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return currentReports.find(r => r.id === id);
+  async getAllReports(filters?: { status?: string; ward?: string }): Promise<WasteRequest[]> {
+    const { data } = await apiClient.get('/reports', { params: filters });
+    return (data.data as any[]).map(normaliseReport);
   },
 
-  async submitReport(data: Omit<WasteRequest, 'id' | 'status' | 'requestedDate'>): Promise<WasteRequest> {
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const newReport: WasteRequest = {
-      ...data,
-      id: `req_${Date.now()}`,
-      status: 'Pending',
-      requestedDate: new Date().toISOString()
-    };
-    
-    currentReports = [newReport, ...currentReports];
-    return newReport;
+  async getReportById(id: string): Promise<WasteRequest> {
+    const { data } = await apiClient.get(`/reports/${id}`);
+    return normaliseReport(data.data);
   },
 
-  async assignCollectorToReport(reportId: string, collectorId: string): Promise<WasteRequest | undefined> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const index = currentReports.findIndex(r => r.id === reportId);
-    if (index === -1) return undefined;
-    
-    currentReports[index] = { ...currentReports[index], collectorId, status: 'Scheduled' };
-    return currentReports[index];
+  async updateReportStatus(reportId: string, status: RequestStatus, driverId?: string): Promise<WasteRequest> {
+    const { data } = await apiClient.patch(`/reports/${reportId}/status`, { status, driverId });
+    return normaliseReport(data.data);
   },
-
-  async updateReportStatus(reportId: string, status: RequestStatus): Promise<WasteRequest | undefined> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const index = currentReports.findIndex(r => r.id === reportId);
-    if (index === -1) return undefined;
-    
-    currentReports[index] = { ...currentReports[index], status };
-    if (status === 'Completed') {
-      currentReports[index].completedDate = new Date().toISOString();
-    }
-    return currentReports[index];
-  },
-
-  async processPayment(reportId: string): Promise<WasteRequest | undefined> {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    const index = currentReports.findIndex(r => r.id === reportId);
-    if (index === -1) return undefined;
-
-    // After payment, standard flow is to mark it Scheduled for pickup
-    currentReports[index] = { ...currentReports[index], status: 'Scheduled' };
-    return currentReports[index];
-  }
 };

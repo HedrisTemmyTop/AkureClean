@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { MapPin, Calendar, AlertTriangle, FileText, CheckCircle, Clock } from 'lucide-react-native';
+import { MapPin, Calendar, AlertTriangle, FileText, CheckCircle, Clock, CreditCard } from 'lucide-react-native';
 
 import { ScreenContainer } from '../../components/ScreenContainer';
 import { AppText } from '../../components/AppText';
@@ -10,20 +10,38 @@ import { AppButton } from '../../components/AppButton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { theme } from '../../theme';
 import { reportService } from '../../services/reportService';
+import { pickupService } from '../../services/pickupService';
 import { WasteRequest } from '../../types';
+import * as Animatable from 'react-native-animatable';
 
-export const ReportDetailsScreen: React.FC = () => {
+export const PickupDetailsScreen: React.FC = () => {
   const route = useRoute<any>();
   const navigation = useNavigation();
-  const { reportId } = route.params;
-
+  const { reportId, isSpecialPickup } = route.params;
   const [report, setReport] = useState<WasteRequest | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const data = await reportService.getReportById(reportId);
+        let data: any;
+        if (isSpecialPickup) {
+          const pickup = await pickupService.getPickupById(reportId);
+          data = {
+            id: pickup.id,
+            residentId: pickup.userId?._id || pickup.userId,
+            status: (pickup.status.charAt(0).toUpperCase() + pickup.status.slice(1)) as RequestStatus,
+            type: pickup.type,
+            street: pickup.address || 'Special Pickup',
+            requestedDate: pickup.createdAt,
+            notes: pickup.notes,
+            severity: 'Medium',
+            locationId: '',
+            cost: pickup.extraFee,
+          };
+        } else {
+          data = await reportService.getReportById(reportId);
+        }
         if (data) setReport(data);
       } catch (e) {
         console.error(e);
@@ -32,7 +50,7 @@ export const ReportDetailsScreen: React.FC = () => {
       }
     };
     fetchReport();
-  }, [reportId]);
+  }, [reportId, isSpecialPickup]);
 
   if (loading) {
     return (
@@ -45,7 +63,7 @@ export const ReportDetailsScreen: React.FC = () => {
   if (!report) {
     return (
       <ScreenContainer style={styles.centered}>
-        <AppText variant="bodyLarge">Report not found.</AppText>
+        <AppText variant="bodyLarge">Pickup not found.</AppText>
         <AppButton title="Go Back" onPress={() => navigation.goBack()} style={{ marginTop: 16 }} />
       </ScreenContainer>
     );
@@ -102,6 +120,16 @@ export const ReportDetailsScreen: React.FC = () => {
         <View style={styles.divider} />
 
         <View style={styles.detailRow}>
+          <CreditCard color={theme.colors.textSecondary} size={20} />
+          <View style={styles.detailTextContainer}>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Payment Method</AppText>
+            <AppText variant="body">Physical Payment (Pay to Driver)</AppText>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.detailRow}>
           <FileText color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>Additional Notes</AppText>
@@ -135,7 +163,7 @@ export const ReportDetailsScreen: React.FC = () => {
           <View style={styles.timelineContent}>
             <AppText variant="body" weight="600" color={report.status === 'Pending' ? theme.colors.textSecondary : theme.colors.text}>Assigned</AppText>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-              {report.collectorId ? 'A collector has been assigned.' : 'Pending assignment.'}
+              {report.driverId ? 'A driver has been assigned.' : 'Pending assignment.'}
             </AppText>
           </View>
         </View>
@@ -156,6 +184,44 @@ export const ReportDetailsScreen: React.FC = () => {
           </View>
         </View>
       </View>
+
+      {(report.status === 'Pending' || (report as any).status === 'pending') && (
+        <Animatable.View animation="fadeInUp" delay={300} style={{ marginTop: 24, marginBottom: 40 }}>
+          <AppButton 
+            title="Cancel Pickup Request" 
+            variant="outline"
+            style={{ borderColor: theme.colors.status.cancelled }}
+            onPress={async () => {
+              try {
+                await pickupService.cancelPickupByResident(report.id);
+                navigation.goBack();
+              } catch (e) {
+                console.error(e);
+              }
+            }}
+          />
+        </Animatable.View>
+      )}
+ 
+      {(report.status === 'Accepted' || (report as any).status === 'accepted') && (
+        <Animatable.View animation="fadeInUp" delay={300} style={{ marginTop: 24, marginBottom: 40 }}>
+          <AppButton 
+            title="Mark as Picked Up" 
+            style={{ backgroundColor: theme.colors.success }}
+            onPress={async () => {
+              try {
+                await pickupService.completePickupByResident(report.id);
+                navigation.goBack();
+              } catch (e) {
+                console.error(e);
+              }
+            }}
+          />
+          <AppText variant="caption" color={theme.colors.textSecondary} align="center" style={{ marginTop: 8 }}>
+            Click this only after the driver has physically collected the waste.
+          </AppText>
+        </Animatable.View>
+      )}
 
     </ScreenContainer>
   );

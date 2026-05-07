@@ -1,4 +1,4 @@
-import { User, Location, WasteRequest, Role, CollectionSchedule, Notification, AssignmentRoute, AdminStats, AreaNode, CollectorStats } from '../types';
+import { User, Location, WasteRequest, Role, CollectionSchedule, Notification, AssignmentRoute, AdminStats, AreaNode, DriverStats } from '../types';
 
 export const mockLocations: Location[] = [
   { id: 'loc1', lga: 'Akure South', ward: 'Obanla', street: 'FUTA South Gate Road' },
@@ -13,17 +13,17 @@ export const mockUsers: User[] = [
     email: 'resident@example.com',
     phone: '+234 800 000 0001',
     address: '15 FUTA South Gate Road, Akure',
-    role: 'Resident',
+    role: 'resident',
     locationId: 'loc1',
     createdAt: new Date().toISOString()
   },
   {
     id: 'col1',
-    name: 'WasteMgt Collector A',
-    email: 'collector@example.com',
+    name: 'WasteMgt Driver A',
+    email: 'driver@example.com',
     phone: '+234 800 000 0002',
-    address: 'Collector Hub, Alagbaka',
-    role: 'Collector',
+    address: 'Driver Hub, Alagbaka',
+    role: 'driver',
     locationId: 'loc1', // Maybe operates in this LGA
     createdAt: new Date().toISOString()
   },
@@ -32,7 +32,7 @@ export const mockUsers: User[] = [
     name: 'Super Admin',
     email: 'admin@example.com',
     phone: '+234 800 000 0003',
-    role: 'Admin',
+    role: 'admin',
     createdAt: new Date().toISOString()
   }
 ];
@@ -52,7 +52,7 @@ export const mockRequests: WasteRequest[] = [
   {
     id: 'req2',
     residentId: 'res1',
-    collectorId: 'col1',
+    driverId: 'col1',
     locationId: 'loc1',
     street: '15 FUTA South Gate Road',
     severity: 'Low',
@@ -69,7 +69,7 @@ export const mockRequests: WasteRequest[] = [
     street: 'Shop 105, Arakale Market',
     severity: 'High',
     status: 'In Progress',
-    collectorId: 'col1',
+    driverId: 'col1',
     type: 'General',
     requestedDate: new Date(Date.now() - 3600000).toISOString(),
     notes: 'Market overflow'
@@ -92,7 +92,7 @@ export const mockRequests: WasteRequest[] = [
     street: 'Old Garage Area',
     severity: 'Medium',
     status: 'Scheduled',
-    collectorId: 'col2',
+    driverId: 'col2',
     type: 'Bulky',
     requestedDate: new Date(Date.now() - 172800000).toISOString(),
     notes: 'Old sofa and wooden crates'
@@ -104,7 +104,7 @@ export const mockRequests: WasteRequest[] = [
     street: 'Oba Ile Crescent',
     severity: 'High',
     status: 'Completed',
-    collectorId: 'col2',
+    driverId: 'col2',
     type: 'General',
     requestedDate: new Date(Date.now() - 259200000).toISOString(),
     completedDate: new Date(Date.now() - 86400000).toISOString(),
@@ -129,12 +129,12 @@ export const mockRequests: WasteRequest[] = [
     street: '15 FUTA South Gate Road',
     severity: 'High',
     status: 'Payment Pending',
-    collectorId: 'col1',
+    driverId: 'col1',
     type: 'Hazardous',
     requestedDate: new Date(Date.now() - 86400000).toISOString(),
     preferredDate: new Date(Date.now() + 86400000).toISOString(),
     cost: 2500,
-    notes: 'Broken glass and batteries. Collector accepted, awaiting payment.'
+    notes: 'Broken glass and batteries. Driver accepted, awaiting payment.'
   }
 ];
 
@@ -177,7 +177,7 @@ export const mockNotifications: Notification[] = [
 export const mockAssignmentRoutes: AssignmentRoute[] = [
   {
     id: 'route1',
-    collectorId: 'col1',
+    driverId: 'col1',
     title: 'South Gate Main Flow',
     area: 'FUTA South Gate, Obanla & Ijoka Axis',
     collectionDate: new Date().toISOString(),
@@ -441,7 +441,7 @@ export const mockAssignmentRoutes: AssignmentRoute[] = [
 
   {
     id: 'route2',
-    collectorId: 'col1',
+    driverId: 'col1',
     title: 'Arakale Market Sweep',
     area: 'Arakale, Oja-Oba, Alagbaka & Ijapo Axis',
     collectionDate: new Date(Date.now() + 86400000).toISOString(),
@@ -709,7 +709,7 @@ export const mockAdminStats: AdminStats = {
   totalReports: 142,
   pendingReports: 28,
   resolvedReports: 95,
-  totalCollectors: 12,
+  totalDrivers: 12,
   activeRoutes: 5,
   activeSchedules: 24
 };
@@ -749,23 +749,23 @@ export const mockAreaNodes: AreaNode[] = [
   }
 ];
 
-export const mockCollectorStats: CollectorStats[] = [
+export const mockDriverStats: DriverStats[] = [
   {
-    collectorId: 'col1',
-    name: 'WasteMgt Collector A',
+    driverId: 'col1',
+    name: 'WasteMgt Driver A',
     activeRoutesCount: 2,
     completedRoutesCount: 45,
     assignedAreas: ['Akure South', 'Obanla', 'Isikan']
   },
   {
-    collectorId: 'col2',
+    driverId: 'col2',
     name: 'Green City Squad B',
     activeRoutesCount: 1,
     completedRoutesCount: 112,
     assignedAreas: ['Akure North', 'Oba Ile']
   },
   {
-    collectorId: 'col3',
+    driverId: 'col3',
     name: 'Eco Warriors West',
     activeRoutesCount: 0,
     completedRoutesCount: 8,

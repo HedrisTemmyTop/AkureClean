@@ -1,0 +1,2910 @@
+{
+  "General": [
+    {
+      "name": "ST  ANDREW'S    II",
+      "coordinates": [5.212263682735991, 7.202346258005767]
+    },
+    {
+      "name": "NEW  AYET ORO",
+      "coordinates": [5.195481762872019, 7.215411743431643]
+    },
+    {
+      "name": "FALOYE  I",
+      "coordinates": [5.197608021620081, 7.226128960492697]
+    },
+    {
+      "name": "FALOYE  II",
+      "coordinates": [5.192411794842066, 7.213470782036835]
+    },
+    {
+      "name": "OKE  AGUNLA",
+      "coordinates": [5.150037196304752, 7.217195622758981]
+    },
+    {
+      "name": "OWODE/",
+      "coordinates": [5.179022321820794, 7.251970167881165]
+    },
+    {
+      "name": "OGBESE   I!, AT OGBESE",
+      "coordinates": [5.159779470428726, 7.213702916182782]
+    },
+    {
+      "name": "OGBESE   1 & I!, ST  ANDREWS   PR Y SCH",
+      "coordinates": [5.24140724770787, 7.226008015523579]
+    },
+    {
+      "name": "MARKET   SQ  II, NEAR  AYEDE  MKT",
+      "coordinates": [5.157498868721087, 7.229151176018954]
+    },
+    {
+      "name": "MARKET   SQ  I, AYEDE  MKT",
+      "coordinates": [5.201170547626115, 7.2215112856828405]
+    },
+    {
+      "name": "ST  MAR YS  PR Y SCH,  ST  MAR YS  PR Y SCH",
+      "coordinates": [5.208827529440991, 7.276224809456546]
+    },
+    {
+      "name": "ARAROMI   AGO  ODO,  AT ARAROMI",
+      "coordinates": [5.155428309398129, 7.20148321792797]
+    },
+    {
+      "name": "AJAGBARA    VILLAGE/   MAKANJU,    L.A PR Y SCH  MAKANJU",
+      "coordinates": [5.20904754010773, 7.221313574571357]
+    },
+    {
+      "name": "COMP   HIGH  SCH  I & II, AYEDE  COMP . HIGH  SCH",
+      "coordinates": [5.193490235322946, 7.264242220195034]
+    }
+  ],
+  "": [
+    {
+      "name": "IREBAMI   POLLING   UNIT",
+      "coordinates": [5.1561254834252, 7.266432206388241]
+    },
+    {
+      "name": "OLADIMEJI   CAMPI  IJAYE  1 & II, CHIEF  AROS  HOUSE",
+      "coordinates": [5.231480858487452, 7.206051166856654]
+    },
+    {
+      "name": "IGBOMOBA/   AYET ORO,  EBENEZER    PR Y SCH",
+      "coordinates": [5.244088348449709, 7.260125223081786]
+    },
+    {
+      "name": "ERINW A I, I| & III/ABA  IJEBU  ST . DANIELS   PR Y SCH",
+      "coordinates": [5.214098906047465, 7.262940630693429]
+    },
+    {
+      "name": "AGAMO/OSEY   ABU/  CAMP , OOGA   AT AGAMO   MARKET",
+      "coordinates": [5.209483233374228, 7.247781711788619]
+    },
+    {
+      "name": "ST  JOHNS  PR Y.",
+      "coordinates": [5.218052936125647, 7.223916123769059]
+    },
+    {
+      "name": "OKEBODI/   EYEJERO/   ALAMO   GRAM.  SCH.,  ALAMO   GRAM.  SCHOOL",
+      "coordinates": [5.20629263297326, 7.242989528040076]
+    },
+    {
+      "name": "ASEBUEYE/   FATUTU/  AYET ORO  JUNCTION,",
+      "coordinates": [5.196140764460536, 7.224168798503764]
+    },
+    {
+      "name": "OKE-OORE    MKT/  MARIY AN/OPOKITI   HOUSE,   MARKET   PLACE",
+      "coordinates": [5.231631262300527, 7.224768787094548]
+    },
+    {
+      "name": "LOCAL  AUTHORITY",
+      "coordinates": [5.2468964239101314, 7.200781630611515]
+    },
+    {
+      "name": "IMAFON   I|",
+      "coordinates": [5.232392714041804, 7.2905548586445095]
+    },
+    {
+      "name": "OBA TEDO,  AT OBA TEDO",
+      "coordinates": [5.215776954942897, 7.261331566061688]
+    },
+    {
+      "name": "AGO  DADA,  OPEN  SP ACE  AT AGO  DADA",
+      "coordinates": [5.216910119183538, 7.262297614389277]
+    },
+    {
+      "name": "ISAGBA,  AT ISAGBA",
+      "coordinates": [5.205659201669034, 7.210653056924075]
+    },
+    {
+      "name": "ILEYO/ILEYO",
+      "coordinates": [5.2255578844101915, 7.295084755417283]
+    },
+    {
+      "name": "AGO  STEPHEN/   MALA  TO,  AT AGO  STEPHEN",
+      "coordinates": [5.155929196515861, 7.276517628966699]
+    },
+    {
+      "name": "AGO  ADA,  AT AGO  ADA",
+      "coordinates": [5.241094173079466, 7.294224980379019]
+    },
+    {
+      "name": "FAMILUGBA,   AT AJEGUNLE",
+      "coordinates": [5.232043329129219, 7.249377434253211]
+    },
+    {
+      "name": "FAMILUGBA,   AT BOLORUNDURO",
+      "coordinates": [5.190050586555844, 7.243701499709916]
+    },
+    {
+      "name": "FAMILUGBA,   AT FAMILUGBA",
+      "coordinates": [5.235028033275725, 7.285113153630754]
+    },
+    {
+      "name": "TEDIBOMI   ALA,  AT ALA  MA TERNITY",
+      "coordinates": [5.189334429948599, 7.26180389665532]
+    },
+    {
+      "name": "OLOBI,  ST  PETERS   PR Y SCH",
+      "coordinates": [5.1549007148327695, 7.266239718491734]
+    },
+    {
+      "name": "OLOMODUDAN/AGO      PANU,  L.A PR Y SCH  AGO  PANU",
+      "coordinates": [5.2453315470319675, 7.224759323638034]
+    },
+    {
+      "name": "ILADO,  AT ILADO",
+      "coordinates": [5.15769658090786, 7.290545584850349]
+    },
+    {
+      "name": "KOJOLA,   ST  PAULS  PR Y SCH",
+      "coordinates": [5.196212908742742, 7.265420142702028]
+    },
+    {
+      "name": "ADEJUBU/L.A.    PR Y.",
+      "coordinates": [5.210605429743892, 7.200348911519433]
+    },
+    {
+      "name": "IGUSIN,  AT IGUSIN",
+      "coordinates": [5.209547663147273, 7.20451305584558]
+    },
+    {
+      "name": "IMAFON,   AT IMAFON",
+      "coordinates": [5.2423610229608855, 7.23640913734159]
+    },
+    {
+      "name": "AYET OT O STREET   II",
+      "coordinates": [5.2388704931769885, 7.2262400382388225]
+    },
+    {
+      "name": "AJEGUNLE    III, ASEPERIS   HOUSE",
+      "coordinates": [5.207172641007803, 7.280119531495066]
+    },
+    {
+      "name": "TOWN  HALL  1 & II, INFRONT   OF  TOWN  HALL  BUILDING",
+      "coordinates": [5.24349458018311, 7.265708911020438]
+    },
+    {
+      "name": "OKE  IGBALA   I & II, AKINWUMIS    HOUSE",
+      "coordinates": [5.220083603218347, 7.28876103927981]
+    },
+    {
+      "name": "IDERA  ST . 1 & I MA TERNITY  , IN  FRONT  OF  TOLUW  AS  HOUSE",
+      "coordinates": [5.249140896518159, 7.238891866233387]
+    },
+    {
+      "name": "MOT OR  PARK  III, AJEGUNLE    | & I| TOWN  HALL  AREA,  NEAR  OLAS  HOUSE",
+      "coordinates": [5.150398688898044, 7.255538702776767]
+    },
+    {
+      "name": "MOT OR  PARK  I!!, AJEGUNLE    I & II TOWN  HALL  AREA,  IN  FRONT  OF  OLAS",
+      "coordinates": [5.16406090907682, 7.2663402098690195]
+    },
+    {
+      "name": "MOT OR  PARK  I & II, NEAR  MOT OR  PARK",
+      "coordinates": [5.218788204348395, 7.226473579273387]
+    },
+    {
+      "name": "OROJUDA",
+      "coordinates": [5.1801626226705215, 7.281454564787209]
+    },
+    {
+      "name": "JEGELE",
+      "coordinates": [5.234590632886766, 7.205178398682718]
+    },
+    {
+      "name": "OPPOSITE   SAM  KA Y",
+      "coordinates": [5.21828977002398, 7.241740378694969]
+    },
+    {
+      "name": "OPPOSITE",
+      "coordinates": [5.161536151248118, 7.21990209775903]
+    },
+    {
+      "name": "ODOFIN   AVENUE",
+      "coordinates": [5.202707050974032, 7.249372605286704]
+    },
+    {
+      "name": "AGBEJA   POLLING   UNIT",
+      "coordinates": [5.227345822896831, 7.264040414778579]
+    },
+    {
+      "name": "MODULOORE",
+      "coordinates": [5.208801837352908, 7.2943016717489435]
+    },
+    {
+      "name": "GLOR Y LAND",
+      "coordinates": [5.24008724177866, 7.288364333186397]
+    },
+    {
+      "name": "UGELE",
+      "coordinates": [5.22205860325356, 7.262205607983733]
+    },
+    {
+      "name": "IGOBA",
+      "coordinates": [5.164051094107542, 7.268682545823068]
+    },
+    {
+      "name": "GADSON   EST ATE",
+      "coordinates": [5.240335411808341, 7.231363759766378]
+    },
+    {
+      "name": "PALACE  AREA/  MARKET   AREA.  AIISINIGBO   MARKET",
+      "coordinates": [5.204820887604248, 7.2218390405586534]
+    },
+    {
+      "name": "ODUDU/ILADO    1 & 11,",
+      "coordinates": [5.151442901787399, 7.281283860451624]
+    },
+    {
+      "name": "ABUSORO/",
+      "coordinates": [5.2359390902660055, 7.272270350653867]
+    },
+    {
+      "name": "ABA  ASAKIN/OKE    OGE/AGO   MILLA,  AT OKE  OGE",
+      "coordinates": [5.172629490230106, 7.214978941773614]
+    },
+    {
+      "name": "ABA  ASAKIN/OKE    OGE  /AGO  MILLA,  ABA  ASAKIN",
+      "coordinates": [5.223214963741583, 7.27997658043379]
+    },
+    {
+      "name": "OSI VILLAGE,   AT OSI VILLAGE",
+      "coordinates": [5.193068488395654, 7.248663127946338]
+    },
+    {
+      "name": "ST  MA THEWS  I & I| AGBAAKIN,   ST  MA THEWS  PR Y SCH",
+      "coordinates": [5.228869950380464, 7.231326833501374]
+    },
+    {
+      "name": "AKINREMI   EST ATE, AKINREMI   HOUSE",
+      "coordinates": [5.249980584300759, 7.248858200236571]
+    },
+    {
+      "name": "COMMUNITY    PRIMAR  Y SCHL,  ILU  DAADA",
+      "coordinates": [5.168478922586597, 7.268900420633536]
+    },
+    {
+      "name": "TEDIBOMI   ALA  II",
+      "coordinates": [5.23514503899557, 7.248128591668694]
+    },
+    {
+      "name": "COMPREHENSIVE",
+      "coordinates": [5.214140539707467, 7.204783781568837]
+    },
+    {
+      "name": "IRADO",
+      "coordinates": [5.2018672513322315, 7.2273227444846855]
+    },
+    {
+      "name": "OKE  IYANU/OKE-BOLA/ABAIP     ANISALA/",
+      "coordinates": [5.2050602966026736, 7.2477153507562155]
+    },
+    {
+      "name": "ODUNDUN,    AT ADEGBITES   HOUSE",
+      "coordinates": [5.163492408438534, 7.2931859504600265]
+    },
+    {
+      "name": "ABA  ALIMI,  AT ALIMIS   HOUSE",
+      "coordinates": [5.169490278402685, 7.212028394025164]
+    },
+    {
+      "name": "ABA  OSOLO,   AT OSOLOS   HOUSE",
+      "coordinates": [5.171213125482661, 7.296611354895307]
+    },
+    {
+      "name": "ST  JAMES  PR Y SCH/  ASAMO/ISALE    ABEBI/",
+      "coordinates": [5.163252319053721, 7.205877671301745]
+    },
+    {
+      "name": "AFOLABI   OLOGUN/   PETER  OJADUA/IRADO/    MISSION   RD,  AT AFOLABI",
+      "coordinates": [5.217998033299616, 7.2976264338493975]
+    },
+    {
+      "name": "OP ARA  SA WMILL",
+      "coordinates": [5.17870605215259, 7.278359003337066]
+    },
+    {
+      "name": "BOLORUNDURO     IV",
+      "coordinates": [5.216077160803931, 7.212120146997558]
+    },
+    {
+      "name": "ILU  ABO  V",
+      "coordinates": [5.215255941480862, 7.218164546447104]
+    },
+    {
+      "name": "ALA YERE,  AT ALA YERE",
+      "coordinates": [5.240741351041728, 7.245645725602724]
+    },
+    {
+      "name": "BOLORUNDURO     I| & III, AT BOLORUNDURO     II",
+      "coordinates": [5.196264258201837, 7.286674717136575]
+    },
+    {
+      "name": "BOLORUNDURO     I, AT BOLORUNDURO     I",
+      "coordinates": [5.2451304203772295, 7.253211237662671]
+    },
+    {
+      "name": "ELEYEWO   III & IV, AT ELEYEWO",
+      "coordinates": [5.211471523843194, 7.226709821811637]
+    },
+    {
+      "name": "ELEYEWO   II, L.A PR Y SCH",
+      "coordinates": [5.154744694358119, 7.236725002863571]
+    },
+    {
+      "name": "ELEYEWO   I, AT ODO  ALA",
+      "coordinates": [5.20546838932421, 7.224733727306049]
+    },
+    {
+      "name": "ILUABO   IV, AT ILUABO   IV",
+      "coordinates": [5.172229675032767, 7.297367111403656]
+    },
+    {
+      "name": "ILUABO   III, AT ILUABO   111",
+      "coordinates": [5.229563992937462, 7.2536133084872905]
+    },
+    {
+      "name": "ILUABO   I & II, L.A PR Y SCH",
+      "coordinates": [5.216887574584674, 7.205535832642066]
+    },
+    {
+      "name": "AYET ORO  POLLING   UNIT",
+      "coordinates": [5.2427614176639885, 7.295996025981572]
+    },
+    {
+      "name": "ODE  POLLING   UNIT",
+      "coordinates": [5.228890512399751, 7.294174336354252]
+    },
+    {
+      "name": "ODUDU",
+      "coordinates": [5.192252453494409, 7.2079903027317656]
+    },
+    {
+      "name": "OKE  ERI/CHURCH    AVENUE  POLLING   UNIT",
+      "coordinates": [5.219567249752914, 7.22459038825139]
+    },
+    {
+      "name": "OKE  ERI II",
+      "coordinates": [5.223561362818173, 7.232621656330357]
+    },
+    {
+      "name": "UT AMO/  EDU/SHASHA",
+      "coordinates": [5.202019863380273, 7.212285333622149]
+    },
+    {
+      "name": "BECKY  PARKER",
+      "coordinates": [5.20614796890976, 7.203741008964985]
+    },
+    {
+      "name": "ITA OLOBA  I, FIRST  GA TE",
+      "coordinates": [5.171526496454428, 7.287497023950136]
+    },
+    {
+      "name": "OWODE   CAMP , AT OWODE",
+      "coordinates": [5.156948307287123, 7.239111072429335]
+    },
+    {
+      "name": "MA TERNITY   II,",
+      "coordinates": [5.158567071621516, 7.203918594115815]
+    },
+    {
+      "name": "MA TERNITY   I, AT MA TERNITY",
+      "coordinates": [5.167611853154961, 7.241559499013775]
+    },
+    {
+      "name": "OPP . OSRC",
+      "coordinates": [5.176047191737054, 7.2628556717003905]
+    },
+    {
+      "name": "OSRC  1, & i,",
+      "coordinates": [5.224786954099, 7.259287625062567]
+    },
+    {
+      "name": "NT A ROAD,  AT AGUDAS   HOUSE",
+      "coordinates": [5.181566470963632, 7.242789808158786]
+    },
+    {
+      "name": "OLOBA  JUNCTION,   AT OLOBA  JUNCTION",
+      "coordinates": [5.157784676019549, 7.271757549558018]
+    },
+    {
+      "name": "OKE  IGELE,  ST  PAULS  PR Y SCH",
+      "coordinates": [5.245824549866217, 7.22403535367218]
+    },
+    {
+      "name": "SECOND   GA TE, AT SECOND   GA TE",
+      "coordinates": [5.186838966284749, 7.282055546100279]
+    },
+    {
+      "name": "FIRST  GA TE, AT FIRST  GA TE",
+      "coordinates": [5.169368458017691, 7.241832302852405]
+    },
+    {
+      "name": "ADAMOLEKUN     1 & II/ WEMA   BANK   & II, AT CHIEF  ADAMOLEKUNS     HOUSE",
+      "coordinates": [5.239552865727217, 7.205900017432743]
+    },
+    {
+      "name": "CHIEF  OYINLOLA    I & II, AT CHIEF  OYINLOLA    HOUSE",
+      "coordinates": [5.243923033730693, 7.203958486042701]
+    },
+    {
+      "name": "ST  MA THEW   III, ST",
+      "coordinates": [5.2272746046792795, 7.261780838877087]
+    },
+    {
+      "name": "ST  MA THEW   I/II, ST",
+      "coordinates": [5.204115426405165, 7.269633757030737]
+    },
+    {
+      "name": "C.A.C  COMM   I/II/III OKE  ATAP ARA  AREA,  C.A.C.  PR Y SCH",
+      "coordinates": [5.217556323365905, 7.201174822253923]
+    },
+    {
+      "name": "OMOLEWO    ROAD   I, I & III, AT OMOLEWO    RD  11",
+      "coordinates": [5.200200931289546, 7.248004541782631]
+    },
+    {
+      "name": "IKERE  RD.  1 & 11, AT OLOT AS  HOUSE",
+      "coordinates": [5.184915689401291, 7.253752701915219]
+    },
+    {
+      "name": "POST  OFFICE/",
+      "coordinates": [5.233310450980158, 7.267181104189263]
+    },
+    {
+      "name": "ST  ANTHONY   1 & II, ILORO  ST/IRESE   RD,  AT ST",
+      "coordinates": [5.217221929101493, 7.239849091728348]
+    },
+    {
+      "name": "ROTIMI   ST/KELE  ST ORE/OWODE,    GABRIEL   OLOGUNS   HOUSE",
+      "coordinates": [5.224080068613194, 7.261851243128263]
+    },
+    {
+      "name": "C.A.C  PR Y. SCH.  I & II, C.A.C  PR Y SCH",
+      "coordinates": [5.2079621474439906, 7.249860779770662]
+    },
+    {
+      "name": "L.A.  PR Y. SCH.  I & II,",
+      "coordinates": [5.184721848648763, 7.204105983733507]
+    },
+    {
+      "name": "OKE  IJIGBO  III",
+      "coordinates": [5.205728614614966, 7.281378597124015]
+    },
+    {
+      "name": "OKE  BOLA,  AT OKE  ROLA",
+      "coordinates": [5.151769122510127, 7.229180122367207]
+    },
+    {
+      "name": "ALA YERE/ALAROYE,    AT ALA YERE",
+      "coordinates": [5.163169838227004, 7.224739175354104]
+    },
+    {
+      "name": "ABUSORO,   AT ABUSORO",
+      "coordinates": [5.205198754590091, 7.253224832873558]
+    },
+    {
+      "name": "K&S/COOP/",
+      "coordinates": [5.192131619539096, 7.255726939982439]
+    },
+    {
+      "name": "ABA  EGBIRA/OPP    COOP , AT ABA  EGBIRA   CAMP",
+      "coordinates": [5.20822491022178, 7.251864795466142]
+    },
+    {
+      "name": "ODO  ULE/",
+      "coordinates": [5.164806878866114, 7.271295650643154]
+    },
+    {
+      "name": "ODO-OJA,   AT OGBOLUS   MARKET",
+      "coordinates": [5.18498628911363, 7.267118225761658]
+    },
+    {
+      "name": "BREEDERS",
+      "coordinates": [5.2021681635179045, 7.237936658568713]
+    },
+    {
+      "name": "ITA OLOBA  II, HOUSING   EST ATE",
+      "coordinates": [5.2217107218635155, 7.242177516940092]
+    },
+    {
+      "name": "OKE  UGELE/   ODOPETU",
+      "coordinates": [5.170781806605996, 7.278211320393507]
+    },
+    {
+      "name": "AGO  AKURE,   ST  PATRICKS   PR Y SCH",
+      "coordinates": [5.20841417130083, 7.247053855913381]
+    },
+    {
+      "name": "APONMU,   APONMU   COMM.  HIGH  SCH",
+      "coordinates": [5.15926326821827, 7.275191273424267]
+    },
+    {
+      "name": "IWOYE  CAMP , ST  STEPHENS   PR Y SCH",
+      "coordinates": [5.187291876467058, 7.21168335425377]
+    },
+    {
+      "name": "OP A IWOYE,   AT AYET OROS  HOUSE",
+      "coordinates": [5.210414609880914, 7.203877178367751]
+    },
+    {
+      "name": "OLOKUT  A,  AT OLOKUT  A JUNCTION",
+      "coordinates": [5.232517705133553, 7.260115361708608]
+    },
+    {
+      "name": "ALADODO   CAMP , IN  FRONT  OF  TIFASES  HOUSE",
+      "coordinates": [5.21256100666367, 7.293446786975726]
+    },
+    {
+      "name": "MILE  13, IN  FRONT  OF  AYODELES   HOUSE",
+      "coordinates": [5.212773962721235, 7.265709947383082]
+    },
+    {
+      "name": "AGO  OBE  - IN  FRONT  OF  OBES  HOUSE",
+      "coordinates": [5.17071866058471, 7.267818506299532]
+    },
+    {
+      "name": "ITA ONIY AN/ADUN,   ST . CARMELS   R.C.M  PR Y SCH",
+      "coordinates": [5.22502917169107, 7.2923140937821005]
+    },
+    {
+      "name": "OKE  AGBE  CAMP   - IN  FRONT  OF  OLUWUNMIS",
+      "coordinates": [5.204147318395937, 7.201142265586059]
+    },
+    {
+      "name": "LISA  CAMP , IN  FRONT  OF  FADAHUNSIS    HOUSE",
+      "coordinates": [5.173565600912247, 7.23317084147638]
+    },
+    {
+      "name": "OLOUNT  A/  OMOLOJU   CAMP , AT OLOUNT  A/  OMOLOJU",
+      "coordinates": [5.206705229189216, 7.278564293759511]
+    },
+    {
+      "name": "OGBESE   ABODI  / CAMP , AT ABODI  OGBESE   CAMP",
+      "coordinates": [5.180326763220878, 7.2584632373240145]
+    },
+    {
+      "name": "TEMIDIRE   VILLAGE/   OGBESE,   AT ATEWOLO-GUN     CAMP",
+      "coordinates": [5.229792713666863, 7.2467476449740165]
+    },
+    {
+      "name": "AGUNLA/ISERI    I/ OKE-  IJU,  OPEN  SP ACE  NEAR  OBAS  MARKET",
+      "coordinates": [5.2181743202422135, 7.209991558011864]
+    },
+    {
+      "name": "ISOLU  CAMP/  ARESUN,   OPP  BAPTIST  CHURCH",
+      "coordinates": [5.229492855295764, 7.2381968002232195]
+    },
+    {
+      "name": "ARAOYINBO    1 & II/ AGUNLA   ISERI  11, AT IBIT OYES  HOUSE",
+      "coordinates": [5.160383258563508, 7.204228575555999]
+    },
+    {
+      "name": "OPTIMCUM    CENTRE",
+      "coordinates": [5.173846407709151, 7.2553452207665]
+    },
+    {
+      "name": "OPTICUM   CENTRE/   ST  MICHAEL   AREA  I & II, ST  MICHAELS    PR Y. SCH.",
+      "coordinates": [5.169091171155955, 7.255903807269663]
+    },
+    {
+      "name": "IJIGBO  1 & II, INFRONT   OF  JOHN  ADEBA YOS  HOUSE",
+      "coordinates": [5.18483779131806, 7.283620624701742]
+    },
+    {
+      "name": "OJUGBESE   1 & II/ST STEPHEN   |I & III, AT CHIEF  ALAJES   HOUSE",
+      "coordinates": [5.184757105675937, 7.234859524202165]
+    },
+    {
+      "name": "NEW  TOWN",
+      "coordinates": [5.187793393421492, 7.265616448514179]
+    },
+    {
+      "name": "LOCAL  GOVERNMENT     ST AFF  TRAINING",
+      "coordinates": [5.166570249184306, 7.245705064489997]
+    },
+    {
+      "name": "MOFOS   HOUSE/   FADELE  CAMP , AT MOFOS   HOUSE",
+      "coordinates": [5.201054450214458, 7.209849360881515]
+    },
+    {
+      "name": "ST  JOHN/MAR  Y",
+      "coordinates": [5.240553818895558, 7.2500148547602485]
+    },
+    {
+      "name": "AJIPOWO,   BESIDE   RCCC  JUNCTION   II",
+      "coordinates": [5.155861698148541, 7.203876512414051]
+    },
+    {
+      "name": "AJPOWO,   BESIDE   RCCC  JUNCTION   I",
+      "coordinates": [5.2021212824360035, 7.260594291889372]
+    },
+    {
+      "name": "AGUNLOYE,    BESIDE   ADEDEWE   PR Y SCH",
+      "coordinates": [5.244368360971216, 7.257917887447588]
+    },
+    {
+      "name": "OLD  EMPREM   HOTEL",
+      "coordinates": [5.2316911979507115, 7.275397361607453]
+    },
+    {
+      "name": "HONEY   MOON,",
+      "coordinates": [5.150569674888532, 7.2106565480765585]
+    },
+    {
+      "name": "DANJUMA,    BESIDE   OLD  CUST OM  HOUSE",
+      "coordinates": [5.154285326662372, 7.229241029215675]
+    },
+    {
+      "name": "SACRED   HEAR T, SACRED   HEAR T PR Y SCH  II",
+      "coordinates": [5.204684747750816, 7.262060640694682]
+    },
+    {
+      "name": "SACRED   HEAR T, SACRED   HEAR T PR Y SCH  I",
+      "coordinates": [5.159474880436395, 7.203010583793221]
+    },
+    {
+      "name": "SACRED   HEAR T,",
+      "coordinates": [5.168965735971695, 7.208781588522724]
+    },
+    {
+      "name": "ARMY   PR Y SCH,  ARMY   HIGH  SCH  II",
+      "coordinates": [5.19214766791057, 7.299628351348296]
+    },
+    {
+      "name": "ARMY   PR Y SCH,  ARMY   HIGH  SCH  I",
+      "coordinates": [5.246030859351443, 7.277991215291253]
+    },
+    {
+      "name": "COOP  CONSUMER,    OPP  COOP  MOTEL",
+      "coordinates": [5.241700486900343, 7.249323109361813]
+    },
+    {
+      "name": "FANIBI  LA YOUT , FANIBI  LA YOUT",
+      "coordinates": [5.164711321756531, 7.282143703419804]
+    },
+    {
+      "name": "FANIBI  LA YOUT , FANIBI  LA YOUT",
+      "coordinates": [5.162699052441127, 7.274885264426883]
+    },
+    {
+      "name": "IREAKARI   PR Y SCH,  IREAKARI   PR Y SCH",
+      "coordinates": [5.175149699785201, 7.285364666848618]
+    },
+    {
+      "name": "TEMIDA  YO  II, BESIDE   THE  HOSPIT AL",
+      "coordinates": [5.221689968552944, 7.25939103378337]
+    },
+    {
+      "name": "TEMIDA  YO  I, BESIDE   THE  HOSPIT AL",
+      "coordinates": [5.248697967704543, 7.283766519743415]
+    },
+    {
+      "name": "ADUN   COMMUNITY    HIGH  SCHOOL   APONMU",
+      "coordinates": [5.160226885039339, 7.267748600603254]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER   IDI MANGO   TREE,  APONMU",
+      "coordinates": [5.190015934346799, 7.2636472712122275]
+    },
+    {
+      "name": "AKOBO,   AT AKOBO   CAMP",
+      "coordinates": [5.210120714449884, 7.29385847099334]
+    },
+    {
+      "name": "AKOBO,   AT AKOBO   JUNCTION",
+      "coordinates": [5.197685897216937, 7.212050419648365]
+    },
+    {
+      "name": "AGO  MA TTEW , IN  FRONT  OF  MA TTEWS  HOUSE",
+      "coordinates": [5.179379459045729, 7.259286081188425]
+    },
+    {
+      "name": "PILOT  SA WMILL,   PILOT  PR Y SCH",
+      "coordinates": [5.185411951515604, 7.286593604151532]
+    },
+    {
+      "name": "AJEGUNLE,   ST  MICHAELS    PR Y SCH",
+      "coordinates": [5.165901032865095, 7.213560982315812]
+    },
+    {
+      "name": "TIPPER  GARAGE",
+      "coordinates": [5.177946422969203, 7.268860920997942]
+    },
+    {
+      "name": "ISIKAN  ROUNDABOUT     CAR  PARK",
+      "coordinates": [5.213837128285436, 7.259250645359269]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   MEDICAL   CENTRE   OWENA",
+      "coordinates": [5.2278047977316175, 7.209728111892352]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   BA YDUK   FILLING  ST ATION,  ADEJUYIGBE    JUNCTION,",
+      "coordinates": [5.228809181889586, 7.234713143440008]
+    },
+    {
+      "name": "MECHANIC    VILLAGE,   IYANGE  OFF  ONDO   ROAD",
+      "coordinates": [5.24538094637697, 7.255927003836021]
+    },
+    {
+      "name": "FANIBI  COMMUNITY    PRIMAR  Y SCHOOL   FANIBI",
+      "coordinates": [5.208705455549328, 7.290628416231364]
+    },
+    {
+      "name": "FANIBI  JUNCTION",
+      "coordinates": [5.179745130619616, 7.269648799860123]
+    },
+    {
+      "name": "MECHANIC",
+      "coordinates": [5.181594051036445, 7.204484593359615]
+    },
+    {
+      "name": "TEMIDA  YO  III ST",
+      "coordinates": [5.1944445342539645, 7.287766393795897]
+    },
+    {
+      "name": "OWONIF  ARI,  OWONIF  ARI  HOTEL  AREA",
+      "coordinates": [5.166521337141666, 7.242968940707563]
+    },
+    {
+      "name": "OWONIF  ARI,  ISIKAN  MARKET",
+      "coordinates": [5.184185234950363, 7.21537807449158]
+    },
+    {
+      "name": "IRALEPO   PALACE,   ODI  OLOWO   STREET",
+      "coordinates": [5.235100712940811, 7.264342399228708]
+    },
+    {
+      "name": "IRALEPO   PALACE,   AT OGUNJOBIS   HOUSE",
+      "coordinates": [5.158835539732803, 7.202241462134451]
+    },
+    {
+      "name": "ERUOBA,   IN  FRONT  OF  FALADES   COMPOUND",
+      "coordinates": [5.2356099827305345, 7.206846153859119]
+    },
+    {
+      "name": "ERUOBA,   BESIDE   ALADE  PHOT O",
+      "coordinates": [5.235549344933911, 7.219247388649543]
+    },
+    {
+      "name": "ST  THOMAS   CHURCH,   CAR.  ST",
+      "coordinates": [5.153659483443416, 7.2417296588697235]
+    },
+    {
+      "name": "ST  THOMAS   CHURCH,   CAR.  ST  THOMAS   CHURCH   I",
+      "coordinates": [5.178470333475226, 7.291536313753881]
+    },
+    {
+      "name": "ST  THOMAS   CHURCH,   OPP  ST",
+      "coordinates": [5.210571173427798, 7.262180080898074]
+    },
+    {
+      "name": "IGBOYEGUN,    IGBOYEGUN    ONDO   ROAD",
+      "coordinates": [5.162935626949251, 7.2701459612558015]
+    },
+    {
+      "name": "IGBOYEGUN,    IGBOYEGUN/IGBEDE",
+      "coordinates": [5.17487952784633, 7.205712039585453]
+    },
+    {
+      "name": "ST  JOHN  PR Y SCH,  ST  JOHN  PR Y SCH  II",
+      "coordinates": [5.201735108839694, 7.275530897847336]
+    },
+    {
+      "name": "ST  JOHN  PR Y SCH,  ST  JOHN  PR Y SCH  I",
+      "coordinates": [5.247429755088431, 7.22806025757441]
+    },
+    {
+      "name": "TUTUGBUW   A 11/ TUTUGBUW   A /DANJUMA",
+      "coordinates": [5.236900964644589, 7.238548026795713]
+    },
+    {
+      "name": "TUTUGBUW   A 1/ TUTUGBUW   A /DANJUMA",
+      "coordinates": [5.150018697323582, 7.2685737380448]
+    },
+    {
+      "name": "OSABIYI  LA YOUT/  OSABIYI  LA YOUT",
+      "coordinates": [5.203306912559781, 7.239848050917995]
+    },
+    {
+      "name": "KISTEN   GARDEN,   ADEBOBAJOS    HOUSE",
+      "coordinates": [5.214436809838224, 7.2304985836334]
+    },
+    {
+      "name": "O/S BESIDE   IGBEDE",
+      "coordinates": [5.202976239318999, 7.218690321093588]
+    },
+    {
+      "name": "O/S BESIDE   45, IGBOYEGUN    STREET",
+      "coordinates": [5.212607855605582, 7.269785298168481]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.184558902434212, 7.21349734293422]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.172111199853459, 7.250721621288868]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.233901594548928, 7.219155925898027]
+    },
+    {
+      "name": "BESIDES",
+      "coordinates": [5.206530710693678, 7.299317826028554]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.1845431164238835, 7.2407955172749885]
+    },
+    {
+      "name": "ADEBOBAJO    STREET   JUNCTION",
+      "coordinates": [5.189639557068013, 7.220008742959382]
+    },
+    {
+      "name": "OLOOTU   JUNCTION",
+      "coordinates": [5.202742973945943, 7.271305309272486]
+    },
+    {
+      "name": "KOLA WOLE",
+      "coordinates": [5.236187998952722, 7.223311651224976]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER",
+      "coordinates": [5.247839247620694, 7.2832653665043985]
+    },
+    {
+      "name": "IYALAJE",
+      "coordinates": [5.193244318810394, 7.296836982328413]
+    },
+    {
+      "name": "AKAD   JUNCTION   AJIPOWO,   45  AJIPOWO",
+      "coordinates": [5.230552722275498, 7.272804834097521]
+    },
+    {
+      "name": "OPEN  SP ACE",
+      "coordinates": [5.241318014112378, 7.210663717198395]
+    },
+    {
+      "name": "CAC  GRAMMAR    SCHOOL,   ONDO   ROAD",
+      "coordinates": [5.183995141191042, 7.261303954500715]
+    },
+    {
+      "name": "BASIC  HEAL TH  CENTRE,   DANJUMA",
+      "coordinates": [5.248626664932373, 7.29004078123078]
+    },
+    {
+      "name": "OPEN  SP ACE  AT HOL Y SA WMILL.ORIRE",
+      "coordinates": [5.1804653305074515, 7.259159702692741]
+    },
+    {
+      "name": "CHAMPION",
+      "coordinates": [5.2244314061132275, 7.2731358129209305]
+    },
+    {
+      "name": "POLICE   QUAR TERS  -",
+      "coordinates": [5.230662014960161, 7.230321100735122]
+    },
+    {
+      "name": "POLICE   QUAR TERS  - BESIDE   POLICE   QUAR TERS",
+      "coordinates": [5.161800567176443, 7.25086565026259]
+    },
+    {
+      "name": "POLICE   QUAR TERS  - DR.  OLAGBA  YES  HOUSE",
+      "coordinates": [5.220551851713099, 7.292308609946826]
+    },
+    {
+      "name": "POLICE   QUAR TERS  - IN  FRONT  OF  OBADARES",
+      "coordinates": [5.212096111344811, 7.246593501399214]
+    },
+    {
+      "name": "AYETUTU,   C.A.C",
+      "coordinates": [5.170287621357314, 7.266478803922509]
+    },
+    {
+      "name": "AYETUTU   - C.A.C",
+      "coordinates": [5.228486284171378, 7.230278811802412]
+    },
+    {
+      "name": "AYETUTU   - C.A.C",
+      "coordinates": [5.191218891950955, 7.289797119822187]
+    },
+    {
+      "name": "AYETUTU   -",
+      "coordinates": [5.2252867220743315, 7.233043823808039]
+    },
+    {
+      "name": "METHODIST    PR Y SCH,  IN  FRONT  OF  MA YEGUNS   HOUSE",
+      "coordinates": [5.193921318373959, 7.2542398228758715]
+    },
+    {
+      "name": "METHODIST  , AYETUTU,   METHODIST    PR Y SCH",
+      "coordinates": [5.212943048964508, 7.245805162932169]
+    },
+    {
+      "name": "AYETUTU,   NA TIONAL   BANK,  ALBER T LANE",
+      "coordinates": [5.164992456409073, 7.288504877264927]
+    },
+    {
+      "name": "AYETUTU,   25",
+      "coordinates": [5.163501658454867, 7.221667312994484]
+    },
+    {
+      "name": "AYETUTU,   2 ILUYOS   HOUSE  AYETUTU",
+      "coordinates": [5.221587813294351, 7.2615831200150796]
+    },
+    {
+      "name": "O/S BESIDE   10",
+      "coordinates": [5.190395603664533, 7.202781393284762]
+    },
+    {
+      "name": "IRALEPO   CAR  PARK  BESIDE   IRALEPO   PALACE",
+      "coordinates": [5.189169609977101, 7.203933625407576]
+    },
+    {
+      "name": "O/S BESIDE",
+      "coordinates": [5.156106272307726, 7.233069482212818]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER   TREE  IN  FRONT  OF  MECHANIC    WORKSHOP",
+      "coordinates": [5.218541534936945, 7.20548898377543]
+    },
+    {
+      "name": "COMMUNITY    PR Y",
+      "coordinates": [5.180379151583902, 7.207068070181835]
+    },
+    {
+      "name": "TOKEM   JUNCTION",
+      "coordinates": [5.215086836011264, 7.23869278714137]
+    },
+    {
+      "name": "O/S BESIDE   IYA",
+      "coordinates": [5.226506731757843, 7.271622114758223]
+    },
+    {
+      "name": "CELESTIAL",
+      "coordinates": [5.178227551236194, 7.20805513114284]
+    },
+    {
+      "name": "O/S BESIDE   ST",
+      "coordinates": [5.174317037850371, 7.2552749612071965]
+    },
+    {
+      "name": "OPEN  SP ACE  AT BUSUYI   LANE  GBOGI",
+      "coordinates": [5.2163849821253825, 7.248603127136497]
+    },
+    {
+      "name": "METHODIST    PR Y",
+      "coordinates": [5.190228417748639, 7.253928069750079]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ODOFIN   LANE  JUNCTION",
+      "coordinates": [5.150646967361806, 7.291050505912607]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDECAC   ALABUNKUNFUN,     GBOGI",
+      "coordinates": [5.160480324266338, 7.229130895535206]
+    },
+    {
+      "name": "O/S BESIDE   OUK",
+      "coordinates": [5.153343002698678, 7.246125604506884]
+    },
+    {
+      "name": "IGUNSIN  CAMP",
+      "coordinates": [5.1720904923302085, 7.299435907606005]
+    },
+    {
+      "name": "FUT A GA TE  AKINDEKO    HALL",
+      "coordinates": [5.198832301097587, 7.208027396470401]
+    },
+    {
+      "name": "FUT A GA TE",
+      "coordinates": [5.226193884427711, 7.296412499219645]
+    },
+    {
+      "name": "ILOYIN  CAMP",
+      "coordinates": [5.179615387393937, 7.228633183081475]
+    },
+    {
+      "name": "AULE  CAMP",
+      "coordinates": [5.16980950015898, 7.282186115992044]
+    },
+    {
+      "name": "OYOTEDO,    OYOTEDO   CAMP",
+      "coordinates": [5.170168874371395, 7.28048625210507]
+    },
+    {
+      "name": "ILESA  ROAD",
+      "coordinates": [5.1841643154149875, 7.210218499950511]
+    },
+    {
+      "name": "ILESA  ROAD   -",
+      "coordinates": [5.199971795414095, 7.218642239407269]
+    },
+    {
+      "name": "ILESA  ROAD   - INSIDE",
+      "coordinates": [5.160790529982718, 7.21508077936298]
+    },
+    {
+      "name": "ILESA  ROAD   -",
+      "coordinates": [5.219911288603479, 7.235832421795888]
+    },
+    {
+      "name": "OPEN  SP ACE  AT KLUB  20  JUNCTION",
+      "coordinates": [5.231645188132603, 7.266987934813266]
+    },
+    {
+      "name": "OPEN  SP ACE  AT CASSA VA JUNCTION   FUT A",
+      "coordinates": [5.200152858760116, 7.291220147347849]
+    },
+    {
+      "name": "OPEN  SP ACE  AT",
+      "coordinates": [5.233982515921894, 7.23515709880205]
+    },
+    {
+      "name": "O/S AT ROAD   D6",
+      "coordinates": [5.1940146251266, 7.2980496224015585]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   AKARAKIRI'S   HOUSE",
+      "coordinates": [5.19524181224088, 7.226785836333642]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   MOMAK   HOSPIT AL  LAFE",
+      "coordinates": [5.197389184177667, 7.293609307374596]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDES  ADEGOROYES",
+      "coordinates": [5.186065815071513, 7.2985001613783265]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ILUYOMADE    HOUSE  AULE",
+      "coordinates": [5.161495554668172, 7.227159618119552]
+    },
+    {
+      "name": "INSIDE  MOJERE",
+      "coordinates": [5.185923677236898, 7.2191275168264255]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ST",
+      "coordinates": [5.161858456123993, 7.213876727620651]
+    },
+    {
+      "name": "OPEN  SP ACE  AT GBEMIGUN    JUNCTION   OFF",
+      "coordinates": [5.214305584520393, 7.282261871513574]
+    },
+    {
+      "name": "BAPTIST  HIGH  SCHOOL   II BANIRE   STREET",
+      "coordinates": [5.194325879482129, 7.256377803085269]
+    },
+    {
+      "name": "O/S BESIDE   NEP A",
+      "coordinates": [5.1706261044260575, 7.230639918863554]
+    },
+    {
+      "name": "SUBEB  PRIMAR  YSCHOOL   AGAGU   ROAD",
+      "coordinates": [5.20462858172448, 7.217477468681249]
+    },
+    {
+      "name": "O/S AT IYANGE",
+      "coordinates": [5.203865353081358, 7.232568632998862]
+    },
+    {
+      "name": "O/S BESIDE",
+      "coordinates": [5.238970996937273, 7.2252221775279235]
+    },
+    {
+      "name": "OPEN  SP ACE  AT DUDUYEMI    JUNCTION   OFF",
+      "coordinates": [5.185675879931278, 7.20600139703762]
+    },
+    {
+      "name": "O/S UNDER  THE  TREE  AT AYANFE  BLOCK",
+      "coordinates": [5.17765417834863, 7.251405511403697]
+    },
+    {
+      "name": "O/S BESIDE   SUR V.",
+      "coordinates": [5.19087198404615, 7.265789501984865]
+    },
+    {
+      "name": "IJAPO  - IJAPO",
+      "coordinates": [5.188161245797512, 7.23449625487065]
+    },
+    {
+      "name": "OKE-|JEBU/OSIKOTI",
+      "coordinates": [5.158954905975759, 7.251111480367827]
+    },
+    {
+      "name": "OKE-IJEBU   - FIBICO  HOTELS",
+      "coordinates": [5.245907417469628, 7.265637293282726]
+    },
+    {
+      "name": "OKE-IJEBU   - JAKOS  JUNCTION",
+      "coordinates": [5.202640127848464, 7.254130409244526]
+    },
+    {
+      "name": "OSISI  QUAR TERS  - OLA  JOMBO  HOUSE",
+      "coordinates": [5.167280314407431, 7.2487402729964225]
+    },
+    {
+      "name": "IÜOMU/OKE   İJEBU",
+      "coordinates": [5.168443025504182, 7.2124695576302855]
+    },
+    {
+      "name": "IJOMUJOKE   IJEBU",
+      "coordinates": [5.240214850905602, 7.297861311322166]
+    },
+    {
+      "name": "ST  STEPHENS   PR Y SCH  - ST  STEPHENS   PR Y",
+      "coordinates": [5.208507287901953, 7.214215452807217]
+    },
+    {
+      "name": "OBANLA   - BADAS  HOUSE",
+      "coordinates": [5.1787989530413725, 7.260603608681071]
+    },
+    {
+      "name": "AYET ORO  - AYET ORO  STREET   I",
+      "coordinates": [5.211208365245645, 7.203057394423985]
+    },
+    {
+      "name": "IJOMU",
+      "coordinates": [5.236659357307752, 7.252657760571985]
+    },
+    {
+      "name": "OBA  ADESIDA   RD  3, IGAN  STR  FRONT  OF  OK  ST ORES",
+      "coordinates": [5.228659499014664, 7.20721353634208]
+    },
+    {
+      "name": "OBA  ADESIDA   ROAD-IJU/IT  AOGBOLU,",
+      "coordinates": [5.212599213095484, 7.293798615560545]
+    },
+    {
+      "name": "OBANLA-C.S.S    BOOKSHOP",
+      "coordinates": [5.158309676223693, 7.262157890910973]
+    },
+    {
+      "name": "O/S UNDER  TREE  AT BACK   OF  CHICKEN   REPUBLIC   OLOKO",
+      "coordinates": [5.1955360919432465, 7.2131777247367594]
+    },
+    {
+      "name": "O/S AT EMBASSY",
+      "coordinates": [5.240856854677237, 7.298930164073745]
+    },
+    {
+      "name": "O/S UNDER  TREE  AT FUT A SECONDAR   Y SCHOOL",
+      "coordinates": [5.234301365902885, 7.212729182339369]
+    },
+    {
+      "name": "OPEN  SP ACE  AT BOLA  INTERNA  TIONAL",
+      "coordinates": [5.246345121134484, 7.266957835675666]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ROAD   F1  JUNCTION,   FUT A/  ILOYIN  ROAD",
+      "coordinates": [5.23490695583741, 7.26226720524328]
+    },
+    {
+      "name": "O/S AT FAYAN",
+      "coordinates": [5.21671906993158, 7.231031859353761]
+    },
+    {
+      "name": "O/S BESIDE",
+      "coordinates": [5.151266970785619, 7.262306934326809]
+    },
+    {
+      "name": "O/S AT BUNMI  CHIN",
+      "coordinates": [5.193812970232631, 7.2126555411542626]
+    },
+    {
+      "name": "O/S OPP  ONE  WITH  GOD  PR Y SCH  EDO  LODGE",
+      "coordinates": [5.218903820197839, 7.262435064446245]
+    },
+    {
+      "name": "UNDER  THE  TREE  BESIDE   RUBY'S   COUR T",
+      "coordinates": [5.209671641047105, 7.214593852075191]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   YOT OMI  GUEST  HOUSE",
+      "coordinates": [5.155844739455802, 7.286769084806827]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   OLAJUYIGBE'S    HOUSE",
+      "coordinates": [5.245076392427323, 7.213255416659]
+    },
+    {
+      "name": "ST . DA VID  PR Y",
+      "coordinates": [5.249697832242912, 7.234593743552501]
+    },
+    {
+      "name": "ST . DA VID  PR Y",
+      "coordinates": [5.249043295200714, 7.279035644879738]
+    },
+    {
+      "name": "ST . STEPHEN   PR Y",
+      "coordinates": [5.202953493367278, 7.2504299368127425]
+    },
+    {
+      "name": "OPEN  SP ACE  AT BESIDE   OBANLA'S   HOUSE",
+      "coordinates": [5.197426306954359, 7.2016958595605045]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP",
+      "coordinates": [5.22902242615977, 7.213741950601248]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   M & G PLAZA  ABIRIBI  LANE",
+      "coordinates": [5.184024336988062, 7.286130800336665]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.209382007737198, 7.208246119249264]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.165897473378292, 7.2037234964112535]
+    },
+    {
+      "name": "OPEN  SP ACEA T",
+      "coordinates": [5.23202283590298, 7.283564578967044]
+    },
+    {
+      "name": "ADO  ROAD-  AP",
+      "coordinates": [5.1748614041201195, 7.232219855041516]
+    },
+    {
+      "name": "IJAPO  -",
+      "coordinates": [5.157208530227082, 7.2477331530267985]
+    },
+    {
+      "name": "IJAPO  -",
+      "coordinates": [5.194342105012313, 7.224074844545939]
+    },
+    {
+      "name": "OPEN  SP ACE  AT T JUNCTION   ON  ILAJE  STREET  , JAPO",
+      "coordinates": [5.2189349261221505, 7.248350265244387]
+    },
+    {
+      "name": "OPEN  SP ACE  CLOSE  TO RECONCILIA   TION",
+      "coordinates": [5.235840308346475, 7.251912285370642]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER   THE  TREE  AT FAJUYI  STR T, IJAPO",
+      "coordinates": [5.22269915065594, 7.264572667815635]
+    },
+    {
+      "name": "OMONIYI",
+      "coordinates": [5.158719270043489, 7.280527935244854]
+    },
+    {
+      "name": "OPEN  SP ACE  AT T.JUNCTION   EKITI  AVENUE",
+      "coordinates": [5.173429668054332, 7.2185910817183405]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER   THE  TREE  AT FAJUYI  STR T, IJAPO",
+      "coordinates": [5.224740843166228, 7.28670009121393]
+    },
+    {
+      "name": "OMONIYI",
+      "coordinates": [5.17901377150283, 7.248292196962049]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.203706174852933, 7.272589427614478]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER",
+      "coordinates": [5.219130353589322, 7.240099255277846]
+    },
+    {
+      "name": "FLAGSHIP   || NEW",
+      "coordinates": [5.221169855290332, 7.216556834999383]
+    },
+    {
+      "name": "IJAPO  HIGH  SCHOOL",
+      "coordinates": [5.222421273248848, 7.271836282858136]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER   THE  TREE  AT CELESTIAL",
+      "coordinates": [5.160762151829807, 7.209516264072626]
+    },
+    {
+      "name": "ADEGBOLA",
+      "coordinates": [5.2355728206355545, 7.272991451296944]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER   THE  TREE  ADJACENT    ASO",
+      "coordinates": [5.182512905793459, 7.274728284707716]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.199755762395291, 7.294147480905359]
+    },
+    {
+      "name": "O/S AT IFELODUN   STR T JUNCTION   CMCM",
+      "coordinates": [5.175886986739633, 7.2914724515956015]
+    },
+    {
+      "name": "OPEN  SP ACE  AT LABONDY  , JUNCTION   ALAGBAKA",
+      "coordinates": [5.15234267428707, 7.251769997780776]
+    },
+    {
+      "name": "FIW ASA YE  GRAMMAR    SCHOOL",
+      "coordinates": [5.171944713065587, 7.278707269207632]
+    },
+    {
+      "name": "IJO MIMO   HIGH  SCH  - IJO MIMO   HIGH  SCH",
+      "coordinates": [5.1762591098971775, 7.268826630776033]
+    },
+    {
+      "name": "IJO MIMO   HIGH  SCH  - IJO MIMO   HIGH  SCH",
+      "coordinates": [5.200056662692659, 7.295732689187578]
+    },
+    {
+      "name": "ELEMULETU    PR Y SCH  -ELEMULETU    PR Y SCH  II",
+      "coordinates": [5.2228112495807855, 7.245663559521275]
+    },
+    {
+      "name": "ELEMULETU    PR Y SCH  -ELEMULETU    PR Y SCH  I",
+      "coordinates": [5.190511771742953, 7.2392118175925555]
+    },
+    {
+      "name": "IJOKA  COOP  ST ORE-  NEAR  SA WMILL  COOP  ST ORE",
+      "coordinates": [5.204191238868597, 7.24544227679746]
+    },
+    {
+      "name": "NEAR  IJOKA  COOP  ST ORE,  COOP  ST ORE",
+      "coordinates": [5.236645574601283, 7.280148091342276]
+    },
+    {
+      "name": "OLUW  ATUYI  HOUSE  - NEAR  OLUW  ATUYI  MARKET",
+      "coordinates": [5.218823846164224, 7.2779987673887465]
+    },
+    {
+      "name": "OLUW  ATUYI  RAINBOW   - NEAR  RAINBOW",
+      "coordinates": [5.203081055957754, 7.251250719497092]
+    },
+    {
+      "name": "ABIODUN   STREET   - AT ABIODUN   STREET",
+      "coordinates": [5.15125842938447, 7.219377293684284]
+    },
+    {
+      "name": "ABIODUN   STREET   - NEAR  ABIODUN   HOUSE",
+      "coordinates": [5.193981994805046, 7.231689755782196]
+    },
+    {
+      "name": "ALA  QUAR TERS  - SIJUW ADE  JUNCTION",
+      "coordinates": [5.224918748363192, 7.281714402909064]
+    },
+    {
+      "name": "ALA  QUAR TERS  - AT ALA  QUAR TERS",
+      "coordinates": [5.204185278538798, 7.266116950275461]
+    },
+    {
+      "name": "ODA  ROAD   - NEAR  LACOS  HOUSE",
+      "coordinates": [5.234287578923997, 7.279590343321065]
+    },
+    {
+      "name": "ALA  POLICE   ST ATION  - ALA  POLICE   ST ATION",
+      "coordinates": [5.241390140215584, 7.263745781742642]
+    },
+    {
+      "name": "SCHOOL   OF  NURSING   - NEAR  SCHOOL   OF  NURSING",
+      "coordinates": [5.222348073920745, 7.200714520135352]
+    },
+    {
+      "name": "MAGISTRA   TE  COUR T - MAGISTRA   TE  COUR T",
+      "coordinates": [5.192102237119888, 7.2121204744343865]
+    },
+    {
+      "name": "ALAGBAKA    PR Y SCH  - ALAGBAKA    PR Y SCH  II",
+      "coordinates": [5.21351926425659, 7.2861065108623055]
+    },
+    {
+      "name": "ALAGBAKA    PR Y SCH  - ALAGBAKA    PR Y SCH  I",
+      "coordinates": [5.232930805666895, 7.226586809520619]
+    },
+    {
+      "name": "COOP  TRAINING   - COOP  TRAINING   COMP   II",
+      "coordinates": [5.230731619540709, 7.200987775007792]
+    },
+    {
+      "name": "COOP  TRAINING   - COOP  TRAINING   COMP   I",
+      "coordinates": [5.196213191660072, 7.277728975323964]
+    },
+    {
+      "name": "NEAR  NEP A OFFICE   - VER TINAR Y CLINIC",
+      "coordinates": [5.175115322055984, 7.286057989904042]
+    },
+    {
+      "name": "NEAR  NEP A OFFICE   - WATER  CORPORA  TION",
+      "coordinates": [5.231391907985108, 7.254224337210574]
+    },
+    {
+      "name": "NEAR  NEP A OFFICE   - NEAR  NEP A OFFICE",
+      "coordinates": [5.241510859779488, 7.246852853032061]
+    },
+    {
+      "name": "HIGH  COUR T - NEAR  HIGH  COUR T",
+      "coordinates": [5.194582913422372, 7.231215117236684]
+    },
+    {
+      "name": "ILEMO  STREET   - NEAR  ODOFINS   HOUSE",
+      "coordinates": [5.164776827883158, 7.249044957769908]
+    },
+    {
+      "name": "ELEMO  STREET   - ELEMO  COMPOUND",
+      "coordinates": [5.215538519985799, 7.202254418918056]
+    },
+    {
+      "name": "AYET ORO  ST  II -  AYET ORO  STREET   II",
+      "coordinates": [5.2378060192602796, 7.252583016670309]
+    },
+    {
+      "name": "AYET ORO  ST  I -  AYET ORO  STREET   I",
+      "coordinates": [5.216314850333587, 7.261744212744247]
+    },
+    {
+      "name": "OKE  LISA  - LISAS  HOUSE",
+      "coordinates": [5.235028018039633, 7.2437272232094525]
+    },
+    {
+      "name": "EBENEZER    PR Y SCH-  EBENEZER    PR Y SCH  II",
+      "coordinates": [5.22523757264642, 7.206463273187088]
+    },
+    {
+      "name": "EBENEZER    PR Y SCH-  EBENEZER    PR Y SCH  I",
+      "coordinates": [5.204827168913733, 7.2046221716222485]
+    },
+    {
+      "name": "OBA  ILE ROAD   - MOBIL  PETROL   ST ATION",
+      "coordinates": [5.213002787299382, 7.296136301084521]
+    },
+    {
+      "name": "AGO  IRETI  - MOBIL  PETROL   ST ATION",
+      "coordinates": [5.221290490217606, 7.282729894137371]
+    },
+    {
+      "name": "AGO  IRETI  - NEAR  AGO  IRETI",
+      "coordinates": [5.210288875950702, 7.2329296134888414]
+    },
+    {
+      "name": "OPEN  SP ACE  AT IJIGBA  BUST OP  KAJOLA\"",
+      "coordinates": [5.173070681684545, 7.267945926073895]
+    },
+    {
+      "name": "ADEDIPE   OMOBOLANLE     COMM   PR Y SCH  ESURE  QTRS",
+      "coordinates": [5.1876952653148605, 7.231940684059099]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   JEHOV AH  WITNESS   HALL  ESURE  QTRS",
+      "coordinates": [5.180094069973628, 7.263583953096012]
+    },
+    {
+      "name": "OPEN  SP ACE  AT NEW  BASIC  HEAL TH  CENTRE   ESURE  QTRS",
+      "coordinates": [5.155799752021827, 7.220937679444218]
+    },
+    {
+      "name": "OPEN  SP ACE  AT PATAKO  LINE  ESURE  QTRS  IJOKA  RD",
+      "coordinates": [5.192109426382096, 7.2815523376468985]
+    },
+    {
+      "name": "IJO MIMO   JUNCTION   IJOKA  ROAD",
+      "coordinates": [5.209356674651811, 7.224261337754662]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ELEMULETU    GA TE  IJOKA  ROAD",
+      "coordinates": [5.1585832803968135, 7.223805625229034]
+    },
+    {
+      "name": "OPEN  SP ACE  AT DAMMY   BUS  ST OP  OGUNLEYE    STR T",
+      "coordinates": [5.2063941681768755, 7.219386936382417]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP  ENERGY   FILLING  ST ATION  OLUW  ATUYI",
+      "coordinates": [5.160669832763653, 7.29797451920746]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   EKO  REST AURANT   OLUW  ATUYI",
+      "coordinates": [5.2267343029712805, 7.224839948028861]
+    },
+    {
+      "name": "OPEN  SP ACE  AT AJOMOLE   SHOPPING   COMPLEX   OLA WATUYI",
+      "coordinates": [5.1743014302151265, 7.225926860874572]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OLUW  ATUYI  ROUND   ABOUT\\/  MARKET",
+      "coordinates": [5.155807109797067, 7.261614976908187]
+    },
+    {
+      "name": "ST  LUKE  PR Y SCHOOL   BEHIND   POLICE   QTRS",
+      "coordinates": [5.214854819588787, 7.223927374843152]
+    },
+    {
+      "name": "OPEN  SP ACE  AT RECREA  TION  CENTRE   ILULA  SIJUADE",
+      "coordinates": [5.17433032282651, 7.213384958298532]
+    },
+    {
+      "name": "OPEN  SP ACE  AT MERCY   STREET   JUNCTION   SIJUADE",
+      "coordinates": [5.2362152658002, 7.23041491889569]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ACHIEVER   HIGH  SCHOOL   SIJUADE",
+      "coordinates": [5.201605558250535, 7.264174928755408]
+    },
+    {
+      "name": "OPEN  SP ACE  AT YEW ANDE  AVENUE  ONI  GARRI  SIJUADE",
+      "coordinates": [5.175549609663898, 7.2362740693863286]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ODSPSGR&DEV    PROJECT   ALA  QTRS",
+      "coordinates": [5.181625378321554, 7.2084179405225575]
+    },
+    {
+      "name": "HEAL TH  TECH  BUS  ST OP  ODA  ROAD",
+      "coordinates": [5.232066675745808, 7.222253709915612]
+    },
+    {
+      "name": "OPEN  SP ACE  AT KAJOLA   ROUND   ABOUT   KAJOLA",
+      "coordinates": [5.199968125910119, 7.259713452411731]
+    },
+    {
+      "name": "OGO  OLUW  A PR Y SCHOOL   OLOGEDE",
+      "coordinates": [5.245148708749487, 7.27414930290049]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP  SEED  ROY AL  SCHOOL   AKINOLA   ST  TUNBITITI",
+      "coordinates": [5.15535957716275, 7.2082040829246266]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   SEEBA  SCH,  ALA  QTRS",
+      "coordinates": [5.208790043092763, 7.284828218890808]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ROAD   12  COUR T OF  APPEAL   EST ATE  ALAGBAKA",
+      "coordinates": [5.18657473857686, 7.272310721441325]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   UNITY  BANK   OBA  ADESIDA   ROAD",
+      "coordinates": [5.2455793463426215, 7.209615957556805]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP  WOTTS  GARDEN   ROUND   ABOUT   ALAGBAKA",
+      "coordinates": [5.194937323942407, 7.245373065400929]
+    },
+    {
+      "name": "OPEN  SP ACE  AT TUNDE  CA TER  ALAGBAKA    EXT",
+      "coordinates": [5.154504820384177, 7.275630531026506]
+    },
+    {
+      "name": "OPEN  SP ACE  AT SOLA  ALADESUYI   ALAGBAKA    EXT",
+      "coordinates": [5.20202849469717, 7.297395720484265]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ADEKUNLE    AJASIN   ROUND   ABOUT   NEP A",
+      "coordinates": [5.179985087011963, 7.263125346507476]
+    },
+    {
+      "name": "OPEN  SP ACE  UNDER   THE  TREE  TUNJI&TUNJI   NEP A MRKT",
+      "coordinates": [5.215977004728138, 7.268700972316854]
+    },
+    {
+      "name": "OPEN  SP ACE  AT AYEYEMI   STREET   OPP  BEULAH   ASSEMBL  Y",
+      "coordinates": [5.192519790566067, 7.228782597863685]
+    },
+    {
+      "name": "OPEN  SP ACE  AYEYEMI   JUNCTION   AYEYEMI",
+      "coordinates": [5.245978890583556, 7.249116854033873]
+    },
+    {
+      "name": "OPEN  SP ACE  BEHIND   TRIANGLE   ST ORE  IROMU",
+      "coordinates": [5.216709785944602, 7.218634935083777]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ORI  EGURU  OJA  OBA",
+      "coordinates": [5.2079721324668, 7.281129971647795]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   3 OKE  EMESO  OPP  BOREHOLE    VINNING   AREA",
+      "coordinates": [5.2215186883224645, 7.229497719572515]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   PUBLIC   BORE  HOLE  AYET ORO",
+      "coordinates": [5.194693651886641, 7.251772504677503]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   LEONAC   ELECTRONICS    OBA  ADESIDA   ROAD",
+      "coordinates": [5.1885421249304935, 7.28387693317384]
+    },
+    {
+      "name": "OPEN  SP ACE  AT GOLDEN   SCISSIOR   PLAZA  OFF  ARAKALE",
+      "coordinates": [5.242627610505418, 7.266665531635743]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP  COMMUNICA   TION  MASK,  AYEGUNLE",
+      "coordinates": [5.156874067651115, 7.241592838519848]
+    },
+    {
+      "name": "OPEN  SP ACE  AT LEONAC    JUNCTION    ALAGBAKA",
+      "coordinates": [5.221726793559579, 7.2175461213587475]
+    },
+    {
+      "name": "ARAKALE   - 92, ASAMOS   HOUSE",
+      "coordinates": [5.154184798570494, 7.289124590128839]
+    },
+    {
+      "name": "OPEN  SP ACE   AT OREOFE   STREET   JUNCTION    EMILORO",
+      "coordinates": [5.229073494255179, 7.2718070310215355]
+    },
+    {
+      "name": "OPEN  SP ACE  VICT OR Y ZONE   JUNCTION   AGBOT A",
+      "coordinates": [5.247881644462342, 7.227256086118062]
+    },
+    {
+      "name": "OPEN  SP ACE   AT ROAD   1 UNITY  EST ATE  JUNCTION   ODA",
+      "coordinates": [5.1586845375630235, 7.223722332899307]
+    },
+    {
+      "name": "T. JUNCTION   AT ROAD   G ALADESA  YE  CRESCENT    ODA",
+      "coordinates": [5.233337797210972, 7.286265337017375]
+    },
+    {
+      "name": "OPEN  SP ACE   AT IJOMU  COMMUNITY   , OGBE",
+      "coordinates": [5.211742089278749, 7.216188926870475]
+    },
+    {
+      "name": "OPEN  SP ACE  AT PREMIER   EST ATE  REGION   8 JUNCTION   OGUNBADEJO",
+      "coordinates": [5.188680391251751, 7.25941159945969]
+    },
+    {
+      "name": "OPEN  SP ACE   AT  AMACING   GRACE  BLOCK  INDUSTR  Y EMILORO",
+      "coordinates": [5.199713101053612, 7.218866691522712]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ROAD   'A' VINT AGE  EST ATE  AMUDUDU    OFF  ODA  ROAD",
+      "coordinates": [5.165483192519432, 7.204461458529926]
+    },
+    {
+      "name": "OPEN  SP ACE  AT  AA YE  PALACE  ROAD",
+      "coordinates": [5.2110764343618685, 7.2075376301776535]
+    },
+    {
+      "name": "OPEN  SP ACE  BY  COMMUNICA   TION  MASK   WELIWELI   ODA  ROAD",
+      "coordinates": [5.1706721838517975, 7.287241045398488]
+    },
+    {
+      "name": "OPEN  SP ACE  AT 3 ARAROMI   JUNCTION   PELEBE",
+      "coordinates": [5.213425671213952, 7.248146183089661]
+    },
+    {
+      "name": "T. JUNCTION   AT ROAD   3 ATIPERE",
+      "coordinates": [5.158751678593272, 7.2713110141255575]
+    },
+    {
+      "name": "IJIGBA  COMMUNITY    SECONDAR   Y  SCHOOL   ILEKUN   IJIGBA",
+      "coordinates": [5.203189646163803, 7.246689007777543]
+    },
+    {
+      "name": "AP AF A II NEAR  AP AF AS  COMP .",
+      "coordinates": [5.195196306617855, 7.202159976687783]
+    },
+    {
+      "name": "AP AF A I INFRONT   OF  OLUAP AF A 2",
+      "coordinates": [5.2192152113980566, 7.200074284803989]
+    },
+    {
+      "name": "OYEBODE   OLOGEDE   - AT OYEBODE   CAMP",
+      "coordinates": [5.234794138273056, 7.270999276859586]
+    },
+    {
+      "name": "EMILORO   - AT EMILORO   TOWN  HALL",
+      "coordinates": [5.200690357696801, 7.224390379461867]
+    },
+    {
+      "name": "ORUKA   EKAN  - AT ELEYIMI  CAMP",
+      "coordinates": [5.194579633348739, 7.226310920572602]
+    },
+    {
+      "name": "OLUGERE   ODA  IN  FRONT  OF  OLUGERE\\u2019S    HOUSE",
+      "coordinates": [5.206770120915041, 7.201884439102706]
+    },
+    {
+      "name": "OSIC  LANGBODO    CAMP   II - LAMGBODO    CAMP",
+      "coordinates": [5.204532592473304, 7.244139109806823]
+    },
+    {
+      "name": "ARAROMI   AJE  ODA  - IN  FRONT  OLU  ARAROMIS    HOUSE",
+      "coordinates": [5.210464782570144, 7.252805083817532]
+    },
+    {
+      "name": "OKE  MEJI  ODA  - OKE  MEJI  CAMP",
+      "coordinates": [5.182433855439349, 7.22039244369663]
+    },
+    {
+      "name": "OGBE  HIGH  SCH  I - OGBE  HIGH  SCH  ODA",
+      "coordinates": [5.242210873097068, 7.207215374209617]
+    },
+    {
+      "name": "ST  JAMES  ANG.  HIGH  SCH  - ST  JAMES  ANG.  HIGH  SCH",
+      "coordinates": [5.178784216916683, 7.272953632693202]
+    },
+    {
+      "name": "OGBE  HIGH  SCH  - OGBE  HIGH  SCH  ODA",
+      "coordinates": [5.1977700586128215, 7.27759306681437]
+    },
+    {
+      "name": "OKE  ILE STREET   - IN  FRONT  OF  CHIEF  ADEJIMIS   HOUSE",
+      "coordinates": [5.184723864850619, 7.2770271834846705]
+    },
+    {
+      "name": "ST  WILLIAMS   SCH  - ST  WILLIAMS   SCH",
+      "coordinates": [5.232866667039683, 7.2314789271568545]
+    },
+    {
+      "name": "ILEKUN   CAMP   - ILEKUN   MOT OR  PARK  AREA",
+      "coordinates": [5.183798547095791, 7.213479586234599]
+    },
+    {
+      "name": "OPEN  SP ACE   OPP . FIRST  LION  OF  JUDAH  OLORUNSOGO     STREET",
+      "coordinates": [5.176618440754295, 7.270385739214551]
+    },
+    {
+      "name": "BASIC  HEAL TH  CENTRE   YABA  ODOPETU",
+      "coordinates": [5.245525791748893, 7.252247744323218]
+    },
+    {
+      "name": "OPEN  SP ACE  AT MECHANIC    WORKSHOP    YABA",
+      "coordinates": [5.171140319675786, 7.230751350519824]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   14, OWODUNNI    STREET",
+      "coordinates": [5.150785536256976, 7.272935339904764]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OTUTUBIOSUN    STREET  , BEHIND   MAMA   GOLD",
+      "coordinates": [5.169102034019237, 7.294573382040818]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OTUTUBIOSUN    JUNCTION",
+      "coordinates": [5.1527699521789385, 7.235120303699882]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   65C  ODOPETU   II",
+      "coordinates": [5.248641750056313, 7.2277799141540235]
+    },
+    {
+      "name": "OPEN  SP ACE  ODIGE  JUNCTION",
+      "coordinates": [5.195408194513358, 7.297164431360932]
+    },
+    {
+      "name": "INSIDE  ODOPETU   MARKET",
+      "coordinates": [5.236208310196676, 7.265516329698684]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP  SAMMY   PLAZA  ARAKALE",
+      "coordinates": [5.2294123025821815, 7.282630964019433]
+    },
+    {
+      "name": "OPEN  SP ACE  INFRONT   OF  MAR VELOUS   PLAZA  ARAKALE",
+      "coordinates": [5.242902788026439, 7.2578005736334505]
+    },
+    {
+      "name": "OPEN  SP ACE  BEHIND   ECO  BANK   OKE  ARA TA STREET",
+      "coordinates": [5.211133358592369, 7.2743808478246015]
+    },
+    {
+      "name": "OPEN  SP ACE  IGISAN  JUNCTION   ARAKALE",
+      "coordinates": [5.235064122815587, 7.254108114933156]
+    },
+    {
+      "name": "OPEN  SP ACE  ODOPETU   MARKET   I IJEMIKIN",
+      "coordinates": [5.197225449026573, 7.241668930366696]
+    },
+    {
+      "name": "ARAKALE   CAR  PARK",
+      "coordinates": [5.17129807708822, 7.248703902163665]
+    },
+    {
+      "name": "IDIAGBA TITUN  - IREAKARI\\/14   EJIOBA  LANE",
+      "coordinates": [5.246039943391687, 7.261223671891059]
+    },
+    {
+      "name": "IDIAGBA TITUN  - 1A, TEMIDIRE",
+      "coordinates": [5.199105683325739, 7.281155260217004]
+    },
+    {
+      "name": "IDIAGBA TITUN  - 11, IBIKUNLE   LANE",
+      "coordinates": [5.18258068730513, 7.204134127166072]
+    },
+    {
+      "name": "IDIAGBA TITUN  - 35  IFELODUN   ST  AKURE",
+      "coordinates": [5.1543149599077465, 7.228924597238332]
+    },
+    {
+      "name": "IDIAGBA TITUN  -L.A  11 PR Y SCH",
+      "coordinates": [5.221412954494658, 7.242787613559397]
+    },
+    {
+      "name": "IDIAGBA TITUN  -31, FEMISORO,   MEDA  YESE  PR Y SCH",
+      "coordinates": [5.212975070076367, 7.282743132512153]
+    },
+    {
+      "name": "IDIAGBA TITUN  - 27A  AJEGUNLE    STREET  , AKURE",
+      "coordinates": [5.248490157539443, 7.237929130531274]
+    },
+    {
+      "name": "IDIAGBA TITUN  AT OWODUNNI    STREET   IN  FRONT  OF  CONT . HOTEL",
+      "coordinates": [5.216641517681525, 7.296981518226357]
+    },
+    {
+      "name": "IDIAGBA TITUN  - 43  OKE  PADRE  NEAR  LAO",
+      "coordinates": [5.175986272287122, 7.242204514091451]
+    },
+    {
+      "name": "IDIAGBA TITUN  - 1, OWODUNNI    STREET   DOWN   THE  STREET",
+      "coordinates": [5.20556226649382, 7.246805898536668]
+    },
+    {
+      "name": "IGBOLIKI   - 19  OTUTUBIOSUN",
+      "coordinates": [5.2013465357449595, 7.259229736696454]
+    },
+    {
+      "name": "IGBOLIKI   - 19  OTUTUBIOSUN",
+      "coordinates": [5.209945457117092, 7.24503349548242]
+    },
+    {
+      "name": "ODOPETU   - 70  OKEARA  TA STREET",
+      "coordinates": [5.155808148876944, 7.225307651374367]
+    },
+    {
+      "name": "ODOPETU   - 14A  ODIGE  STREET  , AKURE",
+      "coordinates": [5.245816692117812, 7.228462159949984]
+    },
+    {
+      "name": "ODOPETU   - 2, OGUNLEYES    HOUSE",
+      "coordinates": [5.177812798591299, 7.209261854464987]
+    },
+    {
+      "name": "ODOPETU   - ST  MAR TINS  PR Y SCH",
+      "coordinates": [5.1745103667125445, 7.292473360721081]
+    },
+    {
+      "name": "ODOPETU   - 108,  FALOYE  WORKSHOP",
+      "coordinates": [5.242434935356299, 7.270235721850177]
+    },
+    {
+      "name": "ODOPETU   - 40, ODOPETU   HOUSE",
+      "coordinates": [5.170857575762551, 7.2613672227813755]
+    },
+    {
+      "name": "ARAKALE   -57B  MA YF ARE",
+      "coordinates": [5.219202046632074, 7.2936711940770085]
+    },
+    {
+      "name": "ARAKALE   -ODA  GARAGE   , IN  FRONT  OF  AROMED",
+      "coordinates": [5.208649208686134, 7.206730810546866]
+    },
+    {
+      "name": "ARAKALE   -92 OJUMUS   HOUSE",
+      "coordinates": [5.227432955721705, 7.230601701572619]
+    },
+    {
+      "name": "ARAKALE   - 82  ARAKALE   STREET",
+      "coordinates": [5.233688588348424, 7.2554721120015815]
+    },
+    {
+      "name": "ARAKALE   - 16B  IJEMIKINS   HOUSE",
+      "coordinates": [5.21981839991981, 7.251978467273265]
+    },
+    {
+      "name": "OPEN  SP ACE  AT IREAKARI   JUNCTION   OKE  ARO",
+      "coordinates": [5.20546144753316, 7.232788972759632]
+    },
+    {
+      "name": "BASIC  HEAL TH  CENTER   FAMILUSI   GAGA",
+      "coordinates": [5.18762079746781, 7.282974815852081]
+    },
+    {
+      "name": "BASIC   HEAL TH  CENTER   GAGA",
+      "coordinates": [5.195422875105938, 7.2573868744763335]
+    },
+    {
+      "name": "ST . FRANCIS   SECONDAR   Y SCHOOL   GAGA",
+      "coordinates": [5.221530066406497, 7.211008035883254]
+    },
+    {
+      "name": "OPEN  SP ACE  BEHIND   MECHANIC    SHOP  ILORO\\/MOFERERE",
+      "coordinates": [5.15319565082033, 7.2132379834918945]
+    },
+    {
+      "name": "ALAFE  - A.L.C.  A.  C OKE  ALAFIA   JUNCTION",
+      "coordinates": [5.227161321535704, 7.202797581948937]
+    },
+    {
+      "name": "BASIRI  COMMUNITY    - NEAR  C.A.C  OKE  BASIRI",
+      "coordinates": [5.155780000531986, 7.236335177703202]
+    },
+    {
+      "name": "OKE-ARO   TITUN  - SAKA  OLUGOSI   HOUSE",
+      "coordinates": [5.164326106495657, 7.2750075647512356]
+    },
+    {
+      "name": "ARISOYIN   STREET   -ST THOMAS   HIGH  SCHOOL",
+      "coordinates": [5.221391092041506, 7.228842767211271]
+    },
+    {
+      "name": "ILUPEJU  STREET   - 20  ILUPEJU  STREET",
+      "coordinates": [5.188958241727543, 7.298383915647018]
+    },
+    {
+      "name": "SURULERE    STREET   - OKE  ARO  MA TERNITY",
+      "coordinates": [5.186718173440924, 7.261024046147892]
+    },
+    {
+      "name": "ARISOYIN   STREET   - IBI PRESS  HOUSE",
+      "coordinates": [5.247670246531439, 7.2729729948115756]
+    },
+    {
+      "name": "OKE  ARO  STREET   - DEXO  FUNITURE",
+      "coordinates": [5.23713196978754, 7.227480495284367]
+    },
+    {
+      "name": "ADEBOW  ALE  STREET   - CHIEF  AKOGUNS   HOUSE",
+      "coordinates": [5.239934119038875, 7.255226064669825]
+    },
+    {
+      "name": "OKE  ARO  - CHIEF  ADEBOW  ALES  HOUSE",
+      "coordinates": [5.188390540510232, 7.246745158589523]
+    },
+    {
+      "name": "JEJE  STREET   - NO  1 JEJE  STREET",
+      "coordinates": [5.205201242483197, 7.2221783897453244]
+    },
+    {
+      "name": "ODOLE  STREET   - NEAR  CHIEF  ODOLES   HOUSE",
+      "coordinates": [5.19032835395262, 7.2425027114034854]
+    },
+    {
+      "name": "ISIKIN  STREET   - NEAR  CHIEF  OLUSIKINS   HOUSE",
+      "coordinates": [5.205375057297257, 7.258776934330498]
+    },
+    {
+      "name": "OKE  ARO  STREET   - NEAR  CH.  ARO  OLOTU  PALACE",
+      "coordinates": [5.194879578419915, 7.2097617270090115]
+    },
+    {
+      "name": "IDIROKO   STREET   - ST  JOHN  PR Y SCH",
+      "coordinates": [5.245951951513432, 7.257799076751362]
+    },
+    {
+      "name": "ODO  SAE  ROAD   - IN  FRONT  OF  ASAES  HOUSE",
+      "coordinates": [5.232172113248537, 7.231551208652937]
+    },
+    {
+      "name": "ALAFE  STREET   - IN  FRONT  OF  ALAFES   HOUSE",
+      "coordinates": [5.230937818671411, 7.228288659963112]
+    },
+    {
+      "name": "IBA  FURNITURE   - IBA  FURNITURE",
+      "coordinates": [5.207751898139015, 7.201603204163763]
+    },
+    {
+      "name": "ILORO  PR Y SCH.  - ILORO  PR Y SCH",
+      "coordinates": [5.22353844371965, 7.29151280510841]
+    },
+    {
+      "name": "ALADIRO   ROAD   - IN  FRONT  OF  CH.  FAYEHUN   HOUSE",
+      "coordinates": [5.180687757095737, 7.2341254592574264]
+    },
+    {
+      "name": "AKURE  SEC.  COMM   - AKURE   SEC.  COMM",
+      "coordinates": [5.212325318141882, 7.2307299416266355]
+    },
+    {
+      "name": "MOT OR  PARK  - IDANRE   MOT OR  PARK",
+      "coordinates": [5.242051138137052, 7.234133571678654]
+    },
+    {
+      "name": "OBODULU   - NEAR  MUSLIM   COLLEGE",
+      "coordinates": [5.196722543207871, 7.2388357743468665]
+    },
+    {
+      "name": "ADOFURE   CAMP   - OLUPELU   HOUSE",
+      "coordinates": [5.160302861564593, 7.277582488321607]
+    },
+    {
+      "name": "ADOFURE   CAMP   - ADOFURE   PR Y SCH",
+      "coordinates": [5.182552752457079, 7.251087574577252]
+    },
+    {
+      "name": "FREEMAN   DR.  SCH  - ROAD   BLOCK",
+      "coordinates": [5.203447705981492, 7.231899613151625]
+    },
+    {
+      "name": "FREEMAN   DR.  SCH  - FREEMAN   DR.  SCH",
+      "coordinates": [5.202007796179177, 7.216923450779059]
+    },
+    {
+      "name": "ST  FRANCIS   PR Y SCH  - GAGA   COMM.  PR Y SCH",
+      "coordinates": [5.174840904439373, 7.263448644248414]
+    },
+    {
+      "name": "ST  FRANCIS   PR Y SCH  - ST  FRANCIS   PR Y SCH",
+      "coordinates": [5.181141788286146, 7.298066787746082]
+    },
+    {
+      "name": "IDANRE   ROAD   -ILORO  MARKET",
+      "coordinates": [5.150112316855377, 7.230129639619779]
+    },
+    {
+      "name": "IDANRE   ROAD   -OKE  ARO  POLICE   ST ATION",
+      "coordinates": [5.172931815745731, 7.210805050598228]
+    },
+    {
+      "name": "AQUINAS   - AQUINAS   COLLEGE",
+      "coordinates": [5.157778341162801, 7.2647762479636135]
+    },
+    {
+      "name": "IW ALEW A STREET   - ALAFIA  TAYO  STREET",
+      "coordinates": [5.23484062337802, 7.260643794248882]
+    },
+    {
+      "name": "IW ALEW A STREET   - IW ALEW A STREET",
+      "coordinates": [5.202692496295866, 7.266590403414407]
+    },
+    {
+      "name": "IROWO  STREET   - LITTLE  BY  LITTLE  PHOT O",
+      "coordinates": [5.241966529935723, 7.286540424129468]
+    },
+    {
+      "name": "LITTLE  BY  LITTLE  PHOT O - LITTLE  BY  LITTLE  PHOT O",
+      "coordinates": [5.22765799723656, 7.283456765266997]
+    },
+    {
+      "name": "IROWO  STREET   - IROWO  JUNCTION",
+      "coordinates": [5.188589706239866, 7.254406781128596]
+    },
+    {
+      "name": "IROWO  STREET   - I, IROWO  STREET",
+      "coordinates": [5.181441723707234, 7.275764157272097]
+    },
+    {
+      "name": "ELEYE  STREET   - ST  JOSEPH   PR Y SCH  II",
+      "coordinates": [5.183608895086459, 7.243830941698283]
+    },
+    {
+      "name": "ELEYE  STREET   - ST  JOSEPH   PR Y SCH  I",
+      "coordinates": [5.2380857813888175, 7.2316402013768855]
+    },
+    {
+      "name": "C.A.C  PR Y SCH  AREA  - C.A.C  PR Y SCH",
+      "coordinates": [5.169760081108261, 7.2426940067110905]
+    },
+    {
+      "name": "C.A.C  SCH  AREA  - C.A.C  PR Y SCH",
+      "coordinates": [5.164958405086909, 7.289014527026784]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ODO  SAE  COMPOUND\"",
+      "coordinates": [5.24472250788491, 7.204680905412604]
+    },
+    {
+      "name": "OPEN  SP ACE  AT TEMIT OPE  CLOSE  OPPOSITE   BASHIRI  MOUNT  AIN",
+      "coordinates": [5.2470549714971435, 7.206421231197363]
+    },
+    {
+      "name": "OPEN  SP ACE  AT KOLA WOLE   STREET   BESIDE   CAC",
+      "coordinates": [5.230988696225745, 7.246503324761917]
+    },
+    {
+      "name": "OPEN  SP ACE  AT T. JUNCTION   AT IFELERE",
+      "coordinates": [5.233810652918715, 7.223212450891962]
+    },
+    {
+      "name": "OPEN  SP ACE   AT ORUNT AN  STREET   JUNCTION",
+      "coordinates": [5.1896745053856215, 7.203338037683226]
+    },
+    {
+      "name": "ARISOYIN    COMMUNITY    PR Y SCHOOL   ARISOYIN",
+      "coordinates": [5.2265801123217575, 7.279736478683963]
+    },
+    {
+      "name": "OPEN  SP ACE  AT NEW  TOWN  MARKET",
+      "coordinates": [5.187285887363854, 7.245848065496361]
+    },
+    {
+      "name": "PROSPECT   HIGH  SCHOOL   OKEARO",
+      "coordinates": [5.224006497662001, 7.210047628897442]
+    },
+    {
+      "name": "OPEN  SP ACE   BESIDE   TRANSFORMER     KOREDE   STREET   OKEARO",
+      "coordinates": [5.183472483565649, 7.25308019086638]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   MADAM   DO  GOOD   ST ORE  OKEARO",
+      "coordinates": [5.21821408051716, 7.217061125952637]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE    MUTICO   GUEST  HOUSE  MOFERERE",
+      "coordinates": [5.2098144251843, 7.256356025733263]
+    },
+    {
+      "name": "OPEN  SP ACE   BEHINDE   ILORO  PR Y SCHOOL",
+      "coordinates": [5.153360136815298, 7.214521863147013]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OWE  AKALA   JUNCTION",
+      "coordinates": [5.189111754896579, 7.262651855397513]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   TRANSFORMER     ARA TUNSIN",
+      "coordinates": [5.1540892891887795, 7.21208734338619]
+    },
+    {
+      "name": "OPEN  SP ACE   BESIDE    IGBALA  YE  SA WMILL  OKE  ARO",
+      "coordinates": [5.231159996380721, 7.221601320979759]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ADU  MEMORIAL",
+      "coordinates": [5.159782255660086, 7.27596944845037]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   COMMUNITY    BOREHOLE,   POT OKI",
+      "coordinates": [5.165344623178192, 7.246819694929966]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   CEMENT   DEPOT  IFEDOLA   STREET",
+      "coordinates": [5.184101017849717, 7.27738580212611]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   KOLADE   HOSPIT AL  SHOLAGBADE     STREET   OKEARO",
+      "coordinates": [5.153895464021376, 7.24157094933259]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OMODARA    JUNCTION   ALONG   IDANRE   ROAD",
+      "coordinates": [5.209670167705949, 7.215264142310128]
+    },
+    {
+      "name": "OPEN  SP ACE   AT OLORUNFEMI    TEDDY  STREET   OGBEBO   OKEARO",
+      "coordinates": [5.228184681805047, 7.216368336519652]
+    },
+    {
+      "name": "OPEN  SP ACE  1ST  GA TE  NA TIONAL   OPEN  UNIVERSITY",
+      "coordinates": [5.209822222007992, 7.28847647922807]
+    },
+    {
+      "name": "OPEN  SP ACE  AT WAY OF  PEACE  3RD  GA TE  OBA  AFUNBIOWO    EST ATE",
+      "coordinates": [5.188036514167317, 7.291591770254909]
+    },
+    {
+      "name": "INSIDE  AGAGU   MARKET   IJOKA  ROAD",
+      "coordinates": [5.2169107853221535, 7.2717284588481075]
+    },
+    {
+      "name": "OPEN  SP ACE  AT JIDE  MARK   IJOKA  ROAD",
+      "coordinates": [5.196156144309384, 7.287092825869418]
+    },
+    {
+      "name": "OPP  KCM  FEDEYI   OSHINLE",
+      "coordinates": [5.211741108741097, 7.249379454120349]
+    },
+    {
+      "name": "OPEN  SP ACE  KIKIOWO   SHOPPING   COMPLEX   ALONG   OLUW  ATUYI",
+      "coordinates": [5.178400335194954, 7.211308908303342]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ISORA  HOTEL  IRO  TITUN",
+      "coordinates": [5.214344759473078, 7.2281432403391195]
+    },
+    {
+      "name": "CAR  WASH  LAST  BUS  ST OP   OSHINLE",
+      "coordinates": [5.1608222008300055, 7.274269203216393]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ADET OLA  OSHINLE",
+      "coordinates": [5.206618141318738, 7.239785918607808]
+    },
+    {
+      "name": "OPEN  SP ACE  AT AJIF A JUNCTION    FALODUN",
+      "coordinates": [5.205340044908844, 7.244696122746824]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   FOLECK   PR Y. SCHOOL   OGO  OLUW  A STREET",
+      "coordinates": [5.248396345903634, 7.278436377227584]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   5 TEMIDIRE   STREET   OSHINLE",
+      "coordinates": [5.2313594880984935, 7.267431779184172]
+    },
+    {
+      "name": "OPEN  SP ACE  OKE  IREWOLEDE    OFF  FADEYI  OSHINLE",
+      "coordinates": [5.1635409099163505, 7.215948382960783]
+    },
+    {
+      "name": "OPEN  SP ACE  AT T-JUNCTION    AKINGBADE    OSHINLE",
+      "coordinates": [5.156395230925969, 7.290854559975505]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   12  OLUSOGA   STREET   OSHINLE",
+      "coordinates": [5.2444483220292, 7.262093942157801]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ST ATE  HOSPIT AL",
+      "coordinates": [5.20856469453784, 7.276011367778617]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   ZENTH  BANK   HOSPIT AL  ROAD",
+      "coordinates": [5.160301653908808, 7.282265979325851]
+    },
+    {
+      "name": "OPEN  SP ACE  AT AYELABOLA    STREET   ALAFIA  TAYO",
+      "coordinates": [5.223322228911803, 7.299148049442614]
+    },
+    {
+      "name": "BESIDE   EVENT  CENTRE   IW ALEW A",
+      "coordinates": [5.189543973394266, 7.220664923755074]
+    },
+    {
+      "name": "OPEN  SP ACE  AT IW ALEW A OPPOSITE   GENERAL   HOPIST AL",
+      "coordinates": [5.19041616212048, 7.241752722637881]
+    },
+    {
+      "name": "BESIDE   KADYET   PLAZA  IROWO",
+      "coordinates": [5.189574862966834, 7.2112651236941945]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP  CENTRAL   MOSQUE   IROWO",
+      "coordinates": [5.228545376746634, 7.242859519465339]
+    },
+    {
+      "name": "OPEN  SP ACE  ADJACENT    OJOP AGOGO   CHAMBER   URO",
+      "coordinates": [5.187524152740659, 7.273918784855083]
+    },
+    {
+      "name": "OPEN  SP ACE  AT EBEN  PHAMACY   OKEBOLA",
+      "coordinates": [5.179086982811101, 7.286684191267257]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE    CAC  PR Y, SCHOOL   OKEBOLA",
+      "coordinates": [5.170984021795243, 7.216968592858741]
+    },
+    {
+      "name": "EYINKE   - AT EYINKE   STREET",
+      "coordinates": [5.177496869393177, 7.289920115143943]
+    },
+    {
+      "name": "IGISOGBA   - AT IGISOGBA   VILLAGE",
+      "coordinates": [5.208136533476453, 7.221624035716654]
+    },
+    {
+      "name": "OKE  OBERE  - OKE  OBERE  VILLAGE",
+      "coordinates": [5.150513978656568, 7.219577784164348]
+    },
+    {
+      "name": "ONL Y JESUS  CAN  SA VE  AREA  - IN  FRONT  OF  ONL Y JESUS  CAN",
+      "coordinates": [5.158355648838542, 7.270432347385254]
+    },
+    {
+      "name": "ONL Y JESUS  CAN  SA VE  - OPPOSITE   ONL Y JESUS  CAN  SA VE",
+      "coordinates": [5.21228384991615, 7.255607118432727]
+    },
+    {
+      "name": "IREPODUN   - ST . MICHAELS    COLLEGE",
+      "coordinates": [5.188515643568253, 7.201313714638002]
+    },
+    {
+      "name": "FEMI  ADEKANYE    STREET   - IN  FRONT  OF  ADEKANYES    HOUSE",
+      "coordinates": [5.199164066742993, 7.27919083440208]
+    },
+    {
+      "name": "FEMI  ADEKANYE    STREET   - OPPOSITE   FEMI  ADEKANYES    HOUSE",
+      "coordinates": [5.247351333788497, 7.226104521272129]
+    },
+    {
+      "name": "IGBO  CHURCH   AREA  - IRO  TITUN  PR Y SCH",
+      "coordinates": [5.245203915083624, 7.221163446352512]
+    },
+    {
+      "name": "IGBO  CHURCH   AREA  -OPPOSITE   IGBO  CHURCH",
+      "coordinates": [5.154285179492152, 7.206886778222594]
+    },
+    {
+      "name": "FALODUN   AREA  - IN  FRONT  OF  ADESIDA   HOUSE",
+      "coordinates": [5.153945669768697, 7.277331338761511]
+    },
+    {
+      "name": "FALODUN    JUNCTION   - AT FALODUN   JUNCTION",
+      "coordinates": [5.179063957330272, 7.220067667807214]
+    },
+    {
+      "name": "FADEYI  AREA-  FADEYI  JUNCTION",
+      "coordinates": [5.2296607691449095, 7.215153686700059]
+    },
+    {
+      "name": "FADEYI  JUNCTION   - FADEYI  STREET",
+      "coordinates": [5.249852917543746, 7.2875922328373015]
+    },
+    {
+      "name": "CASH  HOLD  AREA  - IN  FRONT  OF  ADEGOROYES     HOUSE",
+      "coordinates": [5.184659761607834, 7.218682315220987]
+    },
+    {
+      "name": "CASH  HOLD  AREA  - CASH  HOLD  CHEMIST",
+      "coordinates": [5.16069872062915, 7.299937707592868]
+    },
+    {
+      "name": "AQUINAS   - OPPOSITE   ST ATE  HOSPIT AL",
+      "coordinates": [5.235028483367718, 7.291689193903166]
+    },
+    {
+      "name": "NEW  ST ADIUM  - BESIDE   NEW  ST ADIUM",
+      "coordinates": [5.164961571437891, 7.242184285489355]
+    },
+    {
+      "name": "AKURE  HIGH  SCH  - AKURE   HIGH  SCH  II",
+      "coordinates": [5.218239317024802, 7.227491903855467]
+    },
+    {
+      "name": "SEMINAR  Y - 107",
+      "coordinates": [5.151135687622297, 7.280325354889325]
+    },
+    {
+      "name": "IMUAGUN   STREET   -",
+      "coordinates": [5.219304816780465, 7.282862461889925]
+    },
+    {
+      "name": "ST  ANTHONY   PR Y SCH  - ST  ANTHONY   PR Y",
+      "coordinates": [5.153816240736758, 7.27554460336396]
+    },
+    {
+      "name": "ST  ANTHONY   PR Y SCH  - ST  ANTHONY   PR Y",
+      "coordinates": [5.234979877685337, 7.2004568313035495]
+    },
+    {
+      "name": "SLAUGHTER    SLAB  -",
+      "coordinates": [5.184004366473169, 7.255907241614518]
+    },
+    {
+      "name": "OSHODI   MARKET   - OSHODI   MARKET   II",
+      "coordinates": [5.229893957419401, 7.2487672405685215]
+    },
+    {
+      "name": "OSHODI   MARKET   - OSHODI   MARKET   I",
+      "coordinates": [5.249727834947848, 7.209290941413182]
+    },
+    {
+      "name": "OSOLO  MARKET   - OSOLO  MARKET",
+      "coordinates": [5.2280626339266005, 7.238426751403748]
+    },
+    {
+      "name": "TOWN  HALL  -",
+      "coordinates": [5.166101132057199, 7.220699185945934]
+    },
+    {
+      "name": "TOWN  HALL  -",
+      "coordinates": [5.172776622050328, 7.259933918931921]
+    },
+    {
+      "name": "BESIDE   THE  COMM   WELL  EYINKE   STREET",
+      "coordinates": [5.191171623402122, 7.229305814585884]
+    },
+    {
+      "name": "CUST OMAR  Y COUR T IGISOGBA",
+      "coordinates": [5.174546345184371, 7.297932229602734]
+    },
+    {
+      "name": "ALAKURE   COMPREHENSIVE     HIGH  SCHOOL",
+      "coordinates": [5.169395854213807, 7.213599203838807]
+    },
+    {
+      "name": "BESIDE   KCM  BETHEL   STREET   CANNANLAND",
+      "coordinates": [5.172431046970356, 7.25665287387075]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ATAYESE  BUST OP  ELEMO  OKEOBERE",
+      "coordinates": [5.244639874218545, 7.2767572095667905]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   OGUNS   BLOCK  INDUSTR  Y AGIT A",
+      "coordinates": [5.168713117990011, 7.2755816694009825]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OKE  IYA TOWN  HALL  COMMUNITY",
+      "coordinates": [5.196848222422526, 7.289036191136315]
+    },
+    {
+      "name": "OPEN  SP ACE  AT KEHINDE   IGE  JUNCTION   IJOKA",
+      "coordinates": [5.22887372080652, 7.299571566791522]
+    },
+    {
+      "name": "OPEN  SP ACE  BASIC  HEAL TH  CENTRE   ABUSORO",
+      "coordinates": [5.166764803967875, 7.218693891217936]
+    },
+    {
+      "name": "OLUKOJU   COMMUNITY    PR Y SCHOOL   ABUSORO",
+      "coordinates": [5.200082322023085, 7.200444209765349]
+    },
+    {
+      "name": "PEACE  AVENUE  MODEL   SEC  SCHOOL   ONIMALU",
+      "coordinates": [5.167433823826408, 7.2560305602103865]
+    },
+    {
+      "name": "CANNANLAND     PR Y SCHOOL   IJOKA",
+      "coordinates": [5.232479462203106, 7.2235381796754075]
+    },
+    {
+      "name": "PRESTIGE   JUNCTION   IJOKA",
+      "coordinates": [5.245940902925156, 7.239333516910424]
+    },
+    {
+      "name": "OLUW  ATEDO  PR Y SCHOOL   IJOKA  ROAD",
+      "coordinates": [5.167047394419128, 7.278784887148225]
+    },
+    {
+      "name": "OPEN  SP ACE  POWER   LINE  IJOKA",
+      "coordinates": [5.206274753310443, 7.280858125394121]
+    },
+    {
+      "name": "OPEN  SP ACE  ADJACENT    CROWN",
+      "coordinates": [5.238458450694172, 7.2849766436683145]
+    },
+    {
+      "name": "T. JUNCTION   AT THE  BACK   OF  SKYE  HOSPIT AL",
+      "coordinates": [5.225871983397614, 7.239330391554159]
+    },
+    {
+      "name": "UNDER  THE  TREE,  FIRST  MECHANIC    ISOLO",
+      "coordinates": [5.237948839699443, 7.226653550690229]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OLD  POST  OFFICE   OSHODI",
+      "coordinates": [5.210195658682371, 7.267281067796385]
+    },
+    {
+      "name": "OPEN  SP ACE  AT",
+      "coordinates": [5.218188957136991, 7.239373485135608]
+    },
+    {
+      "name": "AYAYEMI  AT AYEYEMI",
+      "coordinates": [5.172399101288559, 7.235448975157519]
+    },
+    {
+      "name": "OKESI,  AT OKESI  VILLAGE",
+      "coordinates": [5.163285976366755, 7.238525819838259]
+    },
+    {
+      "name": "IRESE  ROAD,  OPP  GOSPEL   FAITH  MISSION",
+      "coordinates": [5.211607513280207, 7.246127190753506]
+    },
+    {
+      "name": "ONYEARUGBULEM",
+      "coordinates": [5.18388702063509, 7.260000591829063]
+    },
+    {
+      "name": "DIPLOMA  TE  HOTEL",
+      "coordinates": [5.21800369618086, 7.252862158792067]
+    },
+    {
+      "name": "DIPLOMA  TE  AREA,",
+      "coordinates": [5.175879654072671, 7.233997327010218]
+    },
+    {
+      "name": "SHAGARI   VILLAGE,   ANGLICAN    PR Y SCH",
+      "coordinates": [5.215052552030298, 7.244429974488898]
+    },
+    {
+      "name": "SHAGARI   VILLAGE,   ANGLICAN    PR Y SCH",
+      "coordinates": [5.187786341372637, 7.278156913776541]
+    },
+    {
+      "name": "NEW  ISOLO  PR Y SCH,  NEW  ISOLO  PR Y SCH",
+      "coordinates": [5.1753706279961555, 7.265560794597509]
+    },
+    {
+      "name": "PLAZA  HOTEL  AREA,  FRONT  OF  PLAZA  HOT AL",
+      "coordinates": [5.183289931089711, 7.277878917775843]
+    },
+    {
+      "name": "OPEN  SP ACE  AT PLAZA  HOTEL  ROAD",
+      "coordinates": [5.207192010568903, 7.233490392931404]
+    },
+    {
+      "name": "OSOLO  PALACE,   FRONT  OF  OSOLO  PALACE",
+      "coordinates": [5.154336117109443, 7.226786238107862]
+    },
+    {
+      "name": "ABIRIBI  LANE,  AT ABIRIBI  LANE",
+      "coordinates": [5.179528352631886, 7.250301203844416]
+    },
+    {
+      "name": "ADESIDA/ISOLO,    BESIDE   PARADISE   HOTEL",
+      "coordinates": [5.24019518483914, 7.281551529261776]
+    },
+    {
+      "name": "OLUKOYI   PALACE  - IN  FRONT  OF  OLUKOYIS",
+      "coordinates": [5.159681225876261, 7.290894661777462]
+    },
+    {
+      "name": "AKOSILE   JUNCTION",
+      "coordinates": [5.174047271231057, 7.245405942400485]
+    },
+    {
+      "name": "SAL VATION  ARMY",
+      "coordinates": [5.177994350216518, 7.221640795414719]
+    },
+    {
+      "name": "ODOKOYI   STREET  -",
+      "coordinates": [5.216102869259156, 7.247902954110296]
+    },
+    {
+      "name": "HAUSA   COMMUNITY",
+      "coordinates": [5.220108493888316, 7.262645249989847]
+    },
+    {
+      "name": "SABO  ODOJOKA   - SABO  ODOJOKA",
+      "coordinates": [5.172768675497846, 7.2398883397327705]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.238147069657468, 7.247068502788211]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.215126190381338, 7.2586183436110465]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.200985420489067, 7.217140878517317]
+    },
+    {
+      "name": "OPEN  SP ACE  2ND",
+      "coordinates": [5.208640206780013, 7.2028731427268395]
+    },
+    {
+      "name": "OPEN  SP ACE",
+      "coordinates": [5.185784723884952, 7.297041206488239]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.169042928836104, 7.280467765686631]
+    },
+    {
+      "name": "OPEN  SP ACE",
+      "coordinates": [5.1675726405375135, 7.294658482776821]
+    },
+    {
+      "name": "ORE  OFE  COMM   PR Y",
+      "coordinates": [5.240111381035025, 7.2308195300535845]
+    },
+    {
+      "name": "MILLENIUM   BASIC",
+      "coordinates": [5.214489217703235, 7.293503824206068]
+    },
+    {
+      "name": "IN  FRONT  OF  BASIC  HEAL TH  CENTRE   KAJOLA,",
+      "coordinates": [5.205273478465449, 7.227804935602597]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.161319911125907, 7.241063364022026]
+    },
+    {
+      "name": "OPEN  SP ACE  AT SABO  JUNCTION   OFF",
+      "coordinates": [5.23003080422489, 7.263302002470385]
+    },
+    {
+      "name": "OPEN  SP ACE  AT AJA YE  SA WMILL,   ARAROMI",
+      "coordinates": [5.192924425453477, 7.240867412390716]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.18706584470399, 7.234770874515993]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.2277011119887975, 7.216527511816722]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ANJOLA   JUNCTION",
+      "coordinates": [5.152558876273195, 7.285127010442724]
+    },
+    {
+      "name": "OPEN  SP ACE  OLD",
+      "coordinates": [5.1923216028836325, 7.221735178342368]
+    },
+    {
+      "name": "IMUAGUN   - 28",
+      "coordinates": [5.20316041827356, 7.29917382775186]
+    },
+    {
+      "name": "ERINGBO/   EGBEDI/ERINGBO",
+      "coordinates": [5.160561559381869, 7.226437010911515]
+    },
+    {
+      "name": "OBA  ODESIDA   ROAD",
+      "coordinates": [5.232039791287249, 7.271758150266961]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.219497247187434, 7.275300796583884]
+    },
+    {
+      "name": "OPEN  SP ACE  AT I.K",
+      "coordinates": [5.1697992159823, 7.212061422308804]
+    },
+    {
+      "name": "OPEN  SP ACE",
+      "coordinates": [5.181414510347759, 7.225813739670107]
+    },
+    {
+      "name": "OPEN  SP ACE  BEISDE",
+      "coordinates": [5.2070962635709686, 7.247484450598492]
+    },
+    {
+      "name": "OMOGBEMI",
+      "coordinates": [5.244853566952844, 7.252787475871317]
+    },
+    {
+      "name": "COMMUNITY    TOWN  HALL  ONIGARI   OMOYINW  A",
+      "coordinates": [5.245994572324228, 7.234688105305577]
+    },
+    {
+      "name": "OPEN  SP ACE  OPP  MERIT  BAKER Y IRESE",
+      "coordinates": [5.163579424476188, 7.2403846715606255]
+    },
+    {
+      "name": "NEAR  I/VII",
+      "coordinates": [5.181086078777151, 7.2155713484851525]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ABUSORO   JUNCTION   OLU",
+      "coordinates": [5.249299951371354, 7.210758155014269]
+    },
+    {
+      "name": "OPEN  SP ACE  AT BRAZIL   BUS  ST OP",
+      "coordinates": [5.201469646928098, 7.258790581824688]
+    },
+    {
+      "name": "KOLA WOLE   ESHO",
+      "coordinates": [5.161305498031465, 7.2463845061133485]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.216756933287032, 7.276627155318748]
+    },
+    {
+      "name": "AYEDUN   - 22",
+      "coordinates": [5.177752954901637, 7.27472098104264]
+    },
+    {
+      "name": "FABUSUYI   STREET   -",
+      "coordinates": [5.2486785965108185, 7.21238907463598]
+    },
+    {
+      "name": "AYEDUN   - 24",
+      "coordinates": [5.17980694708851, 7.225930042624667]
+    },
+    {
+      "name": "IROKUN   -OPOSITE",
+      "coordinates": [5.181692596324265, 7.271430250674033]
+    },
+    {
+      "name": "NA TIONAL   LIBRAR  Y",
+      "coordinates": [5.16296592992262, 7.247249598756666]
+    },
+    {
+      "name": "L.A PR Y SCH  - 5B",
+      "coordinates": [5.166725845483799, 7.259035358526558]
+    },
+    {
+      "name": "IMUAGUN   - 28",
+      "coordinates": [5.247186819317489, 7.262023569793292]
+    },
+    {
+      "name": "EGBEDI   - EGBEDI",
+      "coordinates": [5.15886534122198, 7.234144833003397]
+    },
+    {
+      "name": "OBA  ADESIDA   RD,  OBA  ADESIDA   RD",
+      "coordinates": [5.2250601112732395, 7.266146336894119]
+    },
+    {
+      "name": "ILERE  ODO-ILERE",
+      "coordinates": [5.216801449148053, 7.2867939915165545]
+    },
+    {
+      "name": "O.D.R.C  JUNCTION",
+      "coordinates": [5.15127726802761, 7.2665273055195705]
+    },
+    {
+      "name": "ST  DOMINIC   GRAM.",
+      "coordinates": [5.186628937941535, 7.235246431231106]
+    },
+    {
+      "name": "IPINSA  - ST",
+      "coordinates": [5.234536443829466, 7.240030400525653]
+    },
+    {
+      "name": "ST  PETER  PR Y SCH  - ST  PETER  PR Y SCH",
+      "coordinates": [5.163404928602558, 7.2078075251512]
+    },
+    {
+      "name": "AYEDUN   - 50",
+      "coordinates": [5.174224542529388, 7.296017036045681]
+    },
+    {
+      "name": "FABUSUYI   - 11",
+      "coordinates": [5.173885393892683, 7.207515380948337]
+    },
+    {
+      "name": "TUYI  - 22",
+      "coordinates": [5.217544260989096, 7.2836594577973015]
+    },
+    {
+      "name": "IROKUN   - 71",
+      "coordinates": [5.163168722385219, 7.29472677150095]
+    },
+    {
+      "name": "NA TIONAL   LIBRAR  Y",
+      "coordinates": [5.180834086289152, 7.2805793775941385]
+    },
+    {
+      "name": "L.A PR Y SCH  - L.A PR Y SCH",
+      "coordinates": [5.2166051535078415, 7.284428588697611]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE",
+      "coordinates": [5.155188565856736, 7.283051748864403]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ORUGERE   JUNCTION",
+      "coordinates": [5.244254350534723, 7.200491164279291]
+    },
+    {
+      "name": "OPEN  SP ACE  AT AANUOLUW   APO",
+      "coordinates": [5.162981701147433, 7.283274401964021]
+    },
+    {
+      "name": "OPEN  SP ACE  AT",
+      "coordinates": [5.201998125925472, 7.234232922071464]
+    },
+    {
+      "name": "UNDER  TREE",
+      "coordinates": [5.215152613840258, 7.226418525777685]
+    },
+    {
+      "name": "OPEN  SP ACE  AT TUNJI  JUNCTION   AYEDUN",
+      "coordinates": [5.237186473777308, 7.297794224284338]
+    },
+    {
+      "name": "OPEN  SP ACE  OPPOSITE   AYEDUN",
+      "coordinates": [5.152818911023799, 7.2739448141373035]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   MACBUBSON    NUR  /PRY SCH  TUYI  STREET",
+      "coordinates": [5.177302653446563, 7.281613486007965]
+    },
+    {
+      "name": "UNDER  THE  TREE  BEHIND   SCHOOL   OF  THE  DEAF  ST ADIUM",
+      "coordinates": [5.152402254826635, 7.299351172678444]
+    },
+    {
+      "name": "LEO  HOSPIT AL  -",
+      "coordinates": [5.220914090657743, 7.265107695705247]
+    },
+    {
+      "name": "AYEDUN   ALA  JUNCTION",
+      "coordinates": [5.191019333779289, 7.275741324702429]
+    },
+    {
+      "name": "IROKIN   - 6",
+      "coordinates": [5.222954489372375, 7.294533876837221]
+    },
+    {
+      "name": "L.A PR Y SCH  - 7",
+      "coordinates": [5.184324683405844, 7.2563862526489595]
+    },
+    {
+      "name": "IMUAGUN   - 10",
+      "coordinates": [5.210516014524522, 7.294289102726794]
+    },
+    {
+      "name": "ERINGBO/EGBEDI     - 3",
+      "coordinates": [5.219513497950796, 7.294816238861035]
+    },
+    {
+      "name": "ST  DOMINIC   - SHOLA  AMURE   STREET",
+      "coordinates": [5.1506176110712225, 7.228374684412321]
+    },
+    {
+      "name": "LEO  HOSPIT AL  -",
+      "coordinates": [5.199546967281152, 7.263749467303136]
+    },
+    {
+      "name": "ST  PETERS   PR Y SCH",
+      "coordinates": [5.2487476774655155, 7.206357405224808]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OLOWOMEYE    JUNCTION,   EYIN  ALA,  AYEDUN",
+      "coordinates": [5.207496451946536, 7.259473877623826]
+    },
+    {
+      "name": "OPEN  SP ACE  AT TEMIDIRE   BEHIND   KUTEYI",
+      "coordinates": [5.175640333834422, 7.279272958706183]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ESO  PELE  IREAKARI   EST ATE  1",
+      "coordinates": [5.2334153769643645, 7.240653263183996]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OWOLABI   JUNCTION",
+      "coordinates": [5.228836216935263, 7.218450231227742]
+    },
+    {
+      "name": "OPEN  SP ACE  AT T",
+      "coordinates": [5.181654888367764, 7.290488982261603]
+    },
+    {
+      "name": "SUBEB  MODEL   PR Y SCHOOL   OKUT A ELERINLA",
+      "coordinates": [5.180284688454989, 7.281600074763028]
+    },
+    {
+      "name": "OPEN  SP ACE  AT HOPE  HOSPIT AL",
+      "coordinates": [5.191281121491077, 7.231863329417603]
+    },
+    {
+      "name": "BESIDE   CRUCNHIES   EA TER Y OYEMEKUN    ROAD",
+      "coordinates": [5.215648749440247, 7.299601182657114]
+    },
+    {
+      "name": "OPEN  SP ACE  AT ZICO  JUNCTION   AJISOLA",
+      "coordinates": [5.2243687076235465, 7.230121542323001]
+    },
+    {
+      "name": "AYEDUN",
+      "coordinates": [5.162548432106532, 7.235127218559992]
+    },
+    {
+      "name": "OPEN  SP ACE  BESIDE   FAMORIT  ADE  HOUSE",
+      "coordinates": [5.192013340649038, 7.224988976402482]
+    },
+    {
+      "name": "OPEN  SP ACE  AT THE  BACK   OF  ST ADIUM",
+      "coordinates": [5.230644080901989, 7.246698071247599]
+    },
+    {
+      "name": "OPEN  SP ACE  AT MEDINAL   COMMUNITY",
+      "coordinates": [5.242191624946784, 7.214451439539029]
+    },
+    {
+      "name": "OPEN  SP ACE  AT DON  BOSCO/TRANS-FORMER       JUNCTION",
+      "coordinates": [5.162979392353426, 7.258347980568007]
+    },
+    {
+      "name": "OPEN  SP ACE  AT OKE  ODU  JUNCTION   IJARE",
+      "coordinates": [5.215310245125374, 7.295512011689125]
+    },
+    {
+      "name": "OPEN  SP ACE  AT HALLELUY   AH  JUNCTION",
+      "coordinates": [5.208605718024677, 7.275941688653703]
+    }
+  ]
+}

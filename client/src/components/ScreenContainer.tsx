@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, ViewProps, ScrollViewProps, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  ViewProps,
+  ScrollViewProps,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Animatable from 'react-native-animatable';
 import { theme } from '../theme';
@@ -19,10 +27,11 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
   ...props
 }) => {
   const content = scrollable ? (
-    <ScrollView 
-      contentContainerStyle={[padded && styles.padded, style]} 
+    <ScrollView
+      contentContainerStyle={[padded && styles.padded, style]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled"
+      keyboardDismissMode="none"
       {...scrollViewProps}
     >
       {children}
@@ -35,9 +44,10 @@ export const ScreenContainer: React.FC<ScreenContainerProps> = ({
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <KeyboardAvoidingView 
-        style={{ flex: 1 }} 
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 0}
       >
         <View style={{ flex: 1 }}>
           {content}

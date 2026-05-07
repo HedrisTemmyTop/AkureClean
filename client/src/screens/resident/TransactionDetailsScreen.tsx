@@ -1,8 +1,7 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Clipboard, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { CheckCircle, CreditCard, ChevronLeft } from 'lucide-react-native';
+import { CheckCircle, CreditCard, ChevronLeft, Copy } from 'lucide-react-native';
 
 import { ScreenContainer } from '../../components/ScreenContainer';
 import { AppText } from '../../components/AppText';
@@ -12,7 +11,7 @@ import { ResidentStackParamList } from '../../navigation/RoleNavigator';
 
 type Props = NativeStackScreenProps<ResidentStackParamList, 'TransactionDetails'>;
 
-export const TransactionDetailsScreen: React.FC<Props> = ({ route }) => {
+export const TransactionDetailsScreen = ({ route }: any) => {
   const { billId } = route.params;
   const navigation = useNavigation();
 
@@ -24,7 +23,8 @@ export const TransactionDetailsScreen: React.FC<Props> = ({ route }) => {
     time: '14:30 PM',
     status: 'Successful',
     paymentMethod: 'Card ending ...4242',
-    reference: `TXN-${Math.floor(Math.random() * 1000000)}`,
+    reference: `TXN-${Math.floor(Math.random() * 1000000)}`, // This will be paystackReference
+    paystackReference: `PST-${Math.floor(Math.random() * 1000000)}`,
     description: 'Monthly Waste Subscription',
   };
 
@@ -71,8 +71,19 @@ export const TransactionDetailsScreen: React.FC<Props> = ({ route }) => {
         <View style={styles.divider} />
 
         <View style={styles.row}>
-          <AppText variant="bodySmall" color={theme.colors.textSecondary}>Reference No.</AppText>
-          <AppText variant="bodySmall" weight="600">{transaction.reference}</AppText>
+          <AppText variant="bodySmall" color={theme.colors.textSecondary}>Payment Reference</AppText>
+          <View style={styles.referenceContainer}>
+            <AppText variant="bodySmall" weight="600" style={{ marginRight: 8 }}>{transaction.paystackReference || transaction.reference}</AppText>
+            <TouchableOpacity 
+              onPress={() => {
+                const ref = transaction.paystackReference || transaction.reference;
+                Clipboard.setString(ref);
+                Alert.alert("Copied", "Payment reference copied to clipboard!");
+              }}
+            >
+              <Copy color={theme.colors.primary} size={14} />
+            </TouchableOpacity>
+          </View>
         </View>
       </AppCard>
 
@@ -119,6 +130,10 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
   },
   methodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  referenceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },

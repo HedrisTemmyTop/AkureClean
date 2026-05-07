@@ -12,6 +12,9 @@ import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { reportService } from '../../services/reportService';
 import { scheduleService } from '../../services/scheduleService';
+import { routeService } from '../../services/routeService';
+import { pickupService } from '../../services/pickupService';
+import { billService } from '../../services/billService';
 import { ResidentStackParamList } from '../../navigation/RoleNavigator';
 
 type NavigationProp = NativeStackNavigationProp<ResidentStackParamList, 'ResidentTabs'>;
@@ -23,6 +26,7 @@ export const ResidentDashboard: React.FC = () => {
   const [activeReports, setActiveReports] = useState(0);
   const [resolvedReports, setResolvedReports] = useState(0);
   const [nextCollectionDay, setNextCollectionDay] = useState('Loading...');
+  const [nextCollectionTime, setNextCollectionTime] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
   const handleLogout = () => {
@@ -36,21 +40,46 @@ export const ResidentDashboard: React.FC = () => {
     );
   };
 
+  const [activePickup, setActivePickup] = useState<any>(null);
+  
   const loadDashboardData = async () => {
     if (!user) return;
     try {
-      const reports = await reportService.getReportsByResident(user.id);
-      setActiveReports(reports.filter(r => r.status !== 'Completed' && r.status !== 'Cancelled').length);
-      setResolvedReports(reports.filter(r => r.status === 'Completed').length);
+      const pickups = await pickupService.getMyPickups();
+      setActiveReports(pickups.filter(r => r.status !== 'completed' && r.status !== 'cancelled').length);
+      setResolvedReports(pickups.filter(r => r.status === 'completed').length);
 
-      if (user.locationId) {
-        const schedules = await scheduleService.getSchedulesByLocation(user.locationId);
-        if (schedules.length > 0) {
-          // just taking the first schedule for mock purposes
-          setNextCollectionDay(schedules[0].dayOfWeek);
+      // Check for an accepted pickup that needs resident confirmation
+      const current = pickups.find(p => p.status === 'accepted');
+      setActivePickup(current || null);
+      
+      // ... rest of loadDashboardData
+      const bills = await billService.getMyBills();
+      
+      // Fetch collection schedules based on resident's ward/LGA assignment
+      const nextCollection = await routeService.getNextCollectionDate();
+      if (nextCollection && nextCollection.collectionDate) {
+        const dateObj = new Date(nextCollection.collectionDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (dateObj < today) {
+          setNextCollectionDay('Unscheduled');
+          setNextCollectionTime('');
         } else {
-          setNextCollectionDay('Not Assigned');
+          const todayStr = new Date().toDateString();
+          const collStr = dateObj.toDateString();
+          
+          if (todayStr === collStr) {
+            setNextCollectionDay('TODAY');
+          } else {
+            setNextCollectionDay(dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+          }
+          setNextCollectionTime(nextCollection.collectionTime || '');
         }
+      } else {
+        setNextCollectionDay('Unscheduled');
+        setNextCollectionTime('');
       }
     } catch (e) {
       console.error(e);
@@ -85,6 +114,38 @@ export const ResidentDashboard: React.FC = () => {
         </View>
       </Animatable.View>
 
+      {activePickup && (
+        <Animatable.View animation="pulse" iterationCount="infinite" delay={150}>
+          <AppCard style={[styles.alertCard, { backgroundColor: theme.colors.success + '10', borderColor: theme.colors.success + '40' }]}>
+            <View style={{ flex: 1 }}>
+              <AppText variant="body" weight="600" color={theme.colors.success}>
+                Driver is on the way!
+              </AppText>
+              <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+                Your {activePickup.type} pickup was accepted.
+              </AppText>
+              <TouchableOpacity 
+                style={styles.pickedUpBtn}
+                onPress={async () => {
+                  try {
+                    await pickupService.completePickupByResident(activePickup.id);
+                    Alert.alert("Success", "Pickup confirmed! Thank you.");
+                    loadDashboardData();
+                  } catch (e) {
+                    Alert.alert("Error", "Could not complete pickup.");
+                  }
+                }}
+              >
+                <AppText variant="bodySmall" weight="700" color={theme.colors.surface}>
+                  MARK AS PICKED UP
+                </AppText>
+              </TouchableOpacity>
+            </View>
+            <Truck color={theme.colors.success} size={24} />
+          </AppCard>
+        </Animatable.View>
+      )}
+
       <Animatable.View animation="fadeIn" delay={150}>
         <TouchableOpacity onPress={() => navigation.navigate('ResidentTabs' as any, { screen: 'Waste Bill' })}>
           <View style={styles.alertCard}>
@@ -106,6 +167,11 @@ export const ResidentDashboard: React.FC = () => {
           <View>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>Next Collection</AppText>
             <AppText variant="h3" color={theme.colors.primary}>{nextCollectionDay}</AppText>
+            {!!nextCollectionTime && (
+              <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginTop: 2 }}>
+                Time: {nextCollectionTime}
+              </AppText>
+            )}
           </View>
           <Truck color={theme.colors.primary} size={32} />
         </View>
@@ -118,7 +184,7 @@ export const ResidentDashboard: React.FC = () => {
       <View style={styles.statsRow}>
         <AppCard style={styles.statCard} padded animation="zoomIn" delay={300}>
           <AppText variant="h2" color={theme.colors.status.active}>{activeReports}</AppText>
-          <AppText variant="bodySmall" color={theme.colors.textSecondary}>Active Reports</AppText>
+          <AppText variant="bodySmall" color={theme.colors.textSecondary}>Active Pickups</AppText>
         </AppCard>
         <AppCard style={styles.statCard} padded animation="zoomIn" delay={400}>
           <AppText variant="h2" color={theme.colors.status.completed}>{resolvedReports}</AppText>
@@ -132,8 +198,8 @@ export const ResidentDashboard: React.FC = () => {
       
       <View style={styles.grid}>
         <Animatable.View animation="fadeInUp" delay={600} style={styles.gridItem}>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('ReportWaste')}
+            <TouchableOpacity 
+            onPress={() => navigation.navigate('RequestPickup' as any)}
             activeOpacity={0.8}
             style={{flex: 1}}
           >
@@ -141,14 +207,14 @@ export const ResidentDashboard: React.FC = () => {
               <View style={[styles.iconWrapper, { backgroundColor: theme.colors.status.pending + '20' }]}>
                 <FileText color={theme.colors.status.pending} size={24} />
               </View>
-              <AppText variant="bodySmall" weight="600" style={styles.gridText}>Report Waste</AppText>
+              <AppText variant="bodySmall" weight="600" style={styles.gridText}>Request Pickup</AppText>
             </AppCard>
           </TouchableOpacity>
         </Animatable.View>
 
         <Animatable.View animation="fadeInUp" delay={700} style={styles.gridItem}>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('ResidentTabs' as any, { screen: 'Reports' })}
+            <TouchableOpacity 
+            onPress={() => navigation.navigate('ResidentTabs' as any, { screen: 'Pickups' })}
             activeOpacity={0.8}
             style={{flex: 1}}
           >
@@ -156,7 +222,7 @@ export const ResidentDashboard: React.FC = () => {
               <View style={[styles.iconWrapper, { backgroundColor: theme.colors.primary + '20' }]}>
                 <List color={theme.colors.primary} size={24} />
               </View>
-              <AppText variant="bodySmall" weight="600" style={styles.gridText}>My Reports</AppText>
+              <AppText variant="bodySmall" weight="600" style={styles.gridText}>My Pickups</AppText>
             </AppCard>
           </TouchableOpacity>
         </Animatable.View>
@@ -269,5 +335,13 @@ const styles = StyleSheet.create({
   },
   gridText: {
     textAlign: 'center',
+  },
+  pickedUpBtn: {
+    backgroundColor: theme.colors.success,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.borderRadius.sm,
+    marginTop: theme.spacing.sm,
+    alignSelf: 'flex-start',
   },
 });

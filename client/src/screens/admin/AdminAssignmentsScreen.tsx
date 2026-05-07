@@ -10,8 +10,7 @@ import { AppCard } from '../../components/AppCard';
 import { AppButton } from '../../components/AppButton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { theme } from '../../theme';
-import { routeService } from '../../services/routeService';
-import { collectorService } from '../../services/collectorService';
+import { assignmentService } from '../../services/routeService';
 import { AssignmentRoute } from '../../types';
 import { AdminStackParamList } from '../../navigation/RoleNavigator';
 
@@ -25,9 +24,9 @@ export const AdminAssignmentsScreen: React.FC = () => {
 
   const loadAssignments = async () => {
     try {
-      // In a real app we would fetch all active routes across all collectors.
+      // In a real app we would fetch all active routes across all drivers.
       // Here we mock by fetching routes for mock_col_1 (our dummy data guy)
-      const data = await routeService.getAssignments('mock_col_1');
+      const data = await assignmentService.getAssignments();
       setAssignments(data);
     } catch (e) {
       console.error(e);
@@ -56,7 +55,7 @@ export const AdminAssignmentsScreen: React.FC = () => {
           <View>
             <AppText variant="body" weight="600" style={{ marginBottom: 4 }}>{item.area} Street</AppText>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-              Collector: {item.collectorId}
+              Driver: {item.driverName || item.driverId || 'Unassigned'}
             </AppText>
           </View>
           <StatusBadge status={item.status as any} />
