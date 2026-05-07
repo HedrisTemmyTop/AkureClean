@@ -3,6 +3,7 @@ import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Camera, CheckCircle } from 'lucide-react-native';
 import * as Animatable from 'react-native-animatable';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { ScreenContainer } from '../../components/ScreenContainer';
 import { AppText } from '../../components/AppText';
@@ -10,36 +11,39 @@ import { AppInput } from '../../components/AppInput';
 import { AppButton } from '../../components/AppButton';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
-import { reportService } from '../../services/reportService';
+import { pickupService } from '../../services/pickupService';
+import { parseApiError } from '../../services/api';
 import { Severity, WasteRequest } from '../../types';
 
 const WASTE_TYPES: WasteRequest['type'][] = ['General', 'Recyclables', 'Hazardous', 'Bulky'];
 const SEVERITIES: Severity[] = ['Low', 'Medium', 'High', 'Critical'];
 
-export const ReportWasteScreen: React.FC = () => {
+export const RequestPickupScreen: React.FC = () => {
   const { user } = useAuth();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   const [form, setForm] = useState({
-    lga: 'Akure South', // Mock default
-    ward: '',
-    street: user?.address || '',
-    landmark: '',
     type: 'General' as WasteRequest['type'],
-    severity: 'Medium' as Severity,
     notes: '',
-    preferredDate: '',
+    scheduledDate: '',
+    scheduledTime: '',
+    amount: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [createdPickupId, setCreatedPickupId] = useState<string | null>(null);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.ward.trim()) newErrors.ward = 'Ward is required';
-    if (!form.street.trim()) newErrors.street = 'Street is required';
     if (!form.notes.trim()) newErrors.notes = 'Description is required';
+    if (!form.scheduledDate.trim()) newErrors.scheduledDate = 'Date is required';
+    if (!form.scheduledTime.trim()) newErrors.scheduledTime = 'Time is required';
     return newErrors;
   };
 
@@ -53,24 +57,20 @@ export const ReportWasteScreen: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      await reportService.submitReport({
-        residentId: user!.id,
-        locationId: user!.locationId || 'loc1', // Mocking location resolution
-        street: form.street,
-        landmark: form.landmark,
-        type: form.type,
-        severity: form.severity,
-        notes: form.notes,
-        preferredDate: form.preferredDate ? new Date(form.preferredDate).toISOString() : undefined,
+      const result = await pickupService.createPickupRequest(form.type, form.notes, {
+        scheduledDate: form.scheduledDate,
+        scheduledTime: form.scheduledTime,
+        amount: parseFloat(form.amount),
       });
-
+      
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
-        navigation.goBack();
-      }, 2000);
+        // After successfully creating, redirect back to dashboard
+        navigation.replace('ResidentTabs');
+      }, 1500);
     } catch (e) {
-      Alert.alert('Error', 'Could not submit report.');
+      Alert.alert('Submission Failed', parseApiError(e));
     } finally {
       setIsSubmitting(false);
     }
@@ -117,7 +117,7 @@ export const ReportWasteScreen: React.FC = () => {
           >
             <CheckCircle color={theme.colors.success} size={80} />
             <AppText variant="h2" color={theme.colors.surface} style={{ marginTop: 24, textAlign: 'center' }}>
-              Report Submitted!
+              Pickup Requested!
             </AppText>
             <AppText variant="body" color={theme.colors.surface} style={{ marginTop: 8, textAlign: 'center', opacity: 0.9 }}>
               Thank you for keeping our city clean.
@@ -127,55 +127,10 @@ export const ReportWasteScreen: React.FC = () => {
       )}
 
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
-        <AppText variant="h2">Report Waste</AppText>
+        <AppText variant="h2">Request Pickup</AppText>
         <AppText variant="body" color={theme.colors.textSecondary}>
           Provide details about the waste needing collection.
         </AppText>
-      </Animatable.View>
-
-      <Animatable.View animation="fadeInLeft" delay={200}>
-        <AppInput
-          label="Local Government (LGA)"
-          value={form.lga}
-          onChangeText={(val) => setForm({ ...form, lga: val })}
-        />
-      </Animatable.View>
-      <Animatable.View animation="fadeInRight" delay={300}>
-        <AppInput
-          label="Ward"
-          value={form.ward}
-          onChangeText={(val) => setForm({ ...form, ward: val })}
-          error={errors.ward}
-          placeholder="e.g. Obanla"
-        />
-      </Animatable.View>
-
-      <Animatable.View animation="fadeInLeft" delay={400}>
-        <AppInput
-          label="Street Address"
-          value={form.street}
-          onChangeText={(val) => setForm({ ...form, street: val })}
-          error={errors.street}
-          placeholder="e.g. 15 FUTA South Gate Road"
-        />
-      </Animatable.View>
-
-      <Animatable.View animation="fadeInRight" delay={500}>
-        <AppInput
-          label="Nearest Landmark / House No."
-          value={form.landmark}
-          onChangeText={(val) => setForm({ ...form, landmark: val })}
-          placeholder="Optional but helpful"
-        />
-      </Animatable.View>
-
-      <Animatable.View animation="fadeInLeft" delay={550}>
-        <AppInput
-          label="Preferred Pickup Date"
-          value={form.preferredDate}
-          onChangeText={(val) => setForm({ ...form, preferredDate: val })}
-          placeholder="YYYY-MM-DD (Optional)"
-        />
       </Animatable.View>
 
       <Animatable.View animation="fadeInUp" delay={600}>
@@ -187,27 +142,80 @@ export const ReportWasteScreen: React.FC = () => {
         />
       </Animatable.View>
 
-      <Animatable.View animation="fadeInUp" delay={700}>
-        <Selector 
-          label="Severity" 
-          options={SEVERITIES} 
-          value={form.severity} 
-          onChange={(val: any) => setForm({ ...form, severity: val })} 
-        />
-      </Animatable.View>
-
       <Animatable.View animation="fadeInUp" delay={800}>
         <AppInput
           label="Description"
-        value={form.notes}
-        onChangeText={(val) => setForm({ ...form, notes: val })}
-        error={errors.notes}
-        placeholder="Describe the waste..."
-        multiline
+          value={form.notes}
+          onChangeText={(val) => setForm({ ...form, notes: val })}
+          error={errors.notes}
+          placeholder="Describe the waste..."
+          multiline
           numberOfLines={3}
           style={{ height: 80, textAlignVertical: 'top' }}
         />
       </Animatable.View>
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Animatable.View animation="fadeInUp" delay={850} style={{ flex: 1, marginRight: 8 }}>
+          <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={{ marginBottom: 6 }}>
+            Preferred Date
+          </AppText>
+          <TouchableOpacity 
+            style={[styles.chip, { margin: 0, height: 48, justifyContent: 'center' }, errors.scheduledDate && { borderColor: theme.colors.error }]}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <AppText variant="body" color={form.scheduledDate ? theme.colors.text : theme.colors.textSecondary}>
+              {form.scheduledDate || 'Select Date'}
+            </AppText>
+          </TouchableOpacity>
+          {errors.scheduledDate && <AppText variant="caption" color={theme.colors.error} style={{ marginTop: 4 }}>{errors.scheduledDate}</AppText>}
+          {showDatePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="date"
+              display="default"
+              onChange={(e, date) => {
+                setShowDatePicker(false);
+                if (date) {
+                  setSelectedDate(date);
+                  setForm({ ...form, scheduledDate: date.toISOString().split('T')[0] });
+                }
+              }}
+            />
+          )}
+        </Animatable.View>
+
+        <Animatable.View animation="fadeInUp" delay={850} style={{ flex: 1, marginLeft: 8 }}>
+          <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={{ marginBottom: 6 }}>
+            Preferred Time
+          </AppText>
+          <TouchableOpacity 
+            style={[styles.chip, { margin: 0, height: 48, justifyContent: 'center' }, errors.scheduledTime && { borderColor: theme.colors.error }]}
+            onPress={() => setShowTimePicker(true)}
+          >
+            <AppText variant="body" color={form.scheduledTime ? theme.colors.text : theme.colors.textSecondary}>
+              {form.scheduledTime || 'Select Time'}
+            </AppText>
+          </TouchableOpacity>
+          {errors.scheduledTime && <AppText variant="caption" color={theme.colors.error} style={{ marginTop: 4 }}>{errors.scheduledTime}</AppText>}
+          {showTimePicker && (
+            <DateTimePicker
+              value={selectedDate}
+              mode="time"
+              display="default"
+              onChange={(e, date) => {
+                setShowTimePicker(false);
+                if (date) {
+                  setSelectedDate(date);
+                  setForm({ ...form, scheduledTime: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+                }
+              }}
+            />
+          )}
+        </Animatable.View>
+      </View>
+
+      {/* Amount field removed as payment is physical */}
 
       <Animatable.View animation="zoomIn" delay={900} style={styles.imagePlaceholder}>
         <Camera color={theme.colors.textSecondary} size={32} />
@@ -218,7 +226,7 @@ export const ReportWasteScreen: React.FC = () => {
 
       <Animatable.View animation="fadeInUp" delay={1000}>
         <AppButton 
-          title="Submit Report" 
+          title="Submit Request" 
         onPress={handleSubmit} 
           loading={isSubmitting}
           style={styles.submitBtn}

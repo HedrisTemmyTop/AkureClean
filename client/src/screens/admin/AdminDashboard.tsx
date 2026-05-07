@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Users, Truck, AlertTriangle, CheckCircle, BarChart3, Clock, LogOut, Plus } from 'lucide-react-native';
+import { Users, Truck, AlertTriangle, CheckCircle, BarChart3, Clock, LogOut, Plus, CreditCard } from 'lucide-react-native';
 import * as Animatable from 'react-native-animatable';
 
 import { ScreenContainer } from '../../components/ScreenContainer';
@@ -13,7 +13,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 import { adminService } from '../../services/adminService';
-import { routeService } from '../../services/routeService';
+import { assignmentService } from '../../services/routeService';
 import { AdminStats, AssignmentRoute } from '../../types';
 import { AdminStackParamList } from '../../navigation/RoleNavigator';
 
@@ -40,13 +40,14 @@ export const AdminDashboard: React.FC = () => {
 
   const loadDashboard = async () => {
     try {
-      const statsData = await adminService.getDashboardStats();
-      const assignmentsData = await routeService.getAssignments('col1');
-      
+      const [statsData, assignmentsData] = await Promise.all([
+        adminService.getDashboardStats(),
+        assignmentService.getAssignments(),
+      ]);
       setStats(statsData);
-      setRecentAssignments(assignmentsData.slice(0, 3)); // show top 3 recent assignments
+      setRecentAssignments(assignmentsData.slice(0, 3));
     } catch (e) {
-      console.error(e);
+      console.error('Dashboard load error:', e);
     }
   };
 
@@ -93,44 +94,44 @@ export const AdminDashboard: React.FC = () => {
                 {stats.activeRoutes} Routes Active
               </AppText>
               <AppText variant="caption" color={theme.colors.textSecondary} style={{ marginTop: 2 }}>
-                Across {stats.totalCollectors} Collectors
+                Across {stats.totalDrivers} Drivers
               </AppText>
             </View>
           </View>
 
           {/* Stats Grid */}
           <View style={styles.statsGrid}>
-            <AppCard style={styles.statBox} elevation="sm">
+            <TouchableOpacity style={[styles.statBox, { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md }]} onPress={() => navigation.navigate('AdminPickupsList' as any)}>
               <View style={[styles.kpiIconBox, { backgroundColor: theme.colors.primary + '15', width: 40, height: 40, borderRadius: 20 }]}>
                  <Users color={theme.colors.primary} size={20} />
               </View>
               <AppText variant="h2">{stats.totalReports}</AppText>
-              <AppText variant="bodySmall" color={theme.colors.textSecondary}>Total Reports</AppText>
-            </AppCard>
+              <AppText variant="bodySmall" color={theme.colors.textSecondary}>Total Pickups</AppText>
+            </TouchableOpacity>
             
-            <AppCard style={styles.statBox} elevation="sm">
-              <View style={[styles.kpiIconBox, { backgroundColor: theme.colors.status.pending + '15', width: 40, height: 40, borderRadius: 20 }]}>
-                 <AlertTriangle color={theme.colors.status.pending} size={20} />
+            <TouchableOpacity style={[styles.statBox, { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md }]} onPress={() => navigation.navigate('AdminResidentsList' as any)}>
+              <View style={[styles.kpiIconBox, { backgroundColor: theme.colors.primary + '15', width: 40, height: 40, borderRadius: 20 }]}>
+                 <Users color={theme.colors.primary} size={20} />
               </View>
-              <AppText variant="h2">{stats.pendingReports}</AppText>
-              <AppText variant="bodySmall" color={theme.colors.textSecondary}>Pending</AppText>
-            </AppCard>
+              <AppText variant="h2">{stats.totalResidents}</AppText>
+              <AppText variant="bodySmall" color={theme.colors.textSecondary}>Residents</AppText>
+            </TouchableOpacity>
 
-            <AppCard style={styles.statBox} elevation="sm">
-              <View style={[styles.kpiIconBox, { backgroundColor: theme.colors.status.completed + '15', width: 40, height: 40, borderRadius: 20 }]}>
-                 <CheckCircle color={theme.colors.status.completed} size={20} />
+            <TouchableOpacity style={[styles.statBox, { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md }]} onPress={() => navigation.navigate('AdminPaymentsList' as any)}>
+              <View style={[styles.kpiIconBox, { backgroundColor: theme.colors.success + '15', width: 40, height: 40, borderRadius: 20 }]}>
+                 <CreditCard color={theme.colors.success} size={20} />
               </View>
-              <AppText variant="h2">{stats.resolvedReports}</AppText>
-              <AppText variant="bodySmall" color={theme.colors.textSecondary}>Resolved</AppText>
-            </AppCard>
+              <AppText variant="h2">{stats.totalPayments}</AppText>
+              <AppText variant="bodySmall" color={theme.colors.textSecondary}>Payments</AppText>
+            </TouchableOpacity>
             
-            <AppCard style={styles.statBox} elevation="sm">
+            <TouchableOpacity style={[styles.statBox, { backgroundColor: theme.colors.surface, borderRadius: theme.borderRadius.md }]} onPress={() => navigation.navigate('AdminCollectorsList' as any)}>
               <View style={[styles.kpiIconBox, { backgroundColor: theme.colors.secondary + '15', width: 40, height: 40, borderRadius: 20 }]}>
                  <Truck color={theme.colors.secondary} size={20} />
               </View>
-              <AppText variant="h2">{stats.totalCollectors}</AppText>
+              <AppText variant="h2">{stats.totalDrivers}</AppText>
               <AppText variant="bodySmall" color={theme.colors.textSecondary}>Collectors</AppText>
-            </AppCard>
+            </TouchableOpacity>
           </View>
         </Animatable.View>
       )}
@@ -141,8 +142,18 @@ export const AdminDashboard: React.FC = () => {
           title="Create New Assignment" 
           icon={<Plus color={theme.colors.surface} size={20} />}
           onPress={() => navigation.navigate('CreateAssignment')}
-          style={{ marginBottom: theme.spacing.xl }}
+          style={{ marginBottom: theme.spacing.md }}
         />
+        
+        <View style={styles.quickLinksRow}>
+          <TouchableOpacity style={styles.quickLinkBtn} onPress={() => navigation.navigate('UsersList')}>
+            <AppText variant="bodySmall" weight="600" color={theme.colors.primary}>Users</AppText>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.quickLinkBtn} onPress={() => navigation.navigate('LogsList')}>
+            <AppText variant="bodySmall" weight="600" color={theme.colors.primary}>Logs</AppText>
+          </TouchableOpacity>
+        </View>
+
       </Animatable.View>
 
       {/* Recent Activity */}
@@ -164,7 +175,7 @@ export const AdminDashboard: React.FC = () => {
               <View>
                 <AppText variant="body" weight="600" style={styles.reportType}>{assignment.area} Street</AppText>
                 <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-                  Collector: {assignment.collectorId}
+                  Driver: {assignment.driverName || assignment.driverId || 'Unassigned'}
                 </AppText>
               </View>
               <StatusBadge status={assignment.status as any} />
@@ -239,6 +250,21 @@ const styles = StyleSheet.create({
   },
   statIcon: {
     marginBottom: theme.spacing.sm,
+  },
+  quickLinksRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: theme.spacing.md,
+    gap: 8,
+  },
+  quickLinkBtn: {
+    flex: 1,
+    padding: theme.spacing.md,
+    backgroundColor: theme.colors.primary + '10',
+    borderRadius: theme.borderRadius.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.primary + '30',
   },
   sectionHeader: {
     flexDirection: 'row',

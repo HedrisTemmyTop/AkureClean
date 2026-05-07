@@ -1,26 +1,39 @@
+/**
+ * scheduleService.ts — Collection Schedule API service
+ * Maps to /api/schedules endpoints.
+ */
+import { apiClient } from './api';
 import { CollectionSchedule } from '../types';
-import { mockSchedules } from '../data/mockData';
 
-let currentSchedules = [...mockSchedules];
+function normaliseSchedule(raw: any): CollectionSchedule {
+  return {
+    id: raw._id ?? raw.id,
+    locationId: raw.zoneId?._id ?? raw.zoneId ?? raw.ward ?? '',
+    dayOfWeek: raw.dayOfWeek,
+    nextPickup: raw.nextPickup,
+  };
+}
 
 export const scheduleService = {
-  async getSchedulesByLocation(locationId: string): Promise<CollectionSchedule[]> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    return currentSchedules.filter(s => s.locationId === locationId);
+  /** Resident: fetch schedules matching their ward/LGA from their profile */
+  async getSchedulesByLocation(_locationId?: string): Promise<CollectionSchedule[]> {
+    const { data } = await apiClient.get('/schedules/mine');
+    return (data.data as any[]).map(normaliseSchedule);
   },
 
   async getAllSchedules(): Promise<CollectionSchedule[]> {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return [...currentSchedules];
+    const { data } = await apiClient.get('/schedules');
+    return (data.data as any[]).map(normaliseSchedule);
   },
 
-  async createSchedule(data: Omit<CollectionSchedule, 'id'>): Promise<CollectionSchedule> {
-    await new Promise(resolve => setTimeout(resolve, 600));
-    const newSchedule: CollectionSchedule = {
-      ...data,
-      id: `sch_${Date.now()}`
-    };
-    currentSchedules = [...currentSchedules, newSchedule];
-    return newSchedule;
-  }
+  async createSchedule(payload: {
+    zoneId: string;
+    lga?: string;
+    ward?: string;
+    dayOfWeek: CollectionSchedule['dayOfWeek'];
+    nextPickup: string;
+  }): Promise<CollectionSchedule> {
+    const { data } = await apiClient.post('/schedules', payload);
+    return normaliseSchedule(data.data);
+  },
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { User, Mail, Phone, MapPin, Edit3, LogOut } from 'lucide-react-native';
+import { User, Mail, Phone, MapPin, Edit3, LogOut, ShieldOff, Trash2 } from 'lucide-react-native';
 import * as Animatable from 'react-native-animatable';
 
 import { ScreenContainer } from '../../components/ScreenContainer';
@@ -12,7 +12,7 @@ import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
 
 export const ProfileScreen: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, deactivateAccount, deleteAccount } = useAuth();
   const navigation = useNavigation<any>();
 
   const handleLogout = () => {
@@ -22,6 +22,28 @@ export const ProfileScreen: React.FC = () => {
       [
         { text: "Cancel", style: "cancel" },
         { text: "Sign Out", style: "destructive", onPress: signOut }
+      ]
+    );
+  };
+  
+  const handleDeactivate = () => {
+    Alert.alert(
+      "Deactivate Account",
+      "Are you sure you want to deactivate your account? You will be signed out and won't be able to access your account until it's reactivated.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Deactivate", style: "destructive", onPress: deactivateAccount }
+      ]
+    );
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action is irreversible.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: deleteAccount }
       ]
     );
   };
@@ -87,6 +109,40 @@ export const ProfileScreen: React.FC = () => {
             Sign Out
           </AppText>
         </TouchableOpacity>
+
+        {user.role === 'driver' && (
+          <>
+            <View style={styles.divider} />
+            <TouchableOpacity style={styles.actionRow} onPress={handleDeactivate}>
+              <View style={styles.actionIconBoxWarning}>
+                <ShieldOff size={20} color={theme.colors.warning} />
+              </View>
+              <View style={styles.actionText}>
+                <AppText variant="body" weight="600" color={theme.colors.warning}>
+                  Deactivate Account
+                </AppText>
+                <AppText variant="caption" color={theme.colors.textSecondary}>
+                  Temporarily disable your account
+                </AppText>
+              </View>
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+            <TouchableOpacity style={styles.actionRow} onPress={handleDelete}>
+              <View style={styles.actionIconBoxDestructive}>
+                <Trash2 size={20} color={theme.colors.status.cancelled} />
+              </View>
+              <View style={styles.actionText}>
+                <AppText variant="body" weight="600" color={theme.colors.status.cancelled}>
+                  Delete Account
+                </AppText>
+                <AppText variant="caption" color={theme.colors.textSecondary}>
+                  Permanently remove your account data
+                </AppText>
+              </View>
+            </TouchableOpacity>
+          </>
+        )}
       </Animatable.View>
 
     </ScreenContainer>
@@ -152,7 +208,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: theme.spacing.md,
   },
+  actionIconBoxWarning: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: theme.colors.warning + '10',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: theme.spacing.md,
+  },
   actionText: {
     flex: 1,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    marginHorizontal: theme.spacing.md,
   }
 });

@@ -1,25 +1,38 @@
-import { Notification } from '../types';
-import { mockNotifications } from '../data/mockData';
+/**
+ * notificationService.ts — Notification API service
+ * Maps to /api/notifications endpoints.
+ */
+import { apiClient } from './api';
+import { Notification, NotificationType } from '../types';
 
-let currentNotifications = [...mockNotifications];
+function normaliseNotification(raw: any): Notification {
+  return {
+    id: raw._id ?? raw.id,
+    userId: raw.userId?._id ?? raw.userId ?? '',
+    title: raw.title,
+    message: raw.message,
+    date: raw.createdAt ?? raw.date,
+    type: (raw.type ?? 'System') as NotificationType,
+    read: raw.read ?? false,
+  };
+}
 
 export const notificationService = {
-  async getNotifications(userId: string): Promise<Notification[]> {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    return currentNotifications.filter(n => n.userId === userId).sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+  async getNotifications(_userId?: string): Promise<Notification[]> {
+    const { data } = await apiClient.get('/notifications');
+    return (data.data as any[]).map(normaliseNotification);
+  },
+
+  async getUnreadCount(_userId?: string): Promise<number> {
+    const { data } = await apiClient.get('/notifications/unread-count');
+    return data.data.count as number;
   },
 
   async markAsRead(notificationId: string): Promise<void> {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    currentNotifications = currentNotifications.map(n => 
-      n.id === notificationId ? { ...n, read: true } : n
-    );
+    await apiClient.patch(`/notifications/${notificationId}/read`);
   },
 
-  async getUnreadCount(userId: string): Promise<number> {
-    const notifications = await this.getNotifications(userId);
-    return notifications.filter(n => !n.read).length;
-  }
+  async markAllAsRead(): Promise<void> {
+    await apiClient.patch('/notifications/mark-all-read');
+  },
 };

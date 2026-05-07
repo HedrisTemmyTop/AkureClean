@@ -11,9 +11,9 @@ import { AppButton } from '../../components/AppButton';
 import { theme } from '../../theme';
 import { routeService } from '../../services/routeService';
 import { AssignmentRoute } from '../../types';
-import { CollectorStackParamList } from '../../navigation/RoleNavigator';
+import { DriverStackParamList } from '../../navigation/RoleNavigator';
 
-type NavigationProp = NativeStackNavigationProp<CollectorStackParamList, 'RouteSummary'>;
+type NavigationProp = NativeStackNavigationProp<DriverStackParamList, 'RouteSummary'>;
 
 export const RouteCompletionSummaryScreen: React.FC = () => {
   const routeParams = useRoute<any>();
@@ -104,7 +104,7 @@ export const RouteCompletionSummaryScreen: React.FC = () => {
 
       <AppButton 
         title="Return to Dashboard" 
-        onPress={() => navigation.navigate('CollectorTabs')}
+        onPress={() => navigation.navigate('DriverTabs')}
         size="large"
         style={styles.doneBtn}
       />

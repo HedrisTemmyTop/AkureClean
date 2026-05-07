@@ -12,9 +12,9 @@ import { AppInput } from '../../components/AppInput';
 import { theme } from '../../theme';
 import { routeService } from '../../services/routeService';
 import { RouteStop } from '../../types';
-import { CollectorStackParamList } from '../../navigation/RoleNavigator';
+import { DriverStackParamList } from '../../navigation/RoleNavigator';
 
-type NavigationProp = NativeStackNavigationProp<CollectorStackParamList, 'StopDetails'>;
+type NavigationProp = NativeStackNavigationProp<DriverStackParamList, 'StopDetails'>;
 
 export const StopDetailsScreen: React.FC = () => {
   const routeParams = useRoute<any>();
@@ -141,7 +141,7 @@ export const StopDetailsScreen: React.FC = () => {
         </AppCard>
       ) : null}
 
-      <AppText variant="h3" style={styles.sectionTitle}>Collector Notes</AppText>
+      <AppText variant="h3" style={styles.sectionTitle}>Driver Notes</AppText>
       <AppInput
         placeholder="Add a note (required if skipping)..."
         value={notes}

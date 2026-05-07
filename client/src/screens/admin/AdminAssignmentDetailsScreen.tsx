@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MapPin, Calendar, CheckCircle, Clock, User, Mail, Home } from 'lucide-react-native';
@@ -12,6 +12,7 @@ import { AppButton } from '../../components/AppButton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { theme } from '../../theme';
 import { routeService } from '../../services/routeService';
+import { parseApiError } from '../../services/api';
 import { AssignmentRoute } from '../../types';
 import { AdminStackParamList } from '../../navigation/RoleNavigator';
 
@@ -28,14 +29,10 @@ export const AdminAssignmentDetailsScreen: React.FC = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        // Find from all mock data
-        const data = await routeService.getAssignments('mock_col_1');
-        const found = data.find(r => r.id === routeId);
-        if (found) {
-          setAssignment(found);
-        }
+        const data = await routeService.getRouteById(routeId);
+        setAssignment(data);
       } catch (e) {
-        console.error(e);
+        Alert.alert('Error', parseApiError(e));
       } finally {
         setLoading(false);
       }
@@ -84,16 +81,16 @@ export const AdminAssignmentDetailsScreen: React.FC = () => {
         <View style={styles.detailRow}>
           <User color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Assigned Collector</AppText>
-            <AppText variant="body" weight="600">{assignment.collectorId}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Assigned Driver</AppText>
+            <AppText variant="body" weight="600">{assignment.driverName || assignment.driverId}</AppText>
           </View>
         </View>
 
         <View style={styles.detailRow}>
           <Mail color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Collector Email</AppText>
-            <AppText variant="body" weight="600">{assignment.collectorId}@mock.com</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Driver Email</AppText>
+            <AppText variant="body" weight="600">{assignment.driverEmail || '—'}</AppText>
           </View>
         </View>
 

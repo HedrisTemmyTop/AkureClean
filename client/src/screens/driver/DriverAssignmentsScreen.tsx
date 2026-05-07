@@ -11,13 +11,13 @@ import { AppCard } from '../../components/AppCard';
 import { StatusBadge } from '../../components/StatusBadge';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
-import { routeService } from '../../services/routeService';
+import { assignmentService } from '../../services/routeService';
 import { AssignmentRoute } from '../../types';
-import { CollectorStackParamList } from '../../navigation/RoleNavigator';
+import { DriverStackParamList } from '../../navigation/RoleNavigator';
 
-type NavigationProp = NativeStackNavigationProp<CollectorStackParamList, 'CollectorTabs'>;
+type NavigationProp = NativeStackNavigationProp<DriverStackParamList, 'DriverTabs'>;
 
-export const CollectorAssignmentsScreen: React.FC = () => {
+export const DriverAssignmentsScreen: React.FC = () => {
   const { user } = useAuth();
   const navigation = useNavigation<NavigationProp>();
 
@@ -28,7 +28,7 @@ export const CollectorAssignmentsScreen: React.FC = () => {
   const loadRoutes = async () => {
     if (!user) return;
     try {
-      const data = await routeService.getAssignments(user.id);
+      const data = await assignmentService.getAssignments();
       // Sort: InProgress first, then Pending, then Completed
       data.sort((a, b) => {
         const rank = (s: string) => s === 'InProgress' ? 0 : s === 'Pending' ? 1 : 2;

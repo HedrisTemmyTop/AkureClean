@@ -9,7 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { notificationService } from '../../services/notificationService';
 import { Notification } from '../../types';
 
-export const CollectorNotificationsScreen: React.FC = () => {
+export const DriverNotificationsScreen: React.FC = () => {
   const { user } = useAuth();
   
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -19,12 +19,12 @@ export const CollectorNotificationsScreen: React.FC = () => {
   const loadNotifications = async () => {
     if (!user) return;
     try {
-      // Re-using the same generic notification service but we can mock injected collector alerts 
+      // Re-using the same generic notification service but we can mock injected driver alerts 
       // dynamically if we want. For now we use whatever the service returns for this mock user.
       const data = await notificationService.getNotifications(user.id);
       
-      // Inject dummy collector alerts dynamically since we didn't add them to mockData initially
-      const collectorAlerts: Notification[] = [
+      // Inject dummy driver alerts dynamically since we didn't add them to mockData initially
+      const driverAlerts: Notification[] = [
         {
           id: 'col-notif1',
           userId: user.id,
@@ -45,7 +45,7 @@ export const CollectorNotificationsScreen: React.FC = () => {
         }
       ];
 
-      setNotifications([...collectorAlerts, ...data].sort((a,b) => 
+      setNotifications([...driverAlerts, ...data].sort((a,b) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       ));
     } catch (e) {

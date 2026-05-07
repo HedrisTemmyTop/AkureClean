@@ -1,4 +1,4 @@
-export type Role = 'Resident' | 'Collector' | 'Admin';
+export type Role = 'resident' | 'driver' | 'admin';
 
 export interface Location {
   id: string;
@@ -13,6 +13,18 @@ export interface User {
   email: string;
   phone?: string;
   address?: string;
+  houseDescription?: string;
+  localGovt?: string;
+  ward?: string;
+  houseType?: string;
+  numberOfRooms?: number;
+  numberOfShops?: number;
+  numberOfWorkersRange?: string;
+  truckPlateNumber?: string;
+  truckCapacity?: string;
+  isDeactivated?: boolean;
+  deactivationReason?: string;
+  pollingUnit?: string;
   role: Role;
   locationId?: string; // Optional for Admins sometimes, but mostly used for Residents
   createdAt: string;
@@ -25,7 +37,7 @@ export type Severity = 'Low' | 'Medium' | 'High' | 'Critical';
 export interface WasteRequest {
   id: string;
   residentId: string;
-  collectorId?: string;
+  driverId?: string;
   locationId: string;
   street: string;
   landmark?: string;
@@ -92,7 +104,9 @@ export interface RouteStop {
 
 export interface AssignmentRoute {
   id: string;
-  collectorId: string;
+  driverId: string;
+  driverName?: string;
+  driverEmail?: string;
   title: string;
   area: string;
   collectionDate: string;
@@ -108,10 +122,12 @@ export interface AssignmentRoute {
 export interface AdminStats {
   totalReports: number;
   pendingReports: number;
-  resolvedReports: number;
-  totalCollectors: number;
+  completedReports: number;
+  totalDrivers: number;
   activeRoutes: number;
   activeSchedules: number;
+  totalResidents: number;
+  totalPayments: number;
 }
 
 export interface AreaNode {
@@ -125,8 +141,8 @@ export interface AreaNode {
   }[];
 }
 
-export interface CollectorStats {
-  collectorId: string;
+export interface DriverStats {
+  driverId: string;
   name: string;
   activeRoutesCount: number;
   completedRoutesCount: number;

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   TextInput,
   TextInputProps,
   StyleSheet,
   TouchableOpacity,
+  Animated,
 } from 'react-native';
 import { theme } from '../theme';
 import { AppText } from './AppText';
@@ -24,7 +25,48 @@ export const AppInput: React.FC<AppInputProps> = ({
   ...props
 }) => {
   const [isSecure, setIsSecure] = useState(isPassword);
-  const [isFocused, setIsFocused] = useState(false);
+  // Use Animated.Value to drive border colour — no re-render on focus change
+  const borderAnim = useRef(new Animated.Value(0)).current;
+
+  const handleFocus = useCallback(
+    (e: any) => {
+      Animated.timing(borderAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: false,
+      }).start();
+      props.onFocus?.(e);
+    },
+    [props.onFocus],
+  );
+
+  const handleBlur = useCallback(
+    (e: any) => {
+      Animated.timing(borderAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: false,
+      }).start();
+      props.onBlur?.(e);
+    },
+    [props.onBlur],
+  );
+
+  const borderColor = borderAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [
+      error ? theme.colors.error : theme.colors.border,
+      theme.colors.primary,
+    ],
+  });
+
+  const bgColor = borderAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [
+      error ? theme.colors.error + '05' : theme.colors.surface,
+      theme.colors.primary + '05',
+    ],
+  });
 
   return (
     <View style={styles.container}>
@@ -33,27 +75,22 @@ export const AppInput: React.FC<AppInputProps> = ({
           {label}
         </AppText>
       )}
-      
-      <View style={[
-        styles.inputContainer,
-        isFocused && styles.inputFocused,
-        error ? styles.inputError : null,
-      ]}>
+
+      <Animated.View
+        style={[
+          styles.inputContainer,
+          { borderColor, backgroundColor: bgColor },
+        ]}
+      >
         <TextInput
           style={[styles.input, style]}
           placeholderTextColor={theme.colors.textSecondary}
           secureTextEntry={isSecure}
-          onFocus={(e) => {
-            setIsFocused(true);
-            props.onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setIsFocused(false);
-            props.onBlur?.(e);
-          }}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           {...props}
         />
-        
+
         {isPassword && (
           <TouchableOpacity
             style={styles.eyeIcon}
@@ -66,7 +103,7 @@ export const AppInput: React.FC<AppInputProps> = ({
             )}
           </TouchableOpacity>
         )}
-      </View>
+      </Animated.View>
 
       {error ? (
         <AppText variant="caption" color={theme.colors.error} style={styles.errorText}>
@@ -88,18 +125,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: theme.colors.border,
     borderRadius: theme.borderRadius.md,
-    backgroundColor: theme.colors.surface,
-  },
-  inputFocused: {
-    borderColor: theme.colors.primary,
-    backgroundColor: theme.colors.primary + '05', // tiny hint of primary background
-    ...theme.shadows.sm,
-  },
-  inputError: {
-    borderColor: theme.colors.error,
-    backgroundColor: theme.colors.error + '05',
+    overflow: 'hidden',
   },
   input: {
     flex: 1,
