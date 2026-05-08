@@ -26,6 +26,7 @@ function normaliseStop(raw: any) {
     status: (raw.status ?? 'Pending') as StopStatus,
     residentNote: raw.residentNote,
     collectionNote: raw.collectionNote,
+    skipReason: raw.skipReason,
     reportsCount: raw.reportsCount ?? 1,
   };
 }
@@ -76,16 +77,12 @@ export const assignmentService = {
   },
 
   async createAssignment(payload: {
-    driverEmail: string;
+    driverId: string;
     title: string;
-    area: string;
     collectionDate: string;
-    zoneId?: string;
-    estimatedDistance?: string;
-    estimatedDuration?: string;
-    stops?: any[];
-    pollingUnits?: any[];
-    segments?: Array<{ start: [number, number]; end: [number, number] }>;
+    lga: string;
+    ward: string;
+    pollingUnits: string[];
   }): Promise<AssignmentRoute> {
     const { data } = await apiClient.post('/assignments', payload);
     return normaliseAssignment(data.data);

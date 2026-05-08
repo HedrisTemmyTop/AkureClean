@@ -35,6 +35,7 @@ import { DriverNotificationsScreen } from '../screens/driver/DriverNotifications
 import { AdminDashboard } from '../screens/admin/AdminDashboard';
 import { AdminAssignmentsScreen } from '../screens/admin/AdminAssignmentsScreen';
 import { AdminAssignmentDetailsScreen } from '../screens/admin/AdminAssignmentDetailsScreen';
+import { AdminStopDetailsScreen } from '../screens/admin/AdminStopDetailsScreen';
 import { CreateAssignmentScreen } from '../screens/admin/CreateAssignmentScreen';
 import { CreateZoneScreen } from '../screens/admin/CreateZoneScreen';
 import { AdminZonesScreen } from '../screens/admin/AdminZonesScreen';
@@ -93,6 +94,7 @@ export type AdminStackParamList = {
   AdminCollectorDetails: { driverId: string };
   AdminPickupsList: undefined;
   AdminPickupDetails: { pickupId: string };
+  AdminStopDetails: { routeId: string; stopId: string };
   EditProfile: undefined;
 };
 
@@ -207,6 +209,7 @@ const AdminStackNav = () => (
     <Stack.Screen name="AdminCollectorDetails" component={AdminCollectorDetailsScreen} />
     <Stack.Screen name="AdminPickupsList" component={AdminPickupsScreen} />
     <Stack.Screen name="AdminPickupDetails" component={AdminPickupDetailsScreen} />
+    <Stack.Screen name="AdminStopDetails" component={AdminStopDetailsScreen} />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>
 );

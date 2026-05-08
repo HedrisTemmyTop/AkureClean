@@ -100,6 +100,22 @@ export const RouteCompletionSummaryScreen: React.FC = () => {
           </View>
         </View>
 
+        {skipStops > 0 && (
+          <>
+            <View style={styles.divider} />
+            <AppText variant="h3" style={{ marginBottom: theme.spacing.md }}>Skipped Stops</AppText>
+            {assignment.stops.filter(s => s.status === 'Skipped').map((stop, idx) => (
+              <View key={stop.id || idx} style={styles.skipItem}>
+                <AlertTriangle color={theme.colors.warning} size={16} />
+                <View style={{ marginLeft: 8, flex: 1 }}>
+                  <AppText variant="bodySmall" weight="600">{stop.address}</AppText>
+                  <AppText variant="caption" color={theme.colors.textSecondary}>Reason: {stop.skipReason || 'Not provided'}</AppText>
+                </View>
+              </View>
+            ))}
+          </>
+        )}
+
       </AppCard>
 
       <AppButton 
@@ -150,5 +166,13 @@ const styles = StyleSheet.create({
   },
   doneBtn: {
     marginBottom: theme.spacing.xxl,
+  },
+  skipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: theme.colors.warning + '15',
+    padding: theme.spacing.sm,
+    borderRadius: theme.borderRadius.sm,
+    marginBottom: 8,
   }
 });

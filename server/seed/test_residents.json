@@ -27,7 +27,7 @@
     "localGovt": "Akure South",
     "ward": "WARD 04  - IJOMU/OBANLA",
     "pollingUnit": "ALAGBAKA    PR Y SCH  - ALAGBAKA    PR Y SCH  I",
-    "location": { "type": "Point", "coordinates": [5.210, 7.2320] },
+    "location": { "type": "Point", "coordinates": [5.21, 7.232] },
     "createdAt": { "$date": "2026-05-01T08:00:00Z" },
     "updatedAt": { "$date": "2026-05-01T08:00:00Z" }
   },
@@ -43,7 +43,7 @@
     "localGovt": "Akure South",
     "ward": "WARD 04  - IJOMU/OBANLA",
     "pollingUnit": "ELEMO  STREET   - ELEMO  COMPOUND",
-    "location": { "type": "Point", "coordinates": [5.2090, 7.2058] },
+    "location": { "type": "Point", "coordinates": [5.209, 7.2058] },
     "createdAt": { "$date": "2026-05-01T08:00:00Z" },
     "updatedAt": { "$date": "2026-05-01T08:00:00Z" }
   },
@@ -91,7 +91,7 @@
     "localGovt": "Akure South",
     "ward": "WARD 04  - IJOMU/OBANLA",
     "pollingUnit": "NEAR  NEP A OFFICE   - VER TINAR Y CLINIC",
-    "location": { "type": "Point", "coordinates": [5.2109, 7.2200] },
+    "location": { "type": "Point", "coordinates": [5.2109, 7.22] },
     "createdAt": { "$date": "2026-05-01T08:00:00Z" },
     "updatedAt": { "$date": "2026-05-01T08:00:00Z" }
   },
@@ -107,7 +107,7 @@
     "localGovt": "Akure South",
     "ward": "WARD 04  - IJOMU/OBANLA",
     "pollingUnit": "AYET ORO  ST  II -  AYET ORO  STREET   II",
-    "location": { "type": "Point", "coordinates": [5.1980, 7.2340] },
+    "location": { "type": "Point", "coordinates": [5.198, 7.234] },
     "createdAt": { "$date": "2026-05-01T08:00:00Z" },
     "updatedAt": { "$date": "2026-05-01T08:00:00Z" }
   },
@@ -155,7 +155,7 @@
     "localGovt": "Akure South",
     "ward": "WARD 04  - IJOMU/OBANLA",
     "pollingUnit": "EBENEZER    PR Y SCH-  EBENEZER    PR Y SCH  I",
-    "location": { "type": "Point", "coordinates": [5.1914, 7.2200] },
+    "location": { "type": "Point", "coordinates": [5.1914, 7.22] },
     "createdAt": { "$date": "2026-05-01T08:00:00Z" },
     "updatedAt": { "$date": "2026-05-01T08:00:00Z" }
   },
@@ -203,7 +203,7 @@
     "localGovt": "Akure South",
     "ward": "WARD 04  - IJOMU/OBANLA",
     "pollingUnit": "IJOKA  COOP  ST ORE-  NEAR  SA WMILL  COOP  ST ORE",
-    "location": { "type": "Point", "coordinates": [5.1935, 7.2010] },
+    "location": { "type": "Point", "coordinates": [5.1935, 7.201] },
     "createdAt": { "$date": "2026-05-01T08:00:00Z" },
     "updatedAt": { "$date": "2026-05-01T08:00:00Z" }
   },

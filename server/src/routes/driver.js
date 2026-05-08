@@ -58,6 +58,7 @@ router.get("/route", driverController.getMyRoute);
  *       500:
  *         description: Server error
  */
-router.put("/collect/:householdId", driverController.collectHousehold);
+router.put("/collect/:assignmentId/:stopId", driverController.collectHousehold);
+router.put("/skip/:assignmentId/:stopId", driverController.skipHousehold);
 
 module.exports = router;

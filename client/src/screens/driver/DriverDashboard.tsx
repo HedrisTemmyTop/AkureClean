@@ -18,6 +18,7 @@ import {
   Navigation,
   Clock,
   LogOut,
+  CheckCircle,
 } from "lucide-react-native";
 import * as Animatable from "react-native-animatable";
 
@@ -157,22 +158,32 @@ export const DriverDashboard: React.FC = () => {
           delay={200}
         >
           <View style={styles.cardHeader}>
-            <View style={styles.badge}>
-              <View style={styles.pulseDot} />
+            <View style={[
+              styles.badge, 
+              activeRoute.status === 'Completed' && { backgroundColor: theme.colors.success + '20' },
+              activeRoute.status === 'Paused' && { backgroundColor: theme.colors.warning + '20' }
+            ]}>
+              {(activeRoute.status !== 'Completed' && activeRoute.status !== 'Paused') && <View style={styles.pulseDot} />}
               <AppText
                 variant="caption"
-                color={theme.colors.primary}
+                color={
+                  activeRoute.status === 'Completed' ? theme.colors.success : 
+                  activeRoute.status === 'Paused' ? theme.colors.warning :
+                  theme.colors.primary
+                }
                 weight="600"
               >
-                ACTIVE ROUTE
+                {activeRoute.status === 'Completed' ? 'ROUTE COMPLETED' : 
+                 activeRoute.status === 'Paused' ? 'ROUTE PAUSED' : 'ACTIVE ROUTE'}
               </AppText>
             </View>
             <AppText variant="caption" color={theme.colors.textSecondary}>
-              En Route
+              {activeRoute.status === 'Completed' ? 'Finished' : 
+               activeRoute.status === 'Paused' ? 'On Break' : 'En Route'}
             </AppText>
           </View>
           <AppText variant="h2" style={styles.routeTitle}>
-            Daily Zone Collection
+            {activeRoute.title || 'Daily Zone Collection'}
           </AppText>
 
           <View style={styles.routeMeta}>
@@ -186,22 +197,43 @@ export const DriverDashboard: React.FC = () => {
                 {completedStops}/{stops.length} Stops
               </AppText>
             </View>
+            <View style={styles.metaItem}>
+              <Clock color={theme.colors.textSecondary} size={16} />
+              <AppText
+                variant="bodySmall"
+                color={theme.colors.textSecondary}
+                style={styles.metaText}
+              >
+                {new Date(activeRoute.collectionDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} • {activeRoute.collectionTime || '08:00 AM'}
+              </AppText>
+            </View>
           </View>
 
           <TouchableOpacity
-            style={styles.actionBtn}
+            style={[
+              styles.actionBtn,
+              activeRoute.status === 'Completed' && { backgroundColor: theme.colors.success },
+              activeRoute.status === 'Paused' && { backgroundColor: theme.colors.warning }
+            ]}
             onPress={() =>
-              navigation.navigate("Route", { routeId: activeRoute._id })
+              navigation.navigate(activeRoute.status === 'Completed' ? "RouteSummary" : "Route", { routeId: activeRoute._id })
             }
           >
-            <Navigation color={theme.colors.surface} size={20} />
+            {activeRoute.status === 'Completed' ? (
+              <CheckCircle color={theme.colors.surface} size={20} />
+            ) : activeRoute.status === 'Paused' ? (
+              <Navigation color={theme.colors.surface} size={20} />
+            ) : (
+              <Navigation color={theme.colors.surface} size={20} />
+            )}
             <AppText
               variant="body"
               weight="600"
               color={theme.colors.surface}
               style={{ marginLeft: 8 }}
             >
-              Resume Navigation
+              {activeRoute.status === 'Completed' ? 'View Summary' : 
+               activeRoute.status === 'Paused' ? 'Resume Navigation' : 'Resume Navigation'}
             </AppText>
           </TouchableOpacity>
         </AppCard>
