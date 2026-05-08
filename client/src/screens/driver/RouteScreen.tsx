@@ -1,617 +1,511 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Dimensions,
-  Alert,
-  Platform,
-} from "react-native";
-import {
-  useNavigation,
-  useRoute,
-  useIsFocused,
-} from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import MapView, {
-  Marker,
-  Polyline,
-  PROVIDER_GOOGLE,
-  PROVIDER_DEFAULT,
-} from "react-native-maps";
-import { Pause, CheckCircle } from "lucide-react-native";
-import * as Animatable from "react-native-animatable";
-import * as Location from "expo-location";
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator, Dimensions, Alert, Platform, Modal, TextInput } from 'react-native';
+import { useNavigation, useIsFocused, useRoute } from '@react-navigation/native';
+import MapView, { Marker, Polyline, Callout, PROVIDER_GOOGLE, MapType } from 'react-native-maps';
+import { CheckCircle, Pause, AlertCircle, MapPin, Truck, ChevronUp, Layers, Play } from 'lucide-react-native';
+import * as Animatable from 'react-native-animatable';
+import * as Location from 'expo-location';
+import polylineDecoder from '@mapbox/polyline';
 
-import { AppText } from "../../components/AppText";
-import { AppCard } from "../../components/AppCard";
-import { theme } from "../../theme";
-import { driverService } from "../../services/driverService";
-import { routeService } from "../../services/routeService";
-import { DriverStackParamList } from "../../navigation/RoleNavigator";
+import { AppText } from '../../components/AppText';
+import { AppButton } from '../../components/AppButton';
+import { theme } from '../../theme';
+import { driverService } from '../../services/driverService';
+import { parseApiError } from '../../services/api';
 
-type NavigationProp = NativeStackNavigationProp<DriverStackParamList, "Route">;
-
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
-/**
- * Extract { latitude, longitude } from a stop.
- *
- * Stop shape (new model):
- *   stop.location.coordinates = [lng, lat]   ← flat on the stop document
- *   stop.address                              ← flat string
- *   stop.userId = { name, phone, ... }        ← populated resident
- *
- * Legacy shape (old model, kept for safety):
- *   stop.householdId.location.coordinates = [lng, lat]
- */
 function getCoords(stop: any): { latitude: number; longitude: number } | null {
-  // Normalised shape (from routeService.getRouteById) — already converted
-  if (
-    stop?.coordinates?.latitude &&
-    stop?.coordinates?.longitude &&
-    stop.coordinates.latitude !== 0 &&
-    stop.coordinates.longitude !== 0
-  ) {
-    return {
-      latitude: stop.coordinates.latitude,
-      longitude: stop.coordinates.longitude,
-    };
-  }
-  // Raw shape (from driverService.getMyRoute) — flat location on stop
   if (stop?.location?.coordinates?.length === 2) {
     const [lng, lat] = stop.location.coordinates;
-    if (lng && lat && lng !== 0 && lat !== 0)
-      return { latitude: lat, longitude: lng };
-  }
-  // Legacy shape — coordinates nested under householdId
-  if (stop?.householdId?.location?.coordinates?.length === 2) {
-    const [lng, lat] = stop.householdId.location.coordinates;
-    if (lng && lat && lng !== 0 && lat !== 0)
-      return { latitude: lat, longitude: lng };
+    if (lng && lat) return { latitude: lat, longitude: lng };
   }
   return null;
-}
-
-function getAddress(stop: any): string {
-  console.log("stop===>", stop);
-  return stop?.address || stop?.householdId?.address || "Unknown address";
-}
-
-function getResidentName(stop: any): string {
-  return stop?.userId?.name || stop?.householdId?.userId?.name || "";
-}
-
-function getResidentPhone(stop: any): string {
-  return stop?.userId?.phone || stop?.householdId?.userId?.phone || "";
-}
-
-function getDescription(stop: any): string {
-  return (
-    stop?.street ||
-    stop?.houseDescription ||
-    stop?.householdId?.houseDescription ||
-    ""
-  );
-}
-
-/** ID to pass to collectHousehold — userId preferred, householdId fallback */
-function getStopResidentId(stop: any): string {
-  return (
-    stop?.userId?._id ??
-    stop?.userId ??
-    stop?.householdId?._id ??
-    stop?.householdId ??
-    stop?._id
-  );
 }
 
 // ── component ─────────────────────────────────────────────────────────────────
 
 export const RouteScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp>();
-  const routeParams = useRoute<any>();
+  const navigation = useNavigation<any>();
+  const route = useRoute<any>();
   const isFocused = useIsFocused();
+  const { routeId } = route.params || {};
+  const mapRef = useRef<MapView>(null);
 
-  // routeId is passed from AssignmentDetailsScreen (preferred)
-  // fall back to fetching the driver's active route if not provided
-  const routeId: string | undefined = routeParams?.params?.routeId;
-
-  const [routeData, setRouteData] = useState<any>(null);
+  const [assignment, setAssignment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [routedPolyline, setRoutedPolyline] = useState<
-    { latitude: number; longitude: number }[]
-  >([]);
+  
+  // Driver Position
+  const [driverPos, setDriverPos] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [locationSubscription, setLocationSubscription] = useState<Location.LocationSubscription | null>(null);
 
-  const fetchRoute = async () => {
+  // Directions
+  const [roadPolyline, setRoadPolyline] = useState<{ latitude: number; longitude: number }[]>([]);
+  const [fetchingDirections, setFetchingDirections] = useState(false);
+
+  // Actions
+  const [actionLoading, setActionLoading] = useState(false);
+  const [skipModalVisible, setSkipModalVisible] = useState(false);
+  const [skipReason, setSkipReason] = useState('');
+  const [skipError, setSkipError] = useState('');
+  const [activeStopToSkip, setActiveStopToSkip] = useState<any>(null);
+  const [mapType, setMapType] = useState<MapType>('standard');
+
+  useEffect(() => {
+    if (isFocused) {
+      loadRoute();
+      startTracking();
+    }
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
+  }, [isFocused]);
+
+  const loadRoute = async () => {
     try {
-      let data: any;
-      if (routeId) {
-        data = await routeService.getRouteById(routeId);
-        data._rawStops = data.stops;
-      } else {
-        data = await driverService.getMyRoute();
-        if (data) data._rawStops = data.route ?? data.stops ?? [];
-      }
-      setRouteData(data);
+      setLoading(true);
+      const data = await driverService.getMyRoute(routeId);
+      setAssignment(data);
+      if (!data) return;
 
-      // Get current location to start the route from "Where I am"
-      let userCoords: { latitude: number; longitude: number } | null = null;
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === "granted") {
-          const loc = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.High,
-          });
-          userCoords = {
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-          };
-        }
-      } catch (e) {
-        console.warn("Could not get current location for routing", e);
-      }
-
-      // Build road-following polyline via OSRM for PENDING stops only
-      const rawStops: any[] = data?._rawStops ?? [];
-      const pendingCoords = rawStops
-        .filter((s: any) => s.status === "Pending")
-        .map((s: any) => getCoords(s))
-        .filter((c) => c && c.latitude !== 0 && c.longitude !== 0) as {
-        latitude: number;
-        longitude: number;
-      }[];
-
-      // Combine [Current Location] + [Pending Stops]
-      // We only include userCoords if they are somewhat valid (not 0,0)
-      const waypointsCoords =
-        userCoords && userCoords.latitude !== 0
-          ? [userCoords, ...pendingCoords]
-          : pendingCoords;
-
-      if (waypointsCoords.length >= 2) {
-        try {
-          const waypoints = waypointsCoords
-            .map((c) => `${c.longitude},${c.latitude}`)
-            .join(";");
-
-          // Using OSRM 'route' service.
-          // Note: overview=full is key for road-following geometry
-          const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson&steps=false`;
-
-          const res = await fetch(url);
-          const json = await res.json();
-
-          if (json.code === "Ok" && json.routes?.[0]?.geometry?.coordinates) {
-            const roadCoords = json.routes[0].geometry.coordinates.map(
-              ([lng, lat]: [number, number]) => ({
-                latitude: lat,
-                longitude: lng,
-              }),
-            );
-            setRoutedPolyline(roadCoords);
-          } else {
-            console.log("OSRM returned non-OK code:", json.code);
-            setRoutedPolyline(waypointsCoords);
-          }
-        } catch (err) {
-          console.error("OSRM fetch failed:", err);
-          setRoutedPolyline(waypointsCoords);
-        }
-      } else {
-        setRoutedPolyline([]);
+      // If driver doesn't have a GPS lock yet, use the startPoint from the backend
+      if (data.startPoint?.coordinates?.length === 2) {
+        const [lng, lat] = data.startPoint.coordinates;
+        const initialPos = { latitude: lat, longitude: lng };
+        setDriverPos(initialPos);
+        
+        // Animate map to this position
+        mapRef.current?.animateToRegion({
+          ...initialPos,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        }, 1000);
       }
     } catch (e) {
-      console.error("RouteScreen fetchRoute error:", e);
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (isFocused) fetchRoute();
-  }, [isFocused]);
+  const startTracking = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Please enable location permissions to use navigation.');
+      return;
+    }
 
-  if (loading) {
+    try {
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      setDriverPos({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+
+      const sub = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.High, timeInterval: 5000, distanceInterval: 10 },
+        (loc) => {
+          setDriverPos({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+        }
+      );
+      setLocationSubscription(sub);
+    } catch (e) {
+      console.warn("Location tracking failed", e);
+    }
+  };
+
+  // When driverPos or pending stops change, fetch Google Directions
+  useEffect(() => {
+    if (assignment && driverPos) {
+      fetchDirections();
+    }
+  }, [assignment?.stops, driverPos?.latitude, driverPos?.longitude]);
+
+  const fetchDirections = async () => {
+    if (!assignment || !driverPos) return;
+
+    const pendingStops = assignment.stops.filter((s: any) => s.status === 'Pending');
+    if (pendingStops.length === 0) {
+      setRoadPolyline([]);
+      return;
+    }
+
+    const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY;
+    if (!API_KEY) {
+      console.warn("EXPO_PUBLIC_GOOGLE_MAPS_KEY is missing. Falling back to straight lines.");
+      const coords = [driverPos, ...pendingStops.map(getCoords).filter(Boolean)] as any;
+      setRoadPolyline(coords);
+      return;
+    }
+
+    try {
+      setFetchingDirections(true);
+      
+      const origin = `${driverPos.latitude},${driverPos.longitude}`;
+      
+      // We will only query up to 23 waypoints at once + destination (API Limit is 25 total)
+      const validPendingStops = pendingStops.filter(getCoords);
+      if (validPendingStops.length === 0) return;
+
+      const stopsToRoute = validPendingStops.slice(0, 24); 
+      const destinationCoords = getCoords(stopsToRoute[stopsToRoute.length - 1])!;
+      const destination = `${destinationCoords.latitude},${destinationCoords.longitude}`;
+      
+      const waypoints = stopsToRoute.slice(0, -1).map((s: any) => {
+        const c = getCoords(s)!;
+        return `${c.latitude},${c.longitude}`;
+      }).join('|');
+
+      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}${waypoints ? `&waypoints=${waypoints}` : ''}&key=${API_KEY}`;
+      
+      const response = await fetch(url);
+      const json = await response.json();
+
+      if (json.status === 'OK' && json.routes.length > 0) {
+        const points = polylineDecoder.decode(json.routes[0].overview_polyline.points);
+        const coords = points.map((point: any) => ({ latitude: point[0], longitude: point[1] }));
+        setRoadPolyline(coords);
+      } else {
+        console.warn("Google Directions API failed:", json.status);
+        // Fallback to straight lines
+        const fallback = [driverPos, ...stopsToRoute.map(getCoords)] as any;
+        setRoadPolyline(fallback);
+      }
+    } catch (e) {
+      console.error(e);
+      // Fallback
+    } finally {
+      setFetchingDirections(false);
+    }
+  };
+
+  const handleCollect = async (stopId: string) => {
+    setActionLoading(true);
+    try {
+      await driverService.collectHousehold(assignment._id || assignment.id, stopId);
+      await loadRoute();
+    } catch (e) {
+      Alert.alert('Error', parseApiError(e));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleSkipPrompt = (stop: any) => {
+    setActiveStopToSkip(stop);
+    setSkipReason('');
+    setSkipError('');
+    setSkipModalVisible(true);
+  };
+
+  const submitSkip = async () => {
+    if (!skipReason.trim()) {
+      setSkipError('Please provide a reason before skipping');
+      return;
+    }
+    setActionLoading(true);
+    try {
+      await driverService.skipHousehold(assignment._id || assignment.id, activeStopToSkip._id, skipReason);
+      setSkipModalVisible(false);
+      await loadRoute();
+    } catch (e) {
+      Alert.alert('Error', parseApiError(e));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handlePauseToggle = async () => {
+    if (!assignment) return;
+    
+    const newStatus = assignment.status === 'Paused' ? 'InProgress' : 'Paused';
+    setActionLoading(true);
+    try {
+      await driverService.updateRouteStatus(assignment._id || assignment.id, newStatus);
+      if (newStatus === 'Paused') {
+        Alert.alert('Route Paused', 'Your route has been paused. You can resume it later from the dashboard.');
+        navigation.goBack();
+      } else {
+        await loadRoute();
+      }
+    } catch (e) {
+      Alert.alert('Error', parseApiError(e));
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const toggleMapType = () => {
+    const types: MapType[] = ['standard', 'satellite', 'terrain', 'hybrid'];
+    const nextIndex = (types.indexOf(mapType) + 1) % types.length;
+    setMapType(types[nextIndex]);
+  };
+
+  const stops = assignment?.stops || [];
+  const pendingStops = stops.filter((s: any) => s.status === 'Pending');
+  const isComplete = assignment && pendingStops.length === 0;
+
+  useEffect(() => {
+    if (isComplete && assignment) {
+      navigation.replace('RouteSummary', { routeId: assignment._id || assignment.id });
+    }
+  }, [isComplete, assignment, navigation]);
+
+  if (loading && !assignment) {
     return (
-      <View style={[styles.container, styles.centered]}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
-  if (!routeData) {
+  if (!assignment) {
     return (
-      <View style={[styles.container, styles.centered]}>
-        <AppText
-          variant="body"
-          color={theme.colors.textSecondary}
-          align="center"
-        >
-          No active route found. Ask your admin to assign you a route.
-        </AppText>
+      <View style={styles.centered}>
+        <AppText variant="h3" color={theme.colors.textSecondary}>No active assignment.</AppText>
+        <AppButton title="Go Back" onPress={() => navigation.goBack()} style={{ marginTop: 20 }} />
       </View>
     );
   }
 
-  // _rawStops is always set above regardless of fetch path
-  const stops: any[] = routeData._rawStops ?? [];
-  const completedCount = stops.filter((s) => s.status === "Completed").length;
-  const progressPercent = (completedCount / Math.max(stops.length, 1)) * 100;
+  if (isComplete) return null;
 
-  const pendingStops = stops.filter((s) => s.status === "Pending");
-  const activeStop = pendingStops[0] ?? null;
-
-  // Map region — center on active stop or first stop with valid coords
-  const stopsWithCoords = stops
-    .map((s) => ({ stop: s, coords: getCoords(s) }))
-    .filter((x) => x.coords);
-  const activeCoords = activeStop ? getCoords(activeStop) : null;
-  const firstCoords = stopsWithCoords[0]?.coords ?? null;
-  const centerCoords = activeCoords ?? firstCoords;
-  console.log("stops====>", stopsWithCoords);
-  const mapRegion = centerCoords
-    ? {
-        ...centerCoords,
-        latitudeDelta: activeCoords ? 0.01 : 0.05,
-        longitudeDelta: activeCoords ? 0.01 : 0.05,
-      }
-    : null;
-
-  const polylineCoords =
-    routedPolyline.length >= 2
-      ? routedPolyline
-      : stopsWithCoords
-          .filter((x) => x.stop.status === "Pending")
-          .map((x) => x.coords!);
-
-  // ── handlers ─────────────────────────────────────────────────────────────
-
-  const handlePause = () => navigation.goBack();
-
-  const handleFinish = () => {
-    const assignmentId: string = routeData.id ?? routeData._id;
-    const remaining = pendingStops.length;
-    if (remaining > 0) {
-      Alert.alert(
-        "Unfinished Stops",
-        `You still have ${remaining} stop${remaining > 1 ? "s" : ""} pending. Finish anyway?`,
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Finish Anyway",
-            style: "destructive",
-            onPress: () =>
-              navigation.replace("RouteSummary", { routeId: assignmentId }),
-          },
-        ],
-      );
-    } else {
-      navigation.replace("RouteSummary", { routeId: assignmentId });
-    }
-  };
-
-  const handleCollect = async (stop: any) => {
-    // Use the assignment-level stop update endpoint: PATCH /assignments/:id/stops/:stopId
-    const assignmentId: string = routeData.id ?? routeData._id;
-    const stopId: string = stop.id ?? stop._id;
-
-    if (!assignmentId || !stopId) {
-      Alert.alert("Error", "Cannot identify stop. Please contact admin.");
-      return;
-    }
-    try {
-      setLoading(true);
-      await routeService.updateStopStatus(assignmentId, stopId, "Completed");
-      await fetchRoute();
-    } catch (e: any) {
-      Alert.alert(
-        "Error",
-        e.response?.data?.message || "Could not mark as collected",
-      );
-      setLoading(false);
-    }
-  };
-
-  // ── render ────────────────────────────────────────────────────────────────
+  const nextStop = pendingStops[0];
+  const nextStopCoords = getCoords(nextStop);
 
   return (
     <View style={styles.container}>
-      {/* Map Section */}
-      <View style={styles.mapContainer}>
-        {mapRegion ? (
-          <MapView
-            provider={
-              Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
-            }
-            mapType="satellite"
-            style={styles.map}
-            region={mapRegion}
-            showsUserLocation
-            showsMyLocationButton={false}
-          >
-            {polylineCoords.length > 1 && (
-              <Polyline
-                coordinates={polylineCoords}
-                strokeColor="#4D7DFB"
-                strokeWidth={5}
-                lineJoin="round"
-                lineCap="round"
-              />
-            )}
-            {stopsWithCoords.map(({ stop, coords }) => {
-              const isCompleted = stop.status === "Completed";
-              const isActive = stop._id === activeStop?._id;
-
-              // Optionally hide completed markers or make them very transparent
-              if (isCompleted) return null;
-
-              return (
-                <Marker
-                  key={stop._id}
-                  coordinate={coords!}
-                  title={getAddress(stop)}
-                  description={getResidentName(stop)}
-                  opacity={isActive ? 1 : 0.7}
-                  pinColor={
-                    isActive ? theme.colors.primary : theme.colors.warning
-                  }
-                />
-              );
-            })}
-          </MapView>
-        ) : (
-          <View
-            style={[
-              styles.map,
-              styles.centered,
-              { backgroundColor: "#e8e8e8" },
-            ]}
-          >
-            <AppText
-              variant="body"
-              color={theme.colors.textSecondary}
-              align="center"
-            >
-              No map coordinates yet.{"\n"}Stops have been assigned but have no
-              GPS data.
-            </AppText>
-          </View>
+      <MapView
+        ref={mapRef}
+        provider={PROVIDER_GOOGLE}
+        style={StyleSheet.absoluteFillObject}
+        mapType={mapType}
+        initialRegion={{
+          latitude: 7.2507, // Default Akure Center
+          longitude: 5.2103,
+          latitudeDelta: 0.05,
+          longitudeDelta: 0.05,
+        }}
+      >
+        {driverPos && (
+          <Marker coordinate={driverPos} anchor={{ x: 0.5, y: 0.5 }}>
+            <View style={styles.driverMarker}>
+              <AppText style={{ fontSize: 24 }}>🚛</AppText>
+            </View>
+          </Marker>
         )}
+
+        {pendingStops.map((stop: any, index: number) => {
+          const coords = getCoords(stop);
+          if (!coords) return null;
+          // Use a reliable string key
+          const markerKey = stop._id?.$oid || stop._id || stop.id || `stop-${index}`;
+          
+          return (
+            <Marker key={markerKey} coordinate={coords}>
+              <View style={styles.stopMarker}>
+                <AppText style={{ fontSize: 18 }}>📍</AppText>
+              </View>
+              <Callout tooltip={false}>
+                <View style={{ padding: 10, minWidth: 150 }}>
+                  <AppText variant="bodySmall" weight="600" style={{ color: '#000' }}>
+                    {stop.address || 'Unknown Address'}
+                  </AppText>
+                </View>
+              </Callout>
+            </Marker>
+          );
+        })}
+
+        {roadPolyline.length > 0 && (
+          <Polyline
+            coordinates={roadPolyline}
+            strokeColor="#2196F3"
+            strokeWidth={4}
+          />
+        )}
+      </MapView>
+
+      <TouchableOpacity 
+        style={styles.backBtn} 
+        onPress={handlePauseToggle}
+        disabled={actionLoading}
+      >
+        {assignment.status === 'Paused' ? (
+          <Play color="#fff" size={24} />
+        ) : (
+          <Pause color="#fff" size={24} />
+        )}
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.mapTypeBtn} onPress={toggleMapType}>
+        <Layers color="#fff" size={24} />
+      </TouchableOpacity>
+
+      <View style={styles.sheetBackground}>
+        <View style={styles.sheetContent}>
+          <AppText variant="caption" weight="bold" color={theme.colors.primary} style={{ marginBottom: 4 }}>NEXT STOP</AppText>
+          <AppText variant="h2" numberOfLines={1} style={{ marginBottom: 4 }}>{nextStop.address || 'Unknown Address'}</AppText>
+          <AppText variant="body" color={theme.colors.textSecondary} numberOfLines={1}>
+            {nextStop.userId?.name || 'Resident'}
+          </AppText>
+
+          <View style={{ marginTop: 12, display: 'flex' }}>
+            {nextStop.street ? (
+              <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginBottom: 4 }}>
+                Description: {nextStop.street}
+              </AppText>
+            ) : null}
+            <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginBottom: 4 }}>
+              Ward: {nextStop.ward} • {nextStop.lga}
+            </AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginBottom: 12 }}>
+              PU: {nextStop.pollingUnit}
+            </AppText>
+            {nextStopCoords && (
+              <AppText variant="caption" color={theme.colors.textSecondary} style={{ marginBottom: 16 }}>
+                {nextStopCoords.latitude.toFixed(5)}, {nextStopCoords.longitude.toFixed(5)}
+              </AppText>
+            )}
+
+            <View style={styles.actionRow}>
+              <AppButton 
+                title="Mark as Collected" 
+                onPress={() => handleCollect(nextStop._id)}
+                loading={actionLoading}
+                style={{ flex: 1, marginRight: 12 }}
+              />
+              <AppButton 
+                title="Skip" 
+                variant="outline"
+                onPress={() => handleSkipPrompt(nextStop)}
+                disabled={actionLoading}
+              />
+            </View>
+          </View>
+        </View>
       </View>
 
-      {/* Floating Header */}
-      <Animatable.View
-        animation="slideInDown"
-        duration={600}
-        style={styles.headerOverlay}
-      >
-        <TouchableOpacity style={styles.headerBtn} onPress={handlePause}>
-          <Pause color={theme.colors.text} size={20} />
-        </TouchableOpacity>
-
-        <AppCard style={styles.progressCard} elevation="md">
-          <AppText variant="bodySmall" weight="600" style={{ marginBottom: 4 }}>
-            {completedCount} of {stops.length} Stops Completed
-          </AppText>
-          <View style={styles.progressBarBg}>
-            <View
-              style={[
-                styles.progressBarFill,
-                { width: `${progressPercent}%` as any },
-              ]}
+      {/* Skip Modal */}
+      <Modal visible={skipModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <AppText variant="h3" style={{ marginBottom: 12 }}>Reason for skipping</AppText>
+            <TextInput
+              style={styles.textInput}
+              placeholder="e.g. Nobody home, gate locked..."
+              value={skipReason}
+              onChangeText={text => {
+                setSkipReason(text);
+                setSkipError('');
+              }}
+              multiline
+              numberOfLines={4}
             />
+            {skipError ? (
+              <AppText variant="caption" color={theme.colors.error} style={{ marginTop: 4 }}>{skipError}</AppText>
+            ) : null}
+            
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 24 }}>
+              <AppButton title="Cancel" variant="ghost" onPress={() => setSkipModalVisible(false)} style={{ marginRight: 12 }} />
+              <AppButton title="Submit" onPress={submitSkip} loading={actionLoading} />
+            </View>
           </View>
-        </AppCard>
+        </View>
+      </Modal>
 
-        <TouchableOpacity style={styles.headerBtn} onPress={handleFinish}>
-          <CheckCircle color={theme.colors.success} size={20} />
-        </TouchableOpacity>
-      </Animatable.View>
-
-      {/* Bottom Sheet */}
-      <Animatable.View
-        animation="slideInUp"
-        duration={600}
-        delay={200}
-        style={styles.bottomSheet}
-      >
-        {activeStop ? (
-          <>
-            <AppText
-              variant="caption"
-              color={theme.colors.primary}
-              weight="600"
-              style={{ marginBottom: 8 }}
-            >
-              NEXT STOP
-            </AppText>
-
-            <AppText variant="h2" style={{ marginBottom: 4 }} numberOfLines={2}>
-              {getAddress(activeStop)}
-            </AppText>
-
-            {getResidentName(activeStop) || getResidentPhone(activeStop) ? (
-              <AppText
-                variant="body"
-                color={theme.colors.textSecondary}
-                style={{ marginBottom: 4 }}
-              >
-                {getResidentName(activeStop)}
-                {getResidentPhone(activeStop)
-                  ? ` • ${getResidentPhone(activeStop)}`
-                  : ""}
-              </AppText>
-            ) : null}
-
-            {getDescription(activeStop) ? (
-              <AppText
-                variant="bodySmall"
-                color={theme.colors.textSecondary}
-                style={{ marginBottom: 4 }}
-              >
-                📝 {getDescription(activeStop)}
-              </AppText>
-            ) : null}
-
-            {activeCoords ? (
-              <AppText
-                variant="caption"
-                color={theme.colors.textSecondary}
-                style={{ marginBottom: 4 }}
-              >
-                📍 Lat: {activeCoords.latitude.toFixed(6)}, Lng:{" "}
-                {activeCoords.longitude.toFixed(6)}
-              </AppText>
-            ) : null}
-
-            {activeStop.pollingUnit ? (
-              <AppText
-                variant="bodySmall"
-                color={theme.colors.textSecondary}
-                style={{ marginBottom: theme.spacing.lg }}
-              >
-                🏛️ {activeStop.pollingUnit}
-              </AppText>
-            ) : (
-              <View style={{ marginBottom: theme.spacing.lg }} />
-            )}
-
-            <TouchableOpacity
-              style={styles.arriveBtn}
-              onPress={() => handleCollect(activeStop)}
-              activeOpacity={0.8}
-            >
-              <AppText
-                variant="bodyLarge"
-                weight="600"
-                color={theme.colors.surface}
-              >
-                Collected
-              </AppText>
-              <CheckCircle color={theme.colors.surface} size={24} />
-            </TouchableOpacity>
-
-            {pendingStops.length > 1 && (
-              <View style={styles.upcomingPreview}>
-                <AppText variant="caption" color={theme.colors.textSecondary}>
-                  Next up: {getAddress(pendingStops[1])}
-                </AppText>
-              </View>
-            )}
-          </>
-        ) : (
-          <View style={styles.centered}>
-            <CheckCircle
-              color={theme.colors.success}
-              size={64}
-              style={{ marginBottom: 16 }}
-            />
-            <AppText variant="h2" align="center">
-              All Stops Cleared!
-            </AppText>
-            <AppText
-              variant="body"
-              color={theme.colors.textSecondary}
-              align="center"
-              style={{ marginVertical: 16 }}
-            >
-              You have completed all pickups on this route.
-            </AppText>
-            <TouchableOpacity
-              style={styles.arriveBtn}
-              onPress={handleFinish}
-              activeOpacity={0.8}
-            >
-              <AppText
-                variant="bodyLarge"
-                weight="600"
-                color={theme.colors.surface}
-              >
-                Finish Route
-              </AppText>
-            </TouchableOpacity>
-          </View>
-        )}
-      </Animatable.View>
     </View>
   );
 };
 
-// ── styles ────────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-  mapContainer: { flex: 1 },
-  map: { ...StyleSheet.absoluteFillObject },
-
-  headerOverlay: {
-    position: "absolute",
-    top: 50,
-    left: theme.spacing.md,
-    right: theme.spacing.md,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  driverMarker: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  headerBtn: {
+  stopMarker: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
+  },
+  backBtn: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: theme.colors.surface,
-    justifyContent: "center",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  progressCard: {
-    flex: 1,
-    marginHorizontal: theme.spacing.sm,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-  },
-  progressBarBg: {
-    height: 6,
-    backgroundColor: theme.colors.border,
-    borderRadius: 3,
-    overflow: "hidden",
-  },
-  progressBarFill: { height: "100%", backgroundColor: theme.colors.primary },
-
-  bottomSheet: {
-    position: "absolute",
+  sheetBackground: {
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     backgroundColor: theme.colors.surface,
     borderTopLeftRadius: theme.borderRadius.xl,
     borderTopRightRadius: theme.borderRadius.xl,
-    padding: theme.spacing.xl,
-    paddingBottom: theme.spacing.xxl,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowRadius: 8,
     elevation: 10,
+    paddingBottom: 24,
   },
-
-  arriveBtn: {
-    backgroundColor: theme.colors.primary,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: theme.spacing.lg,
+  sheetContent: {
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.md,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  modalContent: {
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.borderRadius.lg,
+    padding: 24,
   },
-  upcomingPreview: {
-    marginTop: theme.spacing.lg,
-    alignItems: "center",
+  textInput: {
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    fontSize: 16,
+    minHeight: 100,
+    textAlignVertical: 'top',
   },
+  mapTypeBtn: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  }
 });

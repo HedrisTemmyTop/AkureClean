@@ -46,6 +46,7 @@ const stopSchema = new mongoose.Schema({
     enum: ['Pending', 'Completed', 'Skipped'],
     default: 'Pending',
   },
+  skipReason: { type: String, default: null },
   residentNote: { type: String },
   collectionNote: { type: String },
   reportsCount: { type: Number, default: 1 },
@@ -87,6 +88,10 @@ const assignmentSchema = new mongoose.Schema({
     type: String,
     enum: ['Pending', 'InProgress', 'Paused', 'Completed'],
     default: 'Pending',
+  },
+  optimizedRoute: {
+    type: [Number],
+    default: [],
   },
 }, { timestamps: true });
 

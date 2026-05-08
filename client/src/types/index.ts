@@ -99,6 +99,7 @@ export interface RouteStop {
   status: StopStatus;
   residentNote?: string;
   collectionNote?: string;
+  skipReason?: string;
   reportsCount: number; // For grouping multiple bags/reports at one stop
 }
 

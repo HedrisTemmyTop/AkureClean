@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { MapPin, Calendar, CheckCircle, Clock, User, Mail, Home } from 'lucide-react-native';
+import { MapPin, Calendar, CheckCircle, Clock, User, Mail, Home, ChevronRight } from 'lucide-react-native';
+import { TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 
 import { ScreenContainer } from '../../components/ScreenContainer';
@@ -16,7 +17,7 @@ import { parseApiError } from '../../services/api';
 import { AssignmentRoute } from '../../types';
 import { AdminStackParamList } from '../../navigation/RoleNavigator';
 
-type NavigationProp = NativeStackNavigationProp<AdminStackParamList, 'AdminTabs'>;
+type NavigationProp = NativeStackNavigationProp<AdminStackParamList>;
 
 export const AdminAssignmentDetailsScreen: React.FC = () => {
   const route = useRoute<any>();
@@ -124,22 +125,28 @@ export const AdminAssignmentDetailsScreen: React.FC = () => {
       <View>
         <AppText variant="h3" style={styles.sectionTitle}>Stops Details</AppText>
         {assignment.stops?.map((stop, index) => (
-          <AppCard key={stop.id} style={styles.stopCard}>
-            <View style={styles.stopIconBg}>
-              {stop.status === 'Completed' ? (
-                <CheckCircle color={theme.colors.success} size={20} />
-              ) : (
-                <View style={styles.dot} />
-              )}
-            </View>
-            <View style={styles.stopDetails}>
-              <AppText variant="body" weight="600">{stop.address}</AppText>
-              <AppText variant="caption" color={theme.colors.textSecondary}>
-                Waste Type: {stop.wasteType}
-              </AppText>
-            </View>
-            <StatusBadge status={stop.status as any} />
-          </AppCard>
+          <TouchableOpacity 
+            key={stop.id} 
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('AdminStopDetails', { routeId, stopId: stop.id })}
+          >
+            <AppCard style={styles.stopCard}>
+              <View style={styles.stopIconBg}>
+                {stop.status === 'Completed' ? (
+                  <CheckCircle color={theme.colors.success} size={20} />
+                ) : (
+                  <View style={styles.dot} />
+                )}
+              </View>
+              <View style={styles.stopDetails}>
+                <AppText variant="body" weight="600">{stop.address}</AppText>
+                <AppText variant="caption" color={theme.colors.textSecondary}>
+                  Waste Type: {stop.wasteType}
+                </AppText>
+              </View>
+              <StatusBadge status={stop.status as any} />
+            </AppCard>
+          </TouchableOpacity>
         ))}
       </View>
 

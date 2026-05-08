@@ -20,11 +20,12 @@ router.post(
   "/",
   roleGuard("admin"),
   [
-    check("driverEmail", "Driver email is required").isEmail(),
+    check("driverId", "Driver ID is required").notEmpty(),
     check("title", "Title is required").notEmpty(),
-    check("area", "Area is required").notEmpty(),
     check("collectionDate", "Collection date is required").isISO8601(),
-    check("collectionTime", "Collection time is required").notEmpty(),
+    check("lga", "LGA is required").notEmpty(),
+    check("ward", "Ward is required").notEmpty(),
+    check("pollingUnits", "At least one Polling Unit is required").isArray({ min: 1 }),
   ],
   assignmentController.createAssignment,
 );

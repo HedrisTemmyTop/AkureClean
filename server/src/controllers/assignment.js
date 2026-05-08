@@ -14,6 +14,7 @@ const { validationResult } = require("express-validator");
  */
 exports.createAssignment = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
+  console.log("errors: ", errors);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
@@ -22,135 +23,195 @@ exports.createAssignment = asyncHandler(async (req, res) => {
     });
   }
 
-  const {
-    driverEmail,
-    zoneId,
-    title,
-    area,
-    collectionDate,
-    collectionTime,
-    estimatedDistance,
-    estimatedDuration,
-    stops,
-    pollingUnits,
-    segments,
-  } = req.body;
+  const { driverId, title, collectionDate, collectionTime, pollingUnits, lga, ward } = req.body;
 
-  // Verify driver exists and has the right role
-  const driver = await User.findOne({ email: driverEmail, role: "driver" });
-  if (!driver) {
-    return res.status(404).json({
+  // STEP 1 — Fetch all residents matching the area
+  const residents = await User.find({
+    role: "resident",
+    localGovt: lga,
+    ward: ward,
+    pollingUnit: { $in: pollingUnits },
+    "location.type": "Point",
+    "location.coordinates": { $size: 2 },
+  }).select(
+    "_id name phone address houseDescription ward localGovt pollingUnit location",
+  );
+
+  if (residents.length === 0) {
+    return res.status(400).json({
       success: false,
-      message: "Driver not found or user is not a driver",
+      message: "No residents found for the selected area.",
     });
   }
 
-  console.log("driver not found");
-
-  let finalStops = stops || [];
-
-  // NEW: Segment-based bounding box search
-  // segments: [{ start: [lng, lat], end: [lng, lat] }]
-  if (segments && Array.isArray(segments) && segments.length > 0) {
-    for (const seg of segments) {
-      const { start, end } = seg;
-      if (
-        !Array.isArray(start) ||
-        start.length !== 2 ||
-        !Array.isArray(end) ||
-        end.length !== 2
-      )
-        continue;
-
-      const minLng = Math.min(start[0], end[0]);
-      const maxLng = Math.max(start[0], end[0]);
-      const minLat = Math.min(start[1], end[1]);
-      const maxLat = Math.max(start[1], end[1]);
-
-      // ~330m padding so boundary households are included
-      const PAD = 0.003;
-
-      const residentsInBox = await User.find({
-        role: "resident",
-        "location.type": "Point",
-        location: {
-          $geoWithin: {
-            $box: [
-              [minLng - PAD, minLat - PAD],
-              [maxLng + PAD, maxLat + PAD],
-            ],
-          },
-        },
-      }).select(
-        "_id name phone address houseDescription ward localGovt pollingUnit location",
-      );
-
-      for (const u of residentsInBox) {
-        if (
-          !finalStops.some((s) => s.userId?.toString() === u._id.toString())
-        ) {
-          finalStops.push({
-            userId: u._id,
-            address: u.address || "Unknown Address",
-            street: u.houseDescription || "",
-            ward: u.ward || "",
-            lga: u.localGovt || "",
-            pollingUnit: u.pollingUnit || "",
-            location: u.location,
-            status: "Pending",
-          });
-        }
-      }
-    }
+  // STEP 2 — Fetch the driver
+  const driver = await User.findOne({ _id: driverId, role: "driver" });
+  if (!driver) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Driver not found" });
   }
 
-  // LEGACY: Individual polling unit radius search (kept for backward compat)
-  if (pollingUnits && Array.isArray(pollingUnits) && pollingUnits.length > 0) {
-    for (const puCoord of pollingUnits) {
-      if (!Array.isArray(puCoord) || puCoord.length !== 2) continue;
-
-      const nearbyResidents = await User.find({
-        role: "resident",
-        "location.type": "Point",
-        location: {
-          $near: {
-            $geometry: { type: "Point", coordinates: puCoord },
-            $maxDistance: 1500,
-          },
-        },
-      }).select(
-        "_id name phone address houseDescription ward localGovt pollingUnit location",
-      );
-
-      for (const u of nearbyResidents) {
-        if (
-          !finalStops.some((s) => s.userId?.toString() === u._id.toString())
-        ) {
-          finalStops.push({
-            userId: u._id,
-            address: u.address || "Unknown Address",
-            street: u.houseDescription || "",
-            ward: u.ward || "",
-            lga: u.localGovt || "",
-            pollingUnit: u.pollingUnit || "",
-            location: u.location,
-            status: "Pending",
-          });
-        }
-      }
-    }
+  let driverCoords = [0, 0];
+  if (
+    driver.location &&
+    driver.location.coordinates &&
+    driver.location.coordinates.length === 2
+  ) {
+    driverCoords = driver.location.coordinates;
+  } else {
+    return res
+      .status(400)
+      .json({ success: false, message: "Driver has no valid location." });
   }
 
+  // STEP 3 — Build the distance matrix
+  const coordsList = [
+    driverCoords,
+    ...residents.map((r) => r.location.coordinates),
+  ];
+  const coordsString = coordsList.map((c) => `${c[0]},${c[1]}`).join(";");
+  const osrmTableUrl = `http://router.project-osrm.org/table/v1/driving/${coordsString}?sources=0`;
+
+  let distances = [];
+  let isApproximate = false;
+
+  try {
+    const fetchController = new AbortController();
+    const timeoutId = setTimeout(() => fetchController.abort(), 10000);
+    const tableRes = await fetch(osrmTableUrl, {
+      signal: fetchController.signal,
+    });
+    clearTimeout(timeoutId);
+
+    const tableData = await tableRes.json();
+    if (
+      tableData.code === "Ok" &&
+      tableData.durations &&
+      tableData.durations.length > 0
+    ) {
+      distances = tableData.durations[0];
+    } else {
+      throw new Error("Invalid OSRM response");
+    }
+  } catch (err) {
+    console.error(
+      "OSRM Table API failed, falling back to Haversine:",
+      err.message,
+    );
+    isApproximate = true;
+  }
+
+  // STEP 4 — Run nearest-neighbor heuristic
+  let unvisited = residents.map((r, idx) => idx);
+  let optimizedRouteIndices = [];
+  let currentIdx = -1;
+
+  while (unvisited.length > 0) {
+    let nearestIdx = -1;
+    let minCost = Infinity;
+
+    for (let u of unvisited) {
+      let cost;
+      const coords1 =
+        currentIdx === -1
+          ? driverCoords
+          : residents[currentIdx].location.coordinates;
+      const coords2 = residents[u].location.coordinates;
+
+      const toRad = (x) => (x * Math.PI) / 180;
+      const lon1 = coords1[0],
+        lat1 = coords1[1];
+      const lon2 = coords2[0],
+        lat2 = coords2[1];
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) *
+          Math.cos(toRad(lat2)) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      cost = R * c;
+
+      if (cost < minCost) {
+        minCost = cost;
+        nearestIdx = u;
+      }
+    }
+
+    optimizedRouteIndices.push(nearestIdx);
+    unvisited = unvisited.filter((v) => v !== nearestIdx);
+    currentIdx = nearestIdx;
+  }
+
+  // STEP 5 — Build stops array
+  const stops = optimizedRouteIndices.map((idx) => {
+    const u = residents[idx];
+    return {
+      userId: u._id,
+      address: u.address || "Unknown Address",
+      street: u.houseDescription || "",
+      ward: u.ward || "",
+      lga: u.localGovt || "",
+      pollingUnit: u.pollingUnit || "",
+      location: u.location,
+      status: "Pending",
+      collectedAt: null,
+      skipReason: null,
+    };
+  });
+
+  // STEP 6 — Calculate estimates
+  let estDistance = "0 km";
+  let estDuration = "0 mins";
+
+  const orderedCoords = [
+    driverCoords,
+    ...stops.map((s) => s.location.coordinates),
+  ];
+  const orderedCoordsString = orderedCoords
+    .map((c) => `${c[0]},${c[1]}`)
+    .join(";");
+  // Limit to roughly 50 waypoints to avoid OSRM limits, or try full
+  const osrmRouteUrl = `http://router.project-osrm.org/route/v1/driving/${orderedCoordsString}`;
+
+  try {
+    const fetchController = new AbortController();
+    const timeoutId = setTimeout(() => fetchController.abort(), 10000);
+    const routeRes = await fetch(osrmRouteUrl, {
+      signal: fetchController.signal,
+    });
+    clearTimeout(timeoutId);
+
+    const routeData = await routeRes.json();
+    if (
+      routeData.code === "Ok" &&
+      routeData.routes &&
+      routeData.routes.length > 0
+    ) {
+      const dist = (routeData.routes[0].distance / 1000).toFixed(1);
+      const dur = Math.ceil(routeData.routes[0].duration / 60);
+      estDistance = `${dist} km${isApproximate ? " (approx)" : ""}`;
+      estDuration = `${dur} mins`;
+    }
+  } catch (err) {
+    console.error("OSRM Route API failed:", err.message);
+  }
+
+  // STEP 7 — Save and return
   const assignment = await Assignment.create({
     driverId: driver._id,
-    zoneId: zoneId || null,
-    title,
-    area,
+    title: title || `${ward} Collection`,
+    area: `${lga} - ${ward}`,
     collectionDate: new Date(collectionDate),
-    collectionTime,
-    estimatedDistance: estimatedDistance || "",
-    estimatedDuration: estimatedDuration || "",
-    stops: finalStops,
+    collectionTime: collectionTime || "08:00 AM",
+    estimatedDistance: estDistance,
+    estimatedDuration: estDuration,
+    stops: stops,
+    optimizedRoute: optimizedRouteIndices,
     status: "Pending",
   });
 
@@ -158,7 +219,7 @@ exports.createAssignment = asyncHandler(async (req, res) => {
   await Notification.create({
     userId: driver._id,
     title: "New Assignment",
-    message: `You have a new assignment: "${title}" scheduled for ${new Date(collectionDate).toDateString()}.`,
+    message: `You have a new assignment: "${assignment.title}" scheduled for ${new Date(collectionDate).toDateString()}.`,
     type: "System",
     relatedId: assignment._id,
     relatedModel: "Assignment",
@@ -168,7 +229,7 @@ exports.createAssignment = asyncHandler(async (req, res) => {
     await notificationService.sendPushNotification(
       driver.expoPushToken,
       "New Assignment",
-      `You have a new assignment: "${title}" scheduled for ${new Date(collectionDate).toDateString()}.`
+      `You have a new assignment: "${assignment.title}" scheduled for ${new Date(collectionDate).toDateString()}.`,
     );
   }
 
@@ -270,38 +331,42 @@ exports.updateAssignmentStatus = asyncHandler(async (req, res) => {
   if (actualDuration) assignment.actualDuration = actualDuration;
   await assignment.save();
 
-  await logActivity(req.user._id, "Update Route", `Updated route ${assignment.area} to ${status}`);
+  await logActivity(
+    req.user._id,
+    "Update Route",
+    `Updated route ${assignment.area} to ${status}`,
+  );
 
   // If driver just started the route, notify all residents
   if (oldStatus !== "InProgress" && status === "InProgress") {
     try {
       const userIds = assignment.stops
-        .map(stop => stop.userId)
-        .filter(id => id); // filter out nulls
+        .map((stop) => stop.userId)
+        .filter((id) => id); // filter out nulls
 
       if (userIds.length > 0) {
         // Unique user IDs
-        const uniqueUserIds = [...new Set(userIds.map(id => id.toString()))];
-        
+        const uniqueUserIds = [...new Set(userIds.map((id) => id.toString()))];
+
         const users = await User.find({ _id: { $in: uniqueUserIds } });
-        const tokens = users.map(u => u.expoPushToken).filter(t => t);
+        const tokens = users.map((u) => u.expoPushToken).filter((t) => t);
 
         if (tokens.length > 0) {
           await notificationService.sendBulkNotification(
             tokens,
             "Collector is on the way!",
-            `Your waste collection route in ${assignment.area} has started.`
+            `Your waste collection route in ${assignment.area} has started.`,
           );
         }
 
         // Also create in-app notifications
-        const appNotifications = uniqueUserIds.map(userId => ({
+        const appNotifications = uniqueUserIds.map((userId) => ({
           userId,
           title: "Collector is on the way!",
           message: `Your waste collection route in ${assignment.area} has started.`,
           type: "AssignmentUpdate",
           relatedId: assignment._id,
-          relatedModel: "Assignment"
+          relatedModel: "Assignment",
         }));
         await Notification.insertMany(appNotifications);
       }
@@ -356,7 +421,10 @@ exports.updateStopStatus = asyncHandler(async (req, res) => {
   }
 
   stop.status = status;
-  if (collectionNote) stop.collectionNote = collectionNote;
+  if (collectionNote) {
+    stop.collectionNote = collectionNote;
+    if (status === "Skipped") stop.skipReason = collectionNote;
+  }
   if (status === "Completed") stop.collectedAt = new Date();
 
   // If all stops are done, auto-complete the assignment

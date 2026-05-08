@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,9 +6,10 @@ import {
   TouchableOpacity,
   Modal,
   FlatList,
+  ScrollView
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Search, User as UserIcon, Plus, Trash2, ArrowRight, MapPin, ChevronDown } from 'lucide-react-native';
+import { Search, User as UserIcon, CheckCircle, ChevronDown, ArrowLeft, Mail, UserCheck } from 'lucide-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { ScreenContainer } from '../../components/ScreenContainer';
@@ -17,441 +18,343 @@ import { AppInput } from '../../components/AppInput';
 import { AppButton } from '../../components/AppButton';
 import { AppCard } from '../../components/AppCard';
 import { theme } from '../../theme';
-import { User } from '../../types';
+import { User, AssignmentRoute } from '../../types';
 import { adminService } from '../../services/adminService';
 import { assignmentService } from '../../services/routeService';
 import { parseApiError } from '../../services/api';
 import pollingUnitsData from '../../data/polling_units_structured.json';
 
-// ── types ────────────────────────────────────────────────────────────────────
-
-interface PollingUnit {
-  name: string;
-  coordinates: [number, number]; // [lng, lat]
-}
-
-interface Segment {
-  id: string;
-  start: PollingUnit | null;
-  end: PollingUnit | null;
-}
-
-type PickerTarget = { segId: string; field: 'start' | 'end' } | null;
-type ActiveModal = 'lga' | 'ward' | 'picker' | null;
-
 // ── static data ───────────────────────────────────────────────────────────────
-
-const data = pollingUnitsData as unknown as Record<string, Record<string, PollingUnit[]>>;
+const data = pollingUnitsData as unknown as Record<string, Record<string, any[]>>;
 const lgas = Object.keys(data);
 
 function getWards(lga: string) {
   return Object.keys(data[lga] || {}).filter((w) => w !== 'Unknown Ward');
 }
 
-function getPUs(lga: string, ward: string): PollingUnit[] {
-  return (data[lga]?.[ward] || []).filter(
-    (p) => p.name && Array.isArray(p.coordinates) && p.coordinates.length === 2,
-  );
+function getPUs(lga: string, ward: string): string[] {
+  return (data[lga]?.[ward] || [])
+    .filter((p) => p.name)
+    .map(p => p.name);
 }
 
-const uid = () => Math.random().toString(36).slice(2);
-
-// ── component ─────────────────────────────────────────────────────────────────
+type ActiveModal = 'lga' | 'ward' | 'pollingUnits' | null;
 
 export const CreateAssignmentScreen: React.FC = () => {
   const navigation = useNavigation<any>();
 
-  // Driver search
-  const [emailSearch, setEmailSearch] = useState('');
-  const [driver, setDriver] = useState<User | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
+  // Flow State
+  const [step, setStep] = useState<'SEARCH_DRIVER' | 'CREATE_FORM'>('SEARCH_DRIVER');
+  const [driverSearchEmail, setDriverSearchEmail] = useState('');
+  const [isSearchingDriver, setIsSearchingDriver] = useState(false);
 
-  // LGA / Ward selection (step 2)
-  const [selectedLga, setSelectedLga] = useState<string>(lgas[0]);
-  const [selectedWard, setSelectedWard] = useState<string>(getWards(lgas[0])[0] || '');
-
-  // Current PUs for selected ward
-  const wardPUs = getPUs(selectedLga, selectedWard);
-
-  // Segments (step 3)
-  const [segments, setSegments] = useState<Segment[]>([
-    { id: uid(), start: null, end: null },
-  ]);
-
-  // Route details (step 4)
+  // Form State
+  const [selectedLga, setSelectedLga] = useState<string>('');
+  const [selectedWard, setSelectedWard] = useState<string>('');
+  const [selectedPUs, setSelectedPUs] = useState<string[]>([]);
+  const [selectedDriver, setSelectedDriver] = useState<User | null>(null);
   const [title, setTitle] = useState('');
   const [collectionDate, setCollectionDate] = useState('');
-  const [collectionTime, setCollectionTime] = useState('');
+  const [collectionTime, setCollectionTime] = useState('08:00 AM');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [selectedDateTime, setSelectedDateTime] = useState(new Date());
   const [saving, setSaving] = useState(false);
+
+  // Success State
+  const [successData, setSuccessData] = useState<AssignmentRoute | null>(null);
 
   // Modal state
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
-  const [pickerTarget, setPickerTarget] = useState<PickerTarget>(null);
-  const [puSearch, setPuSearch] = useState('');
 
-  // ── driver search ────────────────────────────────────────────────────────
+  const handleSearchDriver = async () => {
+    if (!driverSearchEmail.trim()) {
+      Alert.alert('Error', 'Please enter a driver email address.');
+      return;
+    }
 
-  const handleSearch = async () => {
-    if (!emailSearch.trim()) return;
-    setIsSearching(true);
-    setDriver(null);
+    setIsSearchingDriver(true);
     try {
-      const results = await adminService.getAllDrivers(emailSearch.trim());
-      if (results.length > 0) {
-        setDriver(results[0]);
+      const results = await adminService.getAllDrivers(driverSearchEmail.trim().toLowerCase());
+      // Ensure we find the exact email match
+      const driver = results.find(d => d.email.toLowerCase() === driverSearchEmail.trim().toLowerCase());
+      
+      if (driver) {
+        setSelectedDriver(driver);
+        setStep('CREATE_FORM');
       } else {
-        Alert.alert('Not Found', 'No driver found with this email.');
+        Alert.alert('Driver Not Found', 'No driver found with that exact email address. Please check and try again.');
       }
     } catch (e) {
-      Alert.alert('Search Failed', parseApiError(e));
+      Alert.alert('Search Failed', 'Could not search for driver. Please try again.');
     } finally {
-      setIsSearching(false);
+      setIsSearchingDriver(false);
     }
   };
 
-  // ── LGA / Ward helpers ───────────────────────────────────────────────────
-
   const handleLgaSelect = (lga: string) => {
     setSelectedLga(lga);
-    const wards = getWards(lga);
-    setSelectedWard(wards[0] || '');
-    setSegments([{ id: uid(), start: null, end: null }]);
+    setSelectedWard('');
+    setSelectedPUs([]);
     setActiveModal(null);
   };
 
   const handleWardSelect = (ward: string) => {
     setSelectedWard(ward);
-    setSegments([{ id: uid(), start: null, end: null }]);
+    setSelectedPUs([]);
     setActiveModal(null);
   };
 
-  // ── segment helpers ──────────────────────────────────────────────────────
-
-  const addSegment = () =>
-    setSegments((prev) => [...prev, { id: uid(), start: null, end: null }]);
-
-  const removeSegment = (id: string) =>
-    setSegments((prev) => prev.filter((s) => s.id !== id));
-
-  const openPicker = (segId: string, field: 'start' | 'end') => {
-    setPuSearch('');
-    setPickerTarget({ segId, field });
-    setActiveModal('picker');
+  const togglePU = (pu: string) => {
+    if (selectedPUs.includes(pu)) {
+      setSelectedPUs(prev => prev.filter(p => p !== pu));
+    } else {
+      setSelectedPUs(prev => [...prev, pu]);
+    }
   };
-
-  const selectPU = (pu: PollingUnit) => {
-    if (!pickerTarget) return;
-    const { segId, field } = pickerTarget;
-    setSegments((prev) =>
-      prev.map((s) => (s.id === segId ? { ...s, [field]: pu } : s)),
-    );
-    setActiveModal(null);
-    setPickerTarget(null);
-  };
-
-  // ── filtered PUs for picker ──────────────────────────────────────────────
-
-  const filteredPUs = useCallback(() => {
-    const q = puSearch.toLowerCase();
-    if (!q) return wardPUs;
-    return wardPUs.filter((p) => p.name.toLowerCase().includes(q));
-  }, [puSearch, wardPUs])();
-
-  // ── submit ───────────────────────────────────────────────────────────────
 
   const handleSave = async () => {
-    if (!driver) {
-      Alert.alert('Error', 'Please search and select a driver first.');
+    if (!selectedLga || !selectedWard) {
+      Alert.alert('Error', 'Please select an LGA and Ward.');
       return;
     }
-    if (!selectedWard) {
-      Alert.alert('Error', 'Please select a Local Govt and Ward.');
+    if (selectedPUs.length === 0) {
+      Alert.alert('Error', 'Please select at least one Polling Unit.');
       return;
     }
-    const validSegments = segments.filter((s) => s.start && s.end);
-    if (validSegments.length === 0) {
-      Alert.alert('Error', 'Please complete at least one route segment (Start → End).');
+    if (!selectedDriver) {
+      Alert.alert('Error', 'No driver selected.');
       return;
     }
-    if (!collectionDate.trim()) {
-      Alert.alert('Error', 'Please enter a collection date (YYYY-MM-DD).');
+    if (!collectionDate) {
+      Alert.alert('Error', 'Please select a collection date.');
       return;
     }
-    if (!collectionTime.trim()) {
-      Alert.alert('Error', 'Please enter a collection time.');
-      return;
-    }
-
-    const areaNames = validSegments
-      .map((s) => `${s.start!.name} → ${s.end!.name}`)
-      .join(', ');
 
     setSaving(true);
     try {
-      await assignmentService.createAssignment({
-        driverEmail: driver.email,
-        title: title.trim() || `${selectedWard} Route`,
-        area: `${selectedLga} — ${selectedWard}`,
+      const assignment = await assignmentService.createAssignment({
+        driverId: selectedDriver.id!,
+        title: title.trim() || `${selectedWard} Collection`,
         collectionDate: new Date(collectionDate).toISOString(),
-        collectionTime,
-        segments: validSegments.map((s) => ({
-          start: s.start!.coordinates,
-          end: s.end!.coordinates,
-        })),
+        collectionTime: collectionTime,
+        lga: selectedLga,
+        ward: selectedWard,
+        pollingUnits: selectedPUs,
       });
-      Alert.alert('Success', 'Route generated and driver assigned!');
-      navigation.goBack();
+      setSuccessData(assignment);
     } catch (e) {
-      Alert.alert('Failed to Create', parseApiError(e));
+      Alert.alert('Failed to Create Route', parseApiError(e));
     } finally {
       setSaving(false);
     }
   };
 
-  // ── render ───────────────────────────────────────────────────────────────
+  if (successData) {
+    return (
+      <ScreenContainer scrollable>
+        <View style={styles.successContainer}>
+          <CheckCircle color={theme.colors.success} size={64} style={{ marginBottom: 16 }} />
+          <AppText variant="h1" align="center" style={{ marginBottom: 8 }}>Route Generated!</AppText>
+          <AppText variant="body" color={theme.colors.textSecondary} align="center" style={{ marginBottom: 32 }}>
+            The optimized route has been created and assigned to {successData.driverName || 'the driver'}.
+          </AppText>
 
-  const wardList = getWards(selectedLga);
-
-  return (
-    <ScreenContainer scrollable>
-
-      {/* Header */}
-      <View style={styles.header}>
-        <AppButton title="Back" variant="ghost" size="small"
-          onPress={() => navigation.goBack()} style={styles.backBtn} />
-        <AppText variant="h2" style={{ flex: 1, textAlign: 'center' }}>Assign Driver</AppText>
-        <View style={{ width: 60 }} />
-      </View>
-
-      {/* ── Step 1: Driver ── */}
-      <View style={styles.section}>
-        <AppText variant="h3" style={styles.sectionLabel}>1. Select Driver</AppText>
-        <AppInput
-          placeholder="Search driver by email..."
-          value={emailSearch}
-          onChangeText={setEmailSearch}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          style={{ marginBottom: theme.spacing.md }}
-        />
-        <AppButton
-          title="Search"
-          icon={<Search color={theme.colors.surface} size={18} />}
-          onPress={handleSearch}
-          loading={isSearching}
-        />
-      </View>
-
-      {driver && (
-        <>
-          {/* Driver card */}
-          <AppCard style={styles.driverCard}>
-            <View style={styles.driverRow}>
-              <View style={styles.avatar}>
-                <UserIcon color={theme.colors.primary} size={24} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <AppText variant="h3">{driver.name}</AppText>
-                <AppText variant="bodySmall" color={theme.colors.textSecondary}>{driver.email}</AppText>
-              </View>
+          <AppCard style={{ width: '100%', marginBottom: 24 }}>
+            <View style={styles.statRow}>
+              <AppText variant="body" weight="600">Total Residents Found:</AppText>
+              <AppText variant="body">{successData.stops.length}</AppText>
+            </View>
+            <View style={styles.statRow}>
+              <AppText variant="body" weight="600">Estimated Distance:</AppText>
+              <AppText variant="body">{successData.estimatedDistance}</AppText>
+            </View>
+            <View style={[styles.statRow, { borderBottomWidth: 0, paddingBottom: 0 }]}>
+              <AppText variant="body" weight="600">Estimated Duration:</AppText>
+              <AppText variant="body">{successData.estimatedDuration}</AppText>
             </View>
           </AppCard>
 
-          {/* ── Step 2: LGA & Ward ── */}
-          <View style={styles.section}>
-            <AppText variant="h3" style={styles.sectionLabel}>2. Select Coverage Area</AppText>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginBottom: 14 }}>
-              Choose the local government and ward. Route segments will be built from polling units within this ward.
-            </AppText>
+          <AppText variant="h3" style={{ alignSelf: 'flex-start', marginBottom: 16 }}>Optimized Sequence</AppText>
+          <AppCard style={{ width: '100%', padding: 0 }}>
+            {successData.stops.slice(0, 10).map((stop, i) => (
+              <View key={stop.id} style={styles.stopItem}>
+                <View style={styles.stopIndex}>
+                  <AppText variant="caption" weight="bold" color="#fff">{i + 1}</AppText>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <AppText variant="bodySmall" weight="600" numberOfLines={1}>{stop.address}</AppText>
+                  {stop.pollingUnit ? <AppText variant="caption" color={theme.colors.textSecondary}>{stop.pollingUnit}</AppText> : null}
+                </View>
+              </View>
+            ))}
+            {successData.stops.length > 10 && (
+              <View style={styles.stopItem}>
+                <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ fontStyle: 'italic' }}>
+                  ...and {successData.stops.length - 10} more stops
+                </AppText>
+              </View>
+            )}
+          </AppCard>
 
-            {/* LGA selector */}
-            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={styles.fieldLabel}>
-              LOCAL GOVERNMENT:
-            </AppText>
-            <TouchableOpacity style={styles.selector} onPress={() => setActiveModal('lga')}>
-              <AppText variant="body" style={{ flex: 1 }}>{selectedLga}</AppText>
-              <ChevronDown color={theme.colors.textSecondary} size={18} />
-            </TouchableOpacity>
+          <AppButton 
+            title="Done" 
+            onPress={() => navigation.goBack()} 
+            style={{ width: '100%', marginTop: 32, marginBottom: 40 }} 
+          />
+        </View>
+      </ScreenContainer>
+    );
+  }
 
-            {/* Ward selector */}
-            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={[styles.fieldLabel, { marginTop: 14 }]}>
-              WARD:
+  const wardList = getWards(selectedLga);
+  const puList = getPUs(selectedLga, selectedWard);
+
+  return (
+    <ScreenContainer scrollable>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => step === 'CREATE_FORM' ? setStep('SEARCH_DRIVER') : navigation.goBack()} style={styles.backBtn}>
+          <ArrowLeft color={theme.colors.text} size={24} />
+        </TouchableOpacity>
+        <AppText variant="h2" style={{ flex: 1, textAlign: 'center' }}>Create Assignment</AppText>
+        <View style={{ width: 40 }} />
+      </View>
+
+      {step === 'SEARCH_DRIVER' ? (
+        <View style={styles.searchSection}>
+          <View style={styles.searchHero}>
+            <View style={styles.iconCircle}>
+              <Mail color={theme.colors.primary} size={32} />
+            </View>
+            <AppText variant="h3" style={{ marginTop: 16 }}>Find Driver</AppText>
+            <AppText variant="body" color={theme.colors.textSecondary} align="center" style={{ marginTop: 8, paddingHorizontal: 20 }}>
+              Search for a registered driver by their email address to start creating an assignment.
             </AppText>
-            <TouchableOpacity style={styles.selector} onPress={() => setActiveModal('ward')}>
-              <AppText variant="body" style={{ flex: 1 }} numberOfLines={1}>
-                {selectedWard || 'Select ward...'}
-              </AppText>
-              <ChevronDown color={theme.colors.textSecondary} size={18} />
-            </TouchableOpacity>
           </View>
 
-          {/* ── Step 3: Route Segments ── */}
-          {selectedWard ? (
-            <View style={styles.section}>
-              <AppText variant="h3" style={styles.sectionLabel}>3. Build Route Segments</AppText>
-              <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginBottom: 14 }}>
-                Pick a Start and End polling unit for each segment. All registered residents between those two points will be added to the route.
-              </AppText>
-
-              {wardPUs.length === 0 && (
-                <AppText variant="bodySmall" color={theme.colors.error} style={{ marginBottom: 12 }}>
-                  No polling units found for this ward. Choose a different ward.
-                </AppText>
-              )}
-
-              {segments.map((seg, idx) => (
-                <AppCard key={seg.id} style={styles.segCard}>
-                  <View style={styles.segHeader}>
-                    <AppText variant="bodySmall" weight="600" color={theme.colors.textSecondary}>
-                      SEGMENT {idx + 1}
-                    </AppText>
-                    {segments.length > 1 && (
-                      <TouchableOpacity onPress={() => removeSegment(seg.id)}
-                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                        <Trash2 color={theme.colors.error} size={18} />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-
-                  {/* Start */}
-                  <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={styles.fieldLabel}>
-                    START:
-                  </AppText>
-                  <TouchableOpacity
-                    style={[styles.puBtn, seg.start && styles.puBtnFilled]}
-                    onPress={() => openPicker(seg.id, 'start')}
-                  >
-                    <MapPin color={seg.start ? '#22c55e' : theme.colors.textSecondary} size={16} />
-                    <AppText variant="body" style={{ flex: 1, marginLeft: 8 }}
-                      color={seg.start ? theme.colors.text : theme.colors.textSecondary}
-                      numberOfLines={1}>
-                      {seg.start ? seg.start.name : 'Select start polling unit…'}
-                    </AppText>
-                  </TouchableOpacity>
-
-                  {/* Arrow */}
-                  <View style={styles.arrowRow}>
-                    <View style={styles.arrowLine} />
-                    <ArrowRight color={theme.colors.primary} size={20} />
-                    <View style={styles.arrowLine} />
-                  </View>
-
-                  {/* End */}
-                  <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={styles.fieldLabel}>
-                    END:
-                  </AppText>
-                  <TouchableOpacity
-                    style={[styles.puBtn, seg.end && styles.puBtnFilled]}
-                    onPress={() => openPicker(seg.id, 'end')}
-                  >
-                    <MapPin color={seg.end ? '#ef4444' : theme.colors.textSecondary} size={16} />
-                    <AppText variant="body" style={{ flex: 1, marginLeft: 8 }}
-                      color={seg.end ? theme.colors.text : theme.colors.textSecondary}
-                      numberOfLines={1}>
-                      {seg.end ? seg.end.name : 'Select end polling unit…'}
-                    </AppText>
-                  </TouchableOpacity>
-
-                  {seg.start && seg.end && (
-                    <View style={styles.segNote}>
-                      <AppText variant="caption" color={theme.colors.textSecondary}>
-                        All residents registered between these two points will be added.
-                      </AppText>
-                    </View>
-                  )}
-                </AppCard>
-              ))}
-
-              <TouchableOpacity style={styles.addBtn} onPress={addSegment}>
-                <Plus color={theme.colors.primary} size={18} />
-                <AppText variant="body" weight="600" color={theme.colors.primary} style={{ marginLeft: 8 }}>
-                  Add Another Segment
-                </AppText>
+          <View style={{ marginTop: 32 }}>
+            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={styles.fieldLabel}>DRIVER EMAIL</AppText>
+            <AppInput
+              placeholder="e.g. driver@akureclean.com"
+              value={driverSearchEmail}
+              onChangeText={setDriverSearchEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            <AppButton
+              title="Find Driver"
+              onPress={handleSearchDriver}
+              loading={isSearchingDriver}
+              style={{ marginTop: 16 }}
+            />
+          </View>
+        </View>
+      ) : (
+        <View style={styles.formSection}>
+          <AppCard style={styles.driverInfoCard}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={styles.avatar}>
+                <UserCheck color={theme.colors.primary} size={24} />
+              </View>
+              <View style={{ marginLeft: 12, flex: 1 }}>
+                <AppText variant="body" weight="600">{selectedDriver?.name}</AppText>
+                <AppText variant="caption" color={theme.colors.textSecondary}>{selectedDriver?.email}</AppText>
+              </View>
+              <TouchableOpacity onPress={() => setStep('SEARCH_DRIVER')} style={styles.changeBtn}>
+                <AppText variant="caption" color={theme.colors.primary} weight="600">Change</AppText>
               </TouchableOpacity>
             </View>
-          ) : null}
+          </AppCard>
 
-          {/* ── Step 4: Details ── */}
           <View style={styles.section}>
-            <AppText variant="h3" style={styles.sectionLabel}>4. Finalize Details</AppText>
+            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={styles.fieldLabel}>LOCAL GOVERNMENT</AppText>
+            <TouchableOpacity style={styles.selector} onPress={() => setActiveModal('lga')}>
+              <AppText variant="body" style={{ flex: 1 }} color={selectedLga ? theme.colors.text : theme.colors.textSecondary}>
+                {selectedLga || 'Select LGA...'}
+              </AppText>
+              <ChevronDown color={theme.colors.textSecondary} size={18} />
+            </TouchableOpacity>
+
+            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={[styles.fieldLabel, { marginTop: 16 }]}>WARD</AppText>
+            <TouchableOpacity style={[styles.selector, !selectedLga && styles.disabled]} onPress={() => selectedLga && setActiveModal('ward')} disabled={!selectedLga}>
+              <AppText variant="body" style={{ flex: 1 }} color={selectedWard ? theme.colors.text : theme.colors.textSecondary}>
+                {selectedWard || 'Select Ward...'}
+              </AppText>
+              <ChevronDown color={theme.colors.textSecondary} size={18} />
+            </TouchableOpacity>
+
+            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={[styles.fieldLabel, { marginTop: 16 }]}>POLLING UNITS</AppText>
+            <TouchableOpacity style={[styles.selector, !selectedWard && styles.disabled]} onPress={() => selectedWard && setActiveModal('pollingUnits')} disabled={!selectedWard}>
+              <AppText variant="body" style={{ flex: 1 }} color={selectedPUs.length ? theme.colors.text : theme.colors.textSecondary} numberOfLines={1}>
+                {selectedPUs.length ? `${selectedPUs.length} selected` : 'Select Polling Units...'}
+              </AppText>
+              <ChevronDown color={theme.colors.textSecondary} size={18} />
+            </TouchableOpacity>
+
+            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={[styles.fieldLabel, { marginTop: 16 }]}>ROUTE TITLE</AppText>
             <AppInput
-              label="Route Title (optional)"
-              placeholder="e.g. Alagbaka Morning Route"
+              placeholder="e.g. Morning Collection"
               value={title}
               onChangeText={setTitle}
             />
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 }}>
-              <View style={{ flex: 1, marginRight: 8 }}>
-                <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={{ marginBottom: 6 }}>
-                  COLLECTION DATE
-                </AppText>
-                <TouchableOpacity 
-                  style={[styles.selector, { paddingVertical: 12 }]}
-                  onPress={() => setShowDatePicker(true)}
-                >
-                  <AppText variant="body" color={collectionDate ? theme.colors.text : theme.colors.textSecondary}>
-                    {collectionDate || 'Select Date'}
-                  </AppText>
-                </TouchableOpacity>
-                {showDatePicker && (
-                  <DateTimePicker
-                    value={selectedDateTime}
-                    mode="date"
-                    display="default"
-                    onChange={(e, date) => {
-                      setShowDatePicker(false);
-                      if (date) {
-                        setSelectedDateTime(date);
-                        setCollectionDate(date.toISOString().split('T')[0]);
-                      }
-                    }}
-                  />
-                )}
-              </View>
+            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={[styles.fieldLabel, { marginTop: 16 }]}>COLLECTION DATE</AppText>
+            <TouchableOpacity style={styles.selector} onPress={() => setShowDatePicker(true)}>
+              <AppText variant="body" color={collectionDate ? theme.colors.text : theme.colors.textSecondary}>
+                {collectionDate || 'Select Date'}
+              </AppText>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={collectionDate ? new Date(collectionDate) : new Date()}
+                mode="date"
+                display="default"
+                minimumDate={new Date()}
+                onChange={(e, date) => {
+                  setShowDatePicker(false);
+                  if (date) {
+                    setCollectionDate(date.toISOString().split('T')[0]);
+                  }
+                }}
+              />
+            )}
 
-              <View style={{ flex: 1, marginLeft: 8 }}>
-                <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={{ marginBottom: 6 }}>
-                  COLLECTION TIME
-                </AppText>
-                <TouchableOpacity 
-                  style={[styles.selector, { paddingVertical: 12 }]}
-                  onPress={() => setShowTimePicker(true)}
-                >
-                  <AppText variant="body" color={collectionTime ? theme.colors.text : theme.colors.textSecondary}>
-                    {collectionTime || 'Select Time'}
-                  </AppText>
-                </TouchableOpacity>
-                {showTimePicker && (
-                  <DateTimePicker
-                    value={selectedDateTime}
-                    mode="time"
-                    display="default"
-                    onChange={(e, date) => {
-                      setShowTimePicker(false);
-                      if (date) {
-                        setSelectedDateTime(date);
-                        setCollectionTime(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-                      }
-                    }}
-                  />
-                )}
-              </View>
-            </View>
-            <AppButton
-              title="Generate Route & Assign"
-              onPress={handleSave}
-              loading={saving}
-              style={{ marginTop: theme.spacing.md, marginBottom: theme.spacing.xxl }}
-            />
+            <AppText variant="caption" weight="600" color={theme.colors.textSecondary} style={[styles.fieldLabel, { marginTop: 16 }]}>COLLECTION TIME</AppText>
+            <TouchableOpacity style={styles.selector} onPress={() => setShowTimePicker(true)}>
+              <AppText variant="body" color={collectionTime ? theme.colors.text : theme.colors.textSecondary}>
+                {collectionTime || 'Select Time'}
+              </AppText>
+            </TouchableOpacity>
+            {showTimePicker && (
+              <DateTimePicker
+                value={new Date()}
+                mode="time"
+                display="default"
+                is24Hour={false}
+                onChange={(e, date) => {
+                  setShowTimePicker(false);
+                  if (date) {
+                    const hours = date.getHours();
+                    const minutes = date.getMinutes();
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    const h = hours % 12 || 12;
+                    const m = minutes < 10 ? `0${minutes}` : minutes;
+                    setCollectionTime(`${h}:${m} ${ampm}`);
+                  }
+                }}
+              />
+            )}
           </View>
-        </>
+
+          <AppButton
+            title="Generate Route & Assign"
+            onPress={handleSave}
+            loading={saving}
+            style={{ marginTop: theme.spacing.lg, marginBottom: theme.spacing.xxl }}
+          />
+        </View>
       )}
 
-      {/* ── LGA Modal ── */}
+      {/* Modals */}
       <Modal visible={activeModal === 'lga'} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.sheet}>
@@ -461,80 +364,63 @@ export const CreateAssignmentScreen: React.FC = () => {
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity style={styles.sheetItem} onPress={() => handleLgaSelect(item)}>
-                  <AppText variant="body"
-                    weight={item === selectedLga ? '600' : '400'}
-                    color={item === selectedLga ? theme.colors.primary : theme.colors.text}>
-                    {item}
-                  </AppText>
+                  <AppText variant="body" weight={item === selectedLga ? '600' : '400'} color={item === selectedLga ? theme.colors.primary : theme.colors.text}>{item}</AppText>
                 </TouchableOpacity>
               )}
             />
-            <AppButton title="Cancel" variant="outline"
-              onPress={() => setActiveModal(null)} style={{ marginTop: 12 }} />
+            <AppButton title="Cancel" variant="outline" onPress={() => setActiveModal(null)} style={{ marginTop: 12 }} />
           </View>
         </View>
       </Modal>
 
-      {/* ── Ward Modal ── */}
       <Modal visible={activeModal === 'ward'} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.sheet}>
-            <AppText variant="h3" style={{ marginBottom: 12 }}>Select Ward ({selectedLga})</AppText>
+            <AppText variant="h3" style={{ marginBottom: 12 }}>Select Ward</AppText>
             <FlatList
               data={wardList}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity style={styles.sheetItem} onPress={() => handleWardSelect(item)}>
-                  <AppText variant="body"
-                    weight={item === selectedWard ? '600' : '400'}
-                    color={item === selectedWard ? theme.colors.primary : theme.colors.text}
-                    numberOfLines={2}>
-                    {item}
-                  </AppText>
+                  <AppText variant="body" weight={item === selectedWard ? '600' : '400'} color={item === selectedWard ? theme.colors.primary : theme.colors.text}>{item}</AppText>
                 </TouchableOpacity>
               )}
             />
-            <AppButton title="Cancel" variant="outline"
-              onPress={() => setActiveModal(null)} style={{ marginTop: 12 }} />
+            <AppButton title="Cancel" variant="outline" onPress={() => setActiveModal(null)} style={{ marginTop: 12 }} />
           </View>
         </View>
       </Modal>
 
-      {/* ── PU Picker Modal ── */}
-      <Modal visible={activeModal === 'picker'} animationType="slide" transparent>
+      <Modal visible={activeModal === 'pollingUnits'} animationType="slide" transparent>
         <View style={styles.overlay}>
           <View style={styles.sheet}>
-            <AppText variant="h3" style={{ marginBottom: 8 }}>
-              {pickerTarget?.field === 'start' ? '🟢 Start' : '🔴 End'} Polling Unit
-            </AppText>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginBottom: 10 }}>
-              {selectedWard}
-            </AppText>
-            <AppInput
-              placeholder="Search…"
-              value={puSearch}
-              onChangeText={setPuSearch}
-              style={{ marginBottom: 8 }}
-            />
-            <FlatList
-              data={filteredPUs}
-              keyExtractor={(item, i) => `${item.name}-${i}`}
-              renderItem={({ item }) => (
-                <TouchableOpacity style={styles.sheetItem} onPress={() => selectPU(item)}>
-                  <MapPin color={theme.colors.primary} size={14} style={{ marginRight: 8 }} />
-                  <AppText variant="body" style={{ flex: 1 }} numberOfLines={2}>{item.name}</AppText>
-                </TouchableOpacity>
-              )}
-              ListEmptyComponent={
-                <AppText variant="bodySmall" color={theme.colors.textSecondary}
-                  style={{ textAlign: 'center', padding: 20 }}>
-                  No polling units found.
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <AppText variant="h3">Select Polling Units</AppText>
+              <TouchableOpacity onPress={() => {
+                if (selectedPUs.length === puList.length) setSelectedPUs([]);
+                else setSelectedPUs([...puList]);
+              }}>
+                <AppText variant="bodySmall" color={theme.colors.primary}>
+                  {selectedPUs.length === puList.length ? 'Deselect All' : 'Select All'}
                 </AppText>
-              }
-              style={{ maxHeight: 320 }}
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={puList}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => {
+                const isSelected = selectedPUs.includes(item);
+                return (
+                  <TouchableOpacity style={styles.sheetItem} onPress={() => togglePU(item)}>
+                    <View style={[styles.checkbox, isSelected && styles.checkboxChecked]}>
+                      {isSelected && <CheckCircle color="#fff" size={14} />}
+                    </View>
+                    <AppText variant="body" style={{ flex: 1, marginLeft: 12 }}>{item}</AppText>
+                  </TouchableOpacity>
+                );
+              }}
             />
-            <AppButton title="Cancel" variant="outline"
-              onPress={() => setActiveModal(null)} style={{ marginTop: 12 }} />
+            <AppButton title="Done" onPress={() => setActiveModal(null)} style={{ marginTop: 16 }} />
           </View>
         </View>
       </Modal>
@@ -543,30 +429,11 @@ export const CreateAssignmentScreen: React.FC = () => {
   );
 };
 
-// ── styles ────────────────────────────────────────────────────────────────────
-
 const styles = StyleSheet.create({
-  header: { flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xl },
-  backBtn: { marginLeft: -theme.spacing.sm, width: 60 },
-
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: theme.spacing.xl, marginTop: 10 },
+  backBtn: { padding: 8, marginLeft: -8 },
   section: { marginBottom: theme.spacing.xl },
-  sectionLabel: { marginBottom: theme.spacing.sm },
   fieldLabel: { marginBottom: 6 },
-
-  driverCard: {
-    marginBottom: theme.spacing.xl,
-    backgroundColor: theme.colors.primary + '10',
-    borderColor: theme.colors.primary + '30',
-    borderWidth: 1,
-  },
-  driverRow: { flexDirection: 'row', alignItems: 'center' },
-  avatar: {
-    width: 48, height: 48, borderRadius: 24,
-    backgroundColor: theme.colors.primary + '20',
-    alignItems: 'center', justifyContent: 'center',
-    marginRight: theme.spacing.md,
-  },
-
   selector: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -577,59 +444,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     paddingVertical: 14,
   },
-
-  segCard: {
-    marginBottom: theme.spacing.md,
-    padding: theme.spacing.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  segHeader: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', marginBottom: theme.spacing.md,
-  },
-  puBtn: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1, borderColor: theme.colors.border,
-    borderRadius: theme.borderRadius.md,
-    paddingHorizontal: theme.spacing.md, paddingVertical: 12,
-  },
-  puBtnFilled: {
-    borderColor: theme.colors.primary + '60',
-    backgroundColor: theme.colors.primary + '08',
-  },
-  arrowRow: {
-    flexDirection: 'row', alignItems: 'center',
-    justifyContent: 'center', marginVertical: 10,
-  },
-  arrowLine: { flex: 1, height: 1, backgroundColor: theme.colors.border },
-  segNote: {
-    marginTop: 10, padding: 10,
-    backgroundColor: theme.colors.primary + '08',
-    borderRadius: theme.borderRadius.sm,
-  },
-
-  addBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1.5, borderColor: theme.colors.primary,
-    borderStyle: 'dashed', borderRadius: theme.borderRadius.md,
-    padding: 14, marginTop: 4,
-  },
-
-  overlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: theme.colors.background,
-    borderTopLeftRadius: theme.borderRadius.lg,
-    borderTopRightRadius: theme.borderRadius.lg,
-    padding: theme.spacing.lg,
-    maxHeight: '75%',
-  },
-  sheetItem: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 14,
-    borderBottomWidth: 1, borderBottomColor: theme.colors.border,
-  },
+  disabled: { backgroundColor: theme.colors.background, opacity: 0.7 },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: theme.colors.background, borderTopLeftRadius: theme.borderRadius.lg, borderTopRightRadius: theme.borderRadius.lg, padding: theme.spacing.lg, maxHeight: '80%' },
+  sheetItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
+  checkbox: { width: 20, height: 20, borderRadius: 4, borderWidth: 1, borderColor: theme.colors.border, alignItems: 'center', justifyContent: 'center' },
+  checkboxChecked: { backgroundColor: theme.colors.primary, borderColor: theme.colors.primary },
+  successContainer: { flex: 1, alignItems: 'center', paddingVertical: theme.spacing.xl },
+  statRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
+  stopItem: { flexDirection: 'row', alignItems: 'center', padding: 12, borderBottomWidth: 1, borderBottomColor: theme.colors.border },
+  stopIndex: { width: 24, height: 24, borderRadius: 12, backgroundColor: theme.colors.primary, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  searchSection: { flex: 1, paddingTop: 20 },
+  searchHero: { alignItems: 'center', justifyContent: 'center' },
+  iconCircle: { width: 80, height: 80, borderRadius: 40, backgroundColor: theme.colors.primary + '15', alignItems: 'center', justifyContent: 'center' },
+  formSection: { flex: 1 },
+  driverInfoCard: { padding: 16, marginBottom: 24, backgroundColor: theme.colors.surface, borderWidth: 1, borderColor: theme.colors.primary + '20', borderRadius: theme.borderRadius.md },
+  avatar: { width: 44, height: 44, borderRadius: 22, backgroundColor: theme.colors.primary + '10', alignItems: 'center', justifyContent: 'center' },
+  changeBtn: { padding: 4 }
 });
