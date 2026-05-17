@@ -140,7 +140,14 @@ export const SignupLocationScreen: React.FC = () => {
 
   const handleCompleteSignup = async () => {
     if (role === "resident") {
-      if (!address || !houseDescription || !localGovt || !ward || !pollingUnit || !houseType) {
+      if (
+        !address ||
+        !houseDescription ||
+        !localGovt ||
+        !ward ||
+        !pollingUnit ||
+        !houseType
+      ) {
         Alert.alert(
           "Error",
           "Please provide all address details (Address, House Description, House Type, Local Govt, Ward, and Polling Unit).",
@@ -162,7 +169,10 @@ export const SignupLocationScreen: React.FC = () => {
       }
     } else if (role === "driver") {
       if (!address || !truckPlateNumber || !truckCapacity) {
-        Alert.alert("Error", "Please provide address, truck plate number and capacity.");
+        Alert.alert(
+          "Error",
+          "Please provide address, truck plate number and capacity.",
+        );
         return;
       }
     }
@@ -181,16 +191,21 @@ export const SignupLocationScreen: React.FC = () => {
         ward,
         pollingUnit,
         houseType,
-        numberOfRooms: houseType === "Residential building" ? parseInt(numberOfRooms) : undefined,
-        numberOfShops: houseType === "Shop" ? parseInt(numberOfShops) : undefined,
-        numberOfWorkersRange: houseType === "Company" ? numberOfWorkersRange : undefined,
+        numberOfRooms:
+          houseType === "Residential building"
+            ? parseInt(numberOfRooms)
+            : undefined,
+        numberOfShops:
+          houseType === "Shop" ? parseInt(numberOfShops) : undefined,
+        numberOfWorkersRange:
+          houseType === "Company" ? numberOfWorkersRange : undefined,
         location: location as any,
         truckPlateNumber: role === "driver" ? truckPlateNumber : undefined,
         truckCapacity: role === "driver" ? truckCapacity : undefined,
       });
       // AuthContext sets user → RoleNavigator auto-switches screens
     } catch (e) {
-      Alert.alert('Registration Failed', parseApiError(e));
+      Alert.alert("Registration Failed", parseApiError(e));
     } finally {
       setIsLoading(false);
     }
@@ -223,7 +238,9 @@ export const SignupLocationScreen: React.FC = () => {
               >
                 <AppText
                   variant="body"
-                  color={localGovt ? theme.colors.text : theme.colors.textSecondary}
+                  color={
+                    localGovt ? theme.colors.text : theme.colors.textSecondary
+                  }
                 >
                   {localGovt || "Select Local Government..."}
                 </AppText>
@@ -246,7 +263,9 @@ export const SignupLocationScreen: React.FC = () => {
                 >
                   <AppText
                     variant="body"
-                    color={ward ? theme.colors.text : theme.colors.textSecondary}
+                    color={
+                      ward ? theme.colors.text : theme.colors.textSecondary
+                    }
                   >
                     {ward || "Select your ward..."}
                   </AppText>
@@ -270,7 +289,11 @@ export const SignupLocationScreen: React.FC = () => {
                 >
                   <AppText
                     variant="body"
-                    color={pollingUnit ? theme.colors.text : theme.colors.textSecondary}
+                    color={
+                      pollingUnit
+                        ? theme.colors.text
+                        : theme.colors.textSecondary
+                    }
                   >
                     {pollingUnit || "Select closest polling unit..."}
                   </AppText>
@@ -380,7 +403,9 @@ export const SignupLocationScreen: React.FC = () => {
               >
                 <AppText
                   variant="body"
-                  color={houseType ? theme.colors.text : theme.colors.textSecondary}
+                  color={
+                    houseType ? theme.colors.text : theme.colors.textSecondary
+                  }
                 >
                   {houseType || "Select House Type..."}
                 </AppText>
@@ -390,7 +415,7 @@ export const SignupLocationScreen: React.FC = () => {
             {houseType === "Residential building" && (
               <View style={{ marginTop: 16 }}>
                 <AppInput
-                  label="Number of Rooms"
+                  label="Number of People"
                   placeholder="e.g. 5"
                   value={numberOfRooms}
                   onChangeText={setNumberOfRooms}
@@ -427,7 +452,11 @@ export const SignupLocationScreen: React.FC = () => {
                 >
                   <AppText
                     variant="body"
-                    color={numberOfWorkersRange ? theme.colors.text : theme.colors.textSecondary}
+                    color={
+                      numberOfWorkersRange
+                        ? theme.colors.text
+                        : theme.colors.textSecondary
+                    }
                   >
                     {numberOfWorkersRange || "Select Number of Workers..."}
                   </AppText>
@@ -477,9 +506,13 @@ export const SignupLocationScreen: React.FC = () => {
             loading={isLoading}
             onPress={handleCompleteSignup}
             disabled={
-              role === "resident" 
-                ? (!address || !houseDescription || !localGovt || !ward || !location)
-                : (!address || !truckPlateNumber || !truckCapacity || !location)
+              role === "resident"
+                ? !address ||
+                  !houseDescription ||
+                  !localGovt ||
+                  !ward ||
+                  !location
+                : !address || !truckPlateNumber || !truckCapacity || !location
             }
           />
           <AppButton
@@ -610,9 +643,11 @@ export const SignupLocationScreen: React.FC = () => {
               onChangeText={setPuSearchQuery}
             />
             <FlatList
-              data={(require("../../data/polling_units.json")["General"] || []).filter((pu: any) => 
-                pu.name.toLowerCase().includes(puSearchQuery.toLowerCase())
-              ).slice(0, 50)}
+              data={(require("../../data/polling_units.json")["General"] || [])
+                .filter((pu: any) =>
+                  pu.name.toLowerCase().includes(puSearchQuery.toLowerCase()),
+                )
+                .slice(0, 50)}
               keyExtractor={(item: any, index) => `${item.name}-${index}`}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -688,7 +723,7 @@ export const SignupLocationScreen: React.FC = () => {
                 "11-50 workers",
                 "51-100 workers",
                 "101-500 workers",
-                "500+ workers"
+                "500+ workers",
               ]}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (

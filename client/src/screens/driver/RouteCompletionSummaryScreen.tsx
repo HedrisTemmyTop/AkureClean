@@ -1,19 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { CheckCircle, Clock, Map, AlertTriangle } from 'lucide-react-native';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { CheckCircle, Clock, Map, AlertTriangle } from "lucide-react-native";
 
-import { ScreenContainer } from '../../components/ScreenContainer';
-import { AppText } from '../../components/AppText';
-import { AppCard } from '../../components/AppCard';
-import { AppButton } from '../../components/AppButton';
-import { theme } from '../../theme';
-import { routeService } from '../../services/routeService';
-import { AssignmentRoute } from '../../types';
-import { DriverStackParamList } from '../../navigation/RoleNavigator';
+import { ScreenContainer } from "../../components/ScreenContainer";
+import { AppText } from "../../components/AppText";
+import { AppCard } from "../../components/AppCard";
+import { AppButton } from "../../components/AppButton";
+import { theme } from "../../theme";
+import { routeService } from "../../services/routeService";
+import { AssignmentRoute } from "../../types";
+import { DriverStackParamList } from "../../navigation/RoleNavigator";
 
-type NavigationProp = NativeStackNavigationProp<DriverStackParamList, 'RouteSummary'>;
+type NavigationProp = NativeStackNavigationProp<
+  DriverStackParamList,
+  "RouteSummary"
+>;
 
 export const RouteCompletionSummaryScreen: React.FC = () => {
   const routeParams = useRoute<any>();
@@ -45,40 +48,69 @@ export const RouteCompletionSummaryScreen: React.FC = () => {
     );
   }
 
-  const compStops = assignment.stops.filter(s => s.status === 'Completed').length;
-  const skipStops = assignment.stops.filter(s => s.status === 'Skipped').length;
+  const compStops = assignment.stops.filter(
+    (s) => s.status === "Completed",
+  ).length;
+  const skipStops = assignment.stops.filter(
+    (s) => s.status === "Skipped",
+  ).length;
   const totalStops = assignment.stops.length;
   const completionPercent = ((compStops + skipStops) / totalStops) * 100;
 
   return (
     <ScreenContainer scrollable>
       <View style={styles.heroSection}>
-        <CheckCircle color={theme.colors.success} size={80} style={{ marginBottom: theme.spacing.lg }} />
-        <AppText variant="h1" align="center" style={{ marginBottom: theme.spacing.xs }}>
-          Route Completed
+        <CheckCircle
+          color={theme.colors.success}
+          size={80}
+          style={{ marginBottom: theme.spacing.lg }}
+        />
+        <AppText
+          variant="h1"
+          align="center"
+          style={{ marginBottom: theme.spacing.xs }}
+        >
+          Task Completed
         </AppText>
-        <AppText variant="body" color={theme.colors.textSecondary} align="center">
+        <AppText
+          variant="body"
+          color={theme.colors.textSecondary}
+          align="center"
+        >
           Great job! The area is clear.
         </AppText>
       </View>
 
       <AppCard style={styles.summaryCard} elevation="md">
-        <AppText variant="h3" style={{ marginBottom: theme.spacing.xl, textAlign: 'center' }}>
+        <AppText
+          variant="h3"
+          style={{ marginBottom: theme.spacing.xl, textAlign: "center" }}
+        >
           {assignment.title}
         </AppText>
 
         <View style={styles.row}>
           <View style={styles.statBox}>
-            <AppText variant="h2" color={theme.colors.success}>{compStops}</AppText>
-            <AppText variant="caption" color={theme.colors.textSecondary}>Completed</AppText>
+            <AppText variant="h2" color={theme.colors.success}>
+              {compStops}
+            </AppText>
+            <AppText variant="caption" color={theme.colors.textSecondary}>
+              Completed
+            </AppText>
           </View>
           <View style={styles.statBox}>
-            <AppText variant="h2" color={theme.colors.warning}>{skipStops}</AppText>
-            <AppText variant="caption" color={theme.colors.textSecondary}>Skipped</AppText>
+            <AppText variant="h2" color={theme.colors.warning}>
+              {skipStops}
+            </AppText>
+            <AppText variant="caption" color={theme.colors.textSecondary}>
+              Skipped
+            </AppText>
           </View>
           <View style={styles.statBox}>
             <AppText variant="h2">{totalStops}</AppText>
-            <AppText variant="caption" color={theme.colors.textSecondary}>Total Stops</AppText>
+            <AppText variant="caption" color={theme.colors.textSecondary}>
+              Total Stops
+            </AppText>
           </View>
         </View>
 
@@ -87,15 +119,22 @@ export const RouteCompletionSummaryScreen: React.FC = () => {
         <View style={styles.detailRow}>
           <Clock color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Duration (Est / Actual)</AppText>
-            <AppText variant="body">{assignment.estimatedDuration} / {assignment.actualDuration || 'N/A'}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Duration (Est / Actual)
+            </AppText>
+            <AppText variant="body">
+              {assignment.estimatedDuration} /{" "}
+              {assignment.actualDuration || "N/A"}
+            </AppText>
           </View>
         </View>
 
         <View style={styles.detailRow}>
           <Map color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Distance Covered</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Distance Covered
+            </AppText>
             <AppText variant="body">{assignment.estimatedDistance}</AppText>
           </View>
         </View>
@@ -103,24 +142,34 @@ export const RouteCompletionSummaryScreen: React.FC = () => {
         {skipStops > 0 && (
           <>
             <View style={styles.divider} />
-            <AppText variant="h3" style={{ marginBottom: theme.spacing.md }}>Skipped Stops</AppText>
-            {assignment.stops.filter(s => s.status === 'Skipped').map((stop, idx) => (
-              <View key={stop.id || idx} style={styles.skipItem}>
-                <AlertTriangle color={theme.colors.warning} size={16} />
-                <View style={{ marginLeft: 8, flex: 1 }}>
-                  <AppText variant="bodySmall" weight="600">{stop.address}</AppText>
-                  <AppText variant="caption" color={theme.colors.textSecondary}>Reason: {stop.skipReason || 'Not provided'}</AppText>
+            <AppText variant="h3" style={{ marginBottom: theme.spacing.md }}>
+              Skipped Stops
+            </AppText>
+            {assignment.stops
+              .filter((s) => s.status === "Skipped")
+              .map((stop, idx) => (
+                <View key={stop.id || idx} style={styles.skipItem}>
+                  <AlertTriangle color={theme.colors.warning} size={16} />
+                  <View style={{ marginLeft: 8, flex: 1 }}>
+                    <AppText variant="bodySmall" weight="600">
+                      {stop.address}
+                    </AppText>
+                    <AppText
+                      variant="caption"
+                      color={theme.colors.textSecondary}
+                    >
+                      Reason: {stop.skipReason || "Not provided"}
+                    </AppText>
+                  </View>
                 </View>
-              </View>
-            ))}
+              ))}
           </>
         )}
-
       </AppCard>
 
-      <AppButton 
-        title="Return to Dashboard" 
-        onPress={() => navigation.navigate('DriverTabs')}
+      <AppButton
+        title="Return to Dashboard"
+        onPress={() => navigation.navigate("DriverTabs")}
         size="large"
         style={styles.doneBtn}
       />
@@ -130,12 +179,12 @@ export const RouteCompletionSummaryScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: theme.spacing.xxl,
     marginBottom: theme.spacing.xl,
   },
@@ -144,11 +193,11 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xxl,
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   statBox: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
   },
   divider: {
@@ -157,8 +206,8 @@ const styles = StyleSheet.create({
     marginVertical: theme.spacing.lg,
   },
   detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: theme.spacing.md,
   },
   detailTextContainer: {
@@ -168,11 +217,11 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xxl,
   },
   skipItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: theme.colors.warning + '15',
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: theme.colors.warning + "15",
     padding: theme.spacing.sm,
     borderRadius: theme.borderRadius.sm,
     marginBottom: 8,
-  }
+  },
 });

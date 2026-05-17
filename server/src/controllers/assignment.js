@@ -14,7 +14,6 @@ const { validationResult } = require("express-validator");
  */
 exports.createAssignment = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
-  console.log("errors: ", errors);
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
@@ -23,7 +22,15 @@ exports.createAssignment = asyncHandler(async (req, res) => {
     });
   }
 
-  const { driverId, title, collectionDate, collectionTime, pollingUnits, lga, ward } = req.body;
+  const {
+    driverId,
+    title,
+    collectionDate,
+    collectionTime,
+    pollingUnits,
+    lga,
+    ward,
+  } = req.body;
 
   // STEP 1 — Fetch all residents matching the area
   const residents = await User.find({

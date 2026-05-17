@@ -1,23 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { Alert, View, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Truck, FileText, Calendar, Bell, List, LogOut, AlertTriangle } from 'lucide-react-native';
-import * as Animatable from 'react-native-animatable';
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {
+  Truck,
+  FileText,
+  Calendar,
+  Bell,
+  List,
+  LogOut,
+  AlertTriangle,
+} from "lucide-react-native";
+import * as Animatable from "react-native-animatable";
 
-import { ScreenContainer } from '../../components/ScreenContainer';
-import { AppText } from '../../components/AppText';
-import { AppCard } from '../../components/AppCard';
-import { theme } from '../../theme';
-import { useAuth } from '../../context/AuthContext';
-import { reportService } from '../../services/reportService';
-import { scheduleService } from '../../services/scheduleService';
-import { routeService } from '../../services/routeService';
-import { pickupService } from '../../services/pickupService';
-import { billService } from '../../services/billService';
-import { ResidentStackParamList } from '../../navigation/RoleNavigator';
+import { ScreenContainer } from "../../components/ScreenContainer";
+import { AppText } from "../../components/AppText";
+import { AppCard } from "../../components/AppCard";
+import { theme } from "../../theme";
+import { useAuth } from "../../context/AuthContext";
+import { reportService } from "../../services/reportService";
+import { scheduleService } from "../../services/scheduleService";
+import { routeService } from "../../services/routeService";
+import { pickupService } from "../../services/pickupService";
+import { billService } from "../../services/billService";
+import { ResidentStackParamList } from "../../navigation/RoleNavigator";
 
-type NavigationProp = NativeStackNavigationProp<ResidentStackParamList, 'ResidentTabs'>;
+type NavigationProp = NativeStackNavigationProp<
+  ResidentStackParamList,
+  "ResidentTabs"
+>;
 
 export const ResidentDashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -25,37 +42,39 @@ export const ResidentDashboard: React.FC = () => {
 
   const [activeReports, setActiveReports] = useState(0);
   const [resolvedReports, setResolvedReports] = useState(0);
-  const [nextCollectionDay, setNextCollectionDay] = useState('Loading...');
-  const [nextCollectionTime, setNextCollectionTime] = useState('');
+  const [nextCollectionDay, setNextCollectionDay] = useState("Loading...");
+  const [nextCollectionTime, setNextCollectionTime] = useState("");
   const [refreshing, setRefreshing] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert(
-      "Sign Out",
-      "Are you sure you want to sign out?",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Sign Out", style: "destructive", onPress: signOut }
-      ]
-    );
+    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Sign Out", style: "destructive", onPress: signOut },
+    ]);
   };
 
   const [activePickup, setActivePickup] = useState<any>(null);
-  
+
   const loadDashboardData = async () => {
     if (!user) return;
     try {
       const pickups = await pickupService.getMyPickups();
-      setActiveReports(pickups.filter(r => r.status !== 'completed' && r.status !== 'cancelled').length);
-      setResolvedReports(pickups.filter(r => r.status === 'completed').length);
+      setActiveReports(
+        pickups.filter(
+          (r) => r.status !== "completed" && r.status !== "cancelled",
+        ).length,
+      );
+      setResolvedReports(
+        pickups.filter((r) => r.status === "completed").length,
+      );
 
       // Check for an accepted pickup that needs resident confirmation
-      const current = pickups.find(p => p.status === 'accepted');
+      const current = pickups.find((p) => p.status === "accepted");
       setActivePickup(current || null);
-      
+
       // ... rest of loadDashboardData
       const bills = await billService.getMyBills();
-      
+
       // Fetch collection schedules based on resident's ward/LGA assignment
       const nextCollection = await routeService.getNextCollectionDate();
       if (nextCollection && nextCollection.collectionDate) {
@@ -64,22 +83,28 @@ export const ResidentDashboard: React.FC = () => {
         today.setHours(0, 0, 0, 0);
 
         if (dateObj < today) {
-          setNextCollectionDay('Unscheduled');
-          setNextCollectionTime('');
+          setNextCollectionDay("Unscheduled");
+          setNextCollectionTime("");
         } else {
           const todayStr = new Date().toDateString();
           const collStr = dateObj.toDateString();
-          
+
           if (todayStr === collStr) {
-            setNextCollectionDay('TODAY');
+            setNextCollectionDay("TODAY");
           } else {
-            setNextCollectionDay(dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }));
+            setNextCollectionDay(
+              dateObj.toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              }),
+            );
           }
-          setNextCollectionTime(nextCollection.collectionTime || '');
+          setNextCollectionTime(nextCollection.collectionTime || "");
         }
       } else {
-        setNextCollectionDay('Unscheduled');
-        setNextCollectionTime('');
+        setNextCollectionDay("Unscheduled");
+        setNextCollectionTime("");
       }
     } catch (e) {
       console.error(e);
@@ -97,9 +122,14 @@ export const ResidentDashboard: React.FC = () => {
   };
 
   return (
-    <ScreenContainer scrollable scrollViewProps={{
-      refreshControl: <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-    }}>
+    <ScreenContainer
+      scrollable
+      scrollViewProps={{
+        refreshControl: (
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        ),
+      }}
+    >
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
         <View style={styles.headerTop}>
           <View>
@@ -115,20 +145,34 @@ export const ResidentDashboard: React.FC = () => {
       </Animatable.View>
 
       {activePickup && (
-        <Animatable.View animation="pulse" iterationCount="infinite" delay={150}>
-          <AppCard style={[styles.alertCard, { backgroundColor: theme.colors.success + '10', borderColor: theme.colors.success + '40' }]}>
+        <Animatable.View
+          animation="pulse"
+          iterationCount="infinite"
+          delay={150}
+        >
+          <AppCard
+            style={[
+              styles.alertCard,
+              {
+                backgroundColor: theme.colors.success + "10",
+                borderColor: theme.colors.success + "40",
+              },
+            ]}
+          >
             <View style={{ flex: 1 }}>
               <AppText variant="body" weight="600" color={theme.colors.success}>
-                Driver is on the way!
+                Collector is on the way!
               </AppText>
               <AppText variant="bodySmall" color={theme.colors.textSecondary}>
                 Your {activePickup.type} pickup was accepted.
               </AppText>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.pickedUpBtn}
                 onPress={async () => {
                   try {
-                    await pickupService.completePickupByResident(activePickup.id);
+                    await pickupService.completePickupByResident(
+                      activePickup.id,
+                    );
                     Alert.alert("Success", "Pickup confirmed! Thank you.");
                     loadDashboardData();
                   } catch (e) {
@@ -136,7 +180,11 @@ export const ResidentDashboard: React.FC = () => {
                   }
                 }}
               >
-                <AppText variant="bodySmall" weight="700" color={theme.colors.surface}>
+                <AppText
+                  variant="bodySmall"
+                  weight="700"
+                  color={theme.colors.surface}
+                >
                   MARK AS PICKED UP
                 </AppText>
               </TouchableOpacity>
@@ -147,9 +195,17 @@ export const ResidentDashboard: React.FC = () => {
       )}
 
       <Animatable.View animation="fadeIn" delay={150}>
-        <TouchableOpacity onPress={() => navigation.navigate('ResidentTabs' as any, { screen: 'Waste Bill' })}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("ResidentTabs" as any, { screen: "Waste Bill" })
+          }
+        >
           <View style={styles.alertCard}>
-            <Calendar color={theme.colors.primary} size={24} style={{ marginRight: theme.spacing.md }} />
+            <Calendar
+              color={theme.colors.primary}
+              size={24}
+              style={{ marginRight: theme.spacing.md }}
+            />
             <View style={{ flex: 1 }}>
               <AppText variant="body" weight="600" color={theme.colors.primary}>
                 View Waste Bill
@@ -162,13 +218,26 @@ export const ResidentDashboard: React.FC = () => {
         </TouchableOpacity>
       </Animatable.View>
 
-      <AppCard style={styles.statusCard} elevation="md" animation="fadeInUp" delay={200}>
+      <AppCard
+        style={styles.statusCard}
+        elevation="md"
+        animation="fadeInUp"
+        delay={200}
+      >
         <View style={styles.statusRow}>
           <View>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Next Collection</AppText>
-            <AppText variant="h3" color={theme.colors.primary}>{nextCollectionDay}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Next Collection
+            </AppText>
+            <AppText variant="h3" color={theme.colors.primary}>
+              {nextCollectionDay}
+            </AppText>
             {!!nextCollectionTime && (
-              <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginTop: 2 }}>
+              <AppText
+                variant="bodySmall"
+                color={theme.colors.textSecondary}
+                style={{ marginTop: 2 }}
+              >
                 Time: {nextCollectionTime}
               </AppText>
             )}
@@ -177,87 +246,149 @@ export const ResidentDashboard: React.FC = () => {
         </View>
         <View style={styles.divider} />
         <AppText variant="caption" color={theme.colors.textSecondary}>
-          Ensure your waste bins are placed outside by 7:00 AM on collection day.
+          Ensure your waste bins are placed outside by 7:00 AM on collection
+          day.
         </AppText>
       </AppCard>
 
       <View style={styles.statsRow}>
         <AppCard style={styles.statCard} padded animation="zoomIn" delay={300}>
-          <AppText variant="h2" color={theme.colors.status.active}>{activeReports}</AppText>
-          <AppText variant="bodySmall" color={theme.colors.textSecondary}>Active Pickups</AppText>
+          <AppText variant="h2" color={theme.colors.status.active}>
+            {activeReports}
+          </AppText>
+          <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+            Active Pickup Requests
+          </AppText>
         </AppCard>
         <AppCard style={styles.statCard} padded animation="zoomIn" delay={400}>
-          <AppText variant="h2" color={theme.colors.status.completed}>{resolvedReports}</AppText>
-          <AppText variant="bodySmall" color={theme.colors.textSecondary}>Resolved</AppText>
+          <AppText variant="h2" color={theme.colors.status.completed}>
+            {resolvedReports}
+          </AppText>
+          <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+            Resolved
+          </AppText>
         </AppCard>
       </View>
 
       <Animatable.Text animation="fadeIn" delay={500}>
-        <AppText variant="h3" style={styles.sectionTitle}>Quick Actions</AppText>
+        <AppText variant="h3" style={styles.sectionTitle}>
+          Quick Actions
+        </AppText>
       </Animatable.Text>
-      
+
       <View style={styles.grid}>
-        <Animatable.View animation="fadeInUp" delay={600} style={styles.gridItem}>
-            <TouchableOpacity 
-            onPress={() => navigation.navigate('RequestPickup' as any)}
+        <Animatable.View
+          animation="fadeInUp"
+          delay={600}
+          style={styles.gridItem}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.navigate("RequestPickup" as any)}
             activeOpacity={0.8}
-            style={{flex: 1}}
+            style={{ flex: 1 }}
           >
             <AppCard elevation="sm" style={styles.gridCard}>
-              <View style={[styles.iconWrapper, { backgroundColor: theme.colors.status.pending + '20' }]}>
+              <View
+                style={[
+                  styles.iconWrapper,
+                  { backgroundColor: theme.colors.status.pending + "20" },
+                ]}
+              >
                 <FileText color={theme.colors.status.pending} size={24} />
               </View>
-              <AppText variant="bodySmall" weight="600" style={styles.gridText}>Request Pickup</AppText>
+              <AppText variant="bodySmall" weight="600" style={styles.gridText}>
+                Request Pickup
+              </AppText>
             </AppCard>
           </TouchableOpacity>
         </Animatable.View>
 
-        <Animatable.View animation="fadeInUp" delay={700} style={styles.gridItem}>
-            <TouchableOpacity 
-            onPress={() => navigation.navigate('ResidentTabs' as any, { screen: 'Pickups' })}
+        <Animatable.View
+          animation="fadeInUp"
+          delay={700}
+          style={styles.gridItem}
+        >
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("ResidentTabs" as any, { screen: "Pickups" })
+            }
             activeOpacity={0.8}
-            style={{flex: 1}}
+            style={{ flex: 1 }}
           >
             <AppCard elevation="sm" style={styles.gridCard}>
-              <View style={[styles.iconWrapper, { backgroundColor: theme.colors.primary + '20' }]}>
+              <View
+                style={[
+                  styles.iconWrapper,
+                  { backgroundColor: theme.colors.primary + "20" },
+                ]}
+              >
                 <List color={theme.colors.primary} size={24} />
               </View>
-              <AppText variant="bodySmall" weight="600" style={styles.gridText}>My Pickups</AppText>
+              <AppText variant="bodySmall" weight="600" style={styles.gridText}>
+                My Pickup Requests
+              </AppText>
             </AppCard>
           </TouchableOpacity>
         </Animatable.View>
 
-        <Animatable.View animation="fadeInUp" delay={800} style={styles.gridItem}>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('ResidentTabs' as any, { screen: 'Waste Bill' })}
+        <Animatable.View
+          animation="fadeInUp"
+          delay={800}
+          style={styles.gridItem}
+        >
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("ResidentTabs" as any, {
+                screen: "Waste Bill",
+              })
+            }
             activeOpacity={0.8}
-            style={{flex: 1}}
+            style={{ flex: 1 }}
           >
             <AppCard elevation="sm" style={styles.gridCard}>
-              <View style={[styles.iconWrapper, { backgroundColor: theme.colors.secondary + '20' }]}>
+              <View
+                style={[
+                  styles.iconWrapper,
+                  { backgroundColor: theme.colors.secondary + "20" },
+                ]}
+              >
                 <Calendar color={theme.colors.secondary} size={24} />
               </View>
-              <AppText variant="bodySmall" weight="600" style={styles.gridText}>Waste Bill</AppText>
+              <AppText variant="bodySmall" weight="600" style={styles.gridText}>
+                Waste Bill
+              </AppText>
             </AppCard>
           </TouchableOpacity>
         </Animatable.View>
 
-        <Animatable.View animation="fadeInUp" delay={900} style={styles.gridItem}>
-          <TouchableOpacity 
-            onPress={() => navigation.navigate('ResidentTabs' as any, { screen: 'Alerts' })}
+        <Animatable.View
+          animation="fadeInUp"
+          delay={900}
+          style={styles.gridItem}
+        >
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("ResidentTabs" as any, { screen: "Alerts" })
+            }
             activeOpacity={0.8}
-            style={{flex: 1}}
+            style={{ flex: 1 }}
           >
             <AppCard elevation="sm" style={styles.gridCard}>
-              <View style={[styles.iconWrapper, { backgroundColor: theme.colors.status.cancelled + '20' }]}>
+              <View
+                style={[
+                  styles.iconWrapper,
+                  { backgroundColor: theme.colors.status.cancelled + "20" },
+                ]}
+              >
                 <Bell color={theme.colors.status.cancelled} size={24} />
               </View>
-              <AppText variant="bodySmall" weight="600" style={styles.gridText}>Notifications</AppText>
+              <AppText variant="bodySmall" weight="600" style={styles.gridText}>
+                Notifications
+              </AppText>
             </AppCard>
           </TouchableOpacity>
         </Animatable.View>
       </View>
-
     </ScreenContainer>
   );
 };
@@ -267,20 +398,20 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   logoutBtn: {
     padding: theme.spacing.sm,
-    backgroundColor: theme.colors.status.cancelled + '10',
+    backgroundColor: theme.colors.status.cancelled + "10",
     borderRadius: theme.borderRadius.md,
   },
   alertCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary + '10',
-    borderColor: theme.colors.primary + '30',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: theme.colors.primary + "10",
+    borderColor: theme.colors.primary + "30",
     borderWidth: 1,
     padding: theme.spacing.md,
     borderRadius: theme.borderRadius.md,
@@ -291,9 +422,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
   },
   statusRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: theme.spacing.md,
   },
   divider: {
@@ -302,30 +433,30 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginHorizontal: -theme.spacing.xs,
     marginBottom: theme.spacing.xl,
   },
   statCard: {
     flex: 1,
     marginHorizontal: theme.spacing.xs,
-    alignItems: 'center',
+    alignItems: "center",
   },
   sectionTitle: {
     marginBottom: theme.spacing.md,
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     marginHorizontal: -theme.spacing.xs,
   },
   gridItem: {
-    width: '50%',
+    width: "50%",
     padding: theme.spacing.xs,
   },
   gridCard: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: theme.spacing.lg,
   },
   iconWrapper: {
@@ -334,7 +465,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
   },
   gridText: {
-    textAlign: 'center',
+    textAlign: "center",
   },
   pickedUpBtn: {
     backgroundColor: theme.colors.success,
@@ -342,6 +473,6 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.borderRadius.sm,
     marginTop: theme.spacing.sm,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
 });

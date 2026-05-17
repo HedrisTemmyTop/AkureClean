@@ -127,9 +127,9 @@ export const RequestedPickupsScreen: React.FC = () => {
   return (
     <ScreenContainer>
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
-        <AppText variant="h2">Requests</AppText>
+        <AppText variant="h2">Pickup Requests</AppText>
         <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-          Manage your accepted tasks and browse available pickups.
+          Manage your accepted pickup requests and browse available pickups.
         </AppText>
       </Animatable.View>
 
@@ -185,8 +185,8 @@ export const RequestedPickupsScreen: React.FC = () => {
                 align="center"
               >
                 {activeTab === "active"
-                  ? "You don't have any active pickups currently."
-                  : "No pending paid requests at the moment."}
+                  ? "You don't have any active pickup requests currently."
+                  : "No pending paid pickup requests at the moment."}
               </AppText>
             </View>
           ) : null

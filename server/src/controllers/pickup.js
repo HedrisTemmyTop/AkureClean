@@ -6,6 +6,7 @@ const notificationService = require("../services/notification");
 const { logActivity } = require("../utils/logger");
 const asyncHandler = require("../utils/asyncHandler");
 const { validationResult } = require("express-validator");
+const Assignment = require("../models/Assignment");
 
 exports.createPickupRequest = asyncHandler(async (req, res) => {
   const { type, notes, scheduledDate, scheduledTime, amount } = req.body;
@@ -58,23 +59,41 @@ exports.createPickupRequest = asyncHandler(async (req, res) => {
 // payPickupFee removed as payment is physical
 
 exports.getAllAvailablePickups = asyncHandler(async (req, res) => {
+  const driverId = req.user._id; // or however you get the driver from the request
+
+  // Step 1 — Get the driver's last assignment
+  const lastAssignment = await Assignment.findOne({ driverId })
+    .sort({ createdAt: -1 })
+    .lean();
+
+  if (!lastAssignment) {
+    return res.json({ success: true, data: [] });
+  }
+
+  // Step 2 — Extract polling units from the assignment's stops
+  const pollingUnits = [
+    ...new Set(lastAssignment.stops.map((s) => s.pollingUnit).filter(Boolean)),
+  ];
+  const pollingUnitRegexes = pollingUnits.map(
+    (pu) => new RegExp(pu.replace(/\s+/g, "\\s+"), "i"),
+  );
   const today = new Date().toISOString().split("T")[0];
-  // Find all pickups that are pending and not expired
+
   const pickups = await PickupRequest.find({
     status: "pending",
+    pollingUnit: { $in: pollingUnitRegexes },
     $or: [
       { scheduledDate: { $gte: today } },
       { scheduledDate: { $exists: false } },
       { scheduledDate: "" },
     ],
   }).populate("userId", "name phone address localGovt ward pollingUnit");
-
+  console.log("pickups", pickups);
   res.json({
     success: true,
     data: pickups,
   });
 });
-
 exports.getDriverPickups = asyncHandler(async (req, res) => {
   const driverId = req.user._id;
 
@@ -223,7 +242,6 @@ exports.completePickupByResident = asyncHandler(async (req, res) => {
 
 exports.cancelPickup = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const pickup = await PickupRequest.findOne({
     _id: id,
     userId: req.user._id,

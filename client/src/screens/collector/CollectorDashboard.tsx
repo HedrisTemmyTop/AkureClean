@@ -94,7 +94,7 @@ export const DriverDashboard: React.FC = () => {
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-            <AppText variant="h2">Driver Shift</AppText>
+            <AppText variant="h2">COllector Shift</AppText>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>
               {new Date().toLocaleDateString(undefined, {
                 weekday: "long",
