@@ -102,7 +102,7 @@ export const DriverDashboard: React.FC = () => {
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
         <View style={styles.headerTop}>
           <View>
-            <AppText variant="h2">Driver Shift</AppText>
+            <AppText variant="h2">Collector Shift</AppText>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>
               {new Date().toLocaleDateString(undefined, {
                 weekday: "long",
@@ -158,32 +158,49 @@ export const DriverDashboard: React.FC = () => {
           delay={200}
         >
           <View style={styles.cardHeader}>
-            <View style={[
-              styles.badge, 
-              activeRoute.status === 'Completed' && { backgroundColor: theme.colors.success + '20' },
-              activeRoute.status === 'Paused' && { backgroundColor: theme.colors.warning + '20' }
-            ]}>
-              {(activeRoute.status !== 'Completed' && activeRoute.status !== 'Paused') && <View style={styles.pulseDot} />}
+            <View
+              style={[
+                styles.badge,
+                activeRoute.status === "Completed" && {
+                  backgroundColor: theme.colors.success + "20",
+                },
+                activeRoute.status === "Paused" && {
+                  backgroundColor: theme.colors.warning + "20",
+                },
+              ]}
+            >
+              {activeRoute.status !== "Completed" &&
+                activeRoute.status !== "Paused" && (
+                  <View style={styles.pulseDot} />
+                )}
               <AppText
                 variant="caption"
                 color={
-                  activeRoute.status === 'Completed' ? theme.colors.success : 
-                  activeRoute.status === 'Paused' ? theme.colors.warning :
-                  theme.colors.primary
+                  activeRoute.status === "Completed"
+                    ? theme.colors.success
+                    : activeRoute.status === "Paused"
+                      ? theme.colors.warning
+                      : theme.colors.primary
                 }
                 weight="600"
               >
-                {activeRoute.status === 'Completed' ? 'ROUTE COMPLETED' : 
-                 activeRoute.status === 'Paused' ? 'ROUTE PAUSED' : 'ACTIVE ROUTE'}
+                {activeRoute.status === "Completed"
+                  ? "TASK COMPLETED"
+                  : activeRoute.status === "Paused"
+                    ? "TASK PAUSED"
+                    : "ACTIVE TASK"}
               </AppText>
             </View>
             <AppText variant="caption" color={theme.colors.textSecondary}>
-              {activeRoute.status === 'Completed' ? 'Finished' : 
-               activeRoute.status === 'Paused' ? 'On Break' : 'En Route'}
+              {activeRoute.status === "Completed"
+                ? "Finished"
+                : activeRoute.status === "Paused"
+                  ? "On Break"
+                  : "En Route"}
             </AppText>
           </View>
           <AppText variant="h2" style={styles.routeTitle}>
-            {activeRoute.title || 'Daily Zone Collection'}
+            {activeRoute.title || "Daily Zone Collection"}
           </AppText>
 
           <View style={styles.routeMeta}>
@@ -204,7 +221,11 @@ export const DriverDashboard: React.FC = () => {
                 color={theme.colors.textSecondary}
                 style={styles.metaText}
               >
-                {new Date(activeRoute.collectionDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} • {activeRoute.collectionTime || '08:00 AM'}
+                {new Date(activeRoute.collectionDate).toLocaleDateString(
+                  undefined,
+                  { month: "short", day: "numeric" },
+                )}{" "}
+                • {activeRoute.collectionTime || "08:00 AM"}
               </AppText>
             </View>
           </View>
@@ -212,16 +233,23 @@ export const DriverDashboard: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.actionBtn,
-              activeRoute.status === 'Completed' && { backgroundColor: theme.colors.success },
-              activeRoute.status === 'Paused' && { backgroundColor: theme.colors.warning }
+              activeRoute.status === "Completed" && {
+                backgroundColor: theme.colors.success,
+              },
+              activeRoute.status === "Paused" && {
+                backgroundColor: theme.colors.warning,
+              },
             ]}
             onPress={() =>
-              navigation.navigate(activeRoute.status === 'Completed' ? "RouteSummary" : "Route", { routeId: activeRoute._id })
+              navigation.navigate(
+                activeRoute.status === "Completed" ? "RouteSummary" : "Route",
+                { routeId: activeRoute._id },
+              )
             }
           >
-            {activeRoute.status === 'Completed' ? (
+            {activeRoute.status === "Completed" ? (
               <CheckCircle color={theme.colors.surface} size={20} />
-            ) : activeRoute.status === 'Paused' ? (
+            ) : activeRoute.status === "Paused" ? (
               <Navigation color={theme.colors.surface} size={20} />
             ) : (
               <Navigation color={theme.colors.surface} size={20} />
@@ -232,8 +260,11 @@ export const DriverDashboard: React.FC = () => {
               color={theme.colors.surface}
               style={{ marginLeft: 8 }}
             >
-              {activeRoute.status === 'Completed' ? 'View Summary' : 
-               activeRoute.status === 'Paused' ? 'Resume Navigation' : 'Resume Navigation'}
+              {activeRoute.status === "Completed"
+                ? "View Summary"
+                : activeRoute.status === "Paused"
+                  ? "Resume Navigation"
+                  : "Resume Navigation"}
             </AppText>
           </TouchableOpacity>
         </AppCard>

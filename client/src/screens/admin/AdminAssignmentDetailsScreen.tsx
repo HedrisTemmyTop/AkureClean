@@ -1,21 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { MapPin, Calendar, CheckCircle, Clock, User, Mail, Home, ChevronRight } from 'lucide-react-native';
-import { TouchableOpacity } from 'react-native';
-import * as Animatable from 'react-native-animatable';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {
+  MapPin,
+  Calendar,
+  CheckCircle,
+  Clock,
+  User,
+  Mail,
+  Home,
+  ChevronRight,
+} from "lucide-react-native";
+import { TouchableOpacity } from "react-native";
+import * as Animatable from "react-native-animatable";
 
-import { ScreenContainer } from '../../components/ScreenContainer';
-import { AppText } from '../../components/AppText';
-import { AppCard } from '../../components/AppCard';
-import { AppButton } from '../../components/AppButton';
-import { StatusBadge } from '../../components/StatusBadge';
-import { theme } from '../../theme';
-import { routeService } from '../../services/routeService';
-import { parseApiError } from '../../services/api';
-import { AssignmentRoute } from '../../types';
-import { AdminStackParamList } from '../../navigation/RoleNavigator';
+import { ScreenContainer } from "../../components/ScreenContainer";
+import { AppText } from "../../components/AppText";
+import { AppCard } from "../../components/AppCard";
+import { AppButton } from "../../components/AppButton";
+import { StatusBadge } from "../../components/StatusBadge";
+import { theme } from "../../theme";
+import { routeService } from "../../services/routeService";
+import { parseApiError } from "../../services/api";
+import { AssignmentRoute } from "../../types";
+import { AdminStackParamList } from "../../navigation/RoleNavigator";
 
 type NavigationProp = NativeStackNavigationProp<AdminStackParamList>;
 
@@ -33,7 +48,7 @@ export const AdminAssignmentDetailsScreen: React.FC = () => {
         const data = await routeService.getRouteById(routeId);
         setAssignment(data);
       } catch (e) {
-        Alert.alert('Error', parseApiError(e));
+        Alert.alert("Error", parseApiError(e));
       } finally {
         setLoading(false);
       }
@@ -49,97 +64,133 @@ export const AdminAssignmentDetailsScreen: React.FC = () => {
     );
   }
 
-  const completedStops = assignment.stops?.filter(s => s.status === 'Completed').length || 0;
+  const completedStops =
+    assignment.stops?.filter((s) => s.status === "Completed").length || 0;
   const totalStops = assignment.stops?.length || 0;
   const progress = totalStops > 0 ? (completedStops / totalStops) * 100 : 0;
 
   return (
     <ScreenContainer scrollable>
       <View style={styles.header}>
-        <AppButton 
-          title="Back" 
-          variant="ghost" 
-          size="small" 
-          onPress={() => navigation.goBack()} 
+        <AppButton
+          title="Back"
+          variant="ghost"
+          size="small"
+          onPress={() => navigation.goBack()}
           style={styles.backBtn}
         />
         <StatusBadge status={assignment.status as any} />
       </View>
 
       <View style={{ marginTop: 24, marginBottom: 32 }}>
-        <AppText variant="h1" style={styles.title}>{assignment.area} Street</AppText>
+        <AppText variant="h1" style={styles.title}>
+          {assignment.area} Street
+        </AppText>
         <View style={styles.metaRow}>
           <MapPin color={theme.colors.textSecondary} size={16} />
-          <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ marginLeft: 6 }}>
+          <AppText
+            variant="bodySmall"
+            color={theme.colors.textSecondary}
+            style={{ marginLeft: 6 }}
+          >
             {assignment.title}
           </AppText>
         </View>
       </View>
 
       <AppCard style={styles.card}>
-        <AppText variant="h3" style={styles.sectionTitle}>Overview</AppText>
-        
+        <AppText variant="h3" style={styles.sectionTitle}>
+          Overview
+        </AppText>
+
         <View style={styles.detailRow}>
           <User color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Assigned Driver</AppText>
-            <AppText variant="body" weight="600">{assignment.driverName || assignment.driverId}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Assigned Collector
+            </AppText>
+            <AppText variant="body" weight="600">
+              {assignment.driverName || assignment.driverId}
+            </AppText>
           </View>
         </View>
 
         <View style={styles.detailRow}>
           <Mail color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Driver Email</AppText>
-            <AppText variant="body" weight="600">{assignment.driverEmail || '—'}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Collector Email
+            </AppText>
+            <AppText variant="body" weight="600">
+              {assignment.driverEmail || "—"}
+            </AppText>
           </View>
         </View>
 
         <View style={styles.detailRow}>
           <Calendar color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Next Schedule Date</AppText>
-            <AppText variant="body" weight="600">{assignment.collectionDate}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Next Schedule Date
+            </AppText>
+            <AppText variant="body" weight="600">
+              {assignment.collectionDate}
+            </AppText>
           </View>
         </View>
 
         <View style={styles.detailRow}>
           <Home color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Number of Houses</AppText>
-            <AppText variant="body" weight="600">{totalStops} Houses</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Number of Houses
+            </AppText>
+            <AppText variant="body" weight="600">
+              {totalStops} Houses
+            </AppText>
           </View>
         </View>
 
         <View style={styles.detailRow}>
           <CheckCircle color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Collection Status</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Collection Status
+            </AppText>
             <AppText variant="body" weight="600">
-              {progress === 100 ? 'Collection Done' : 'Pending / In Progress'}
+              {progress === 100 ? "Collection Done" : "Pending / In Progress"}
             </AppText>
           </View>
         </View>
       </AppCard>
 
       <View>
-        <AppText variant="h3" style={styles.sectionTitle}>Stops Details</AppText>
+        <AppText variant="h3" style={styles.sectionTitle}>
+          Stops Details
+        </AppText>
         {assignment.stops?.map((stop, index) => (
-          <TouchableOpacity 
-            key={stop.id} 
+          <TouchableOpacity
+            key={stop.id}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate('AdminStopDetails', { routeId, stopId: stop.id })}
+            onPress={() =>
+              navigation.navigate("AdminStopDetails", {
+                routeId,
+                stopId: stop.id,
+              })
+            }
           >
             <AppCard style={styles.stopCard}>
               <View style={styles.stopIconBg}>
-                {stop.status === 'Completed' ? (
+                {stop.status === "Completed" ? (
                   <CheckCircle color={theme.colors.success} size={20} />
                 ) : (
                   <View style={styles.dot} />
                 )}
               </View>
               <View style={styles.stopDetails}>
-                <AppText variant="body" weight="600">{stop.address}</AppText>
+                <AppText variant="body" weight="600">
+                  {stop.address}
+                </AppText>
                 <AppText variant="caption" color={theme.colors.textSecondary}>
                   Waste Type: {stop.wasteType}
                 </AppText>
@@ -149,20 +200,19 @@ export const AdminAssignmentDetailsScreen: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
-
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
   centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: theme.spacing.md,
   },
   backBtn: {
@@ -172,8 +222,8 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xs,
   },
   metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: theme.spacing.xl,
   },
   card: {
@@ -184,7 +234,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
   },
   detailRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: theme.spacing.md,
   },
   detailTextContainer: {
@@ -195,23 +245,23 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.sm,
   },
   progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: theme.spacing.xs,
   },
   progressBarBg: {
     height: 8,
     backgroundColor: theme.colors.border,
     borderRadius: 4,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressBarFill: {
-    height: '100%',
+    height: "100%",
     backgroundColor: theme.colors.primary,
   },
   stopCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: theme.spacing.md,
     marginBottom: theme.spacing.sm,
   },
@@ -219,9 +269,9 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: theme.colors.border + '50',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: theme.colors.border + "50",
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: theme.spacing.md,
   },
   dot: {
@@ -232,5 +282,5 @@ const styles = StyleSheet.create({
   },
   stopDetails: {
     flex: 1,
-  }
+  },
 });

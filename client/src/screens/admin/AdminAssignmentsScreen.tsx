@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Map, Truck, Home, Plus, ChevronRight } from 'lucide-react-native';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  RefreshControl,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Map, Truck, Home, Plus, ChevronRight } from "lucide-react-native";
 
-import { ScreenContainer } from '../../components/ScreenContainer';
-import { AppText } from '../../components/AppText';
-import { AppCard } from '../../components/AppCard';
-import { AppButton } from '../../components/AppButton';
-import { StatusBadge } from '../../components/StatusBadge';
-import { theme } from '../../theme';
-import { assignmentService } from '../../services/routeService';
-import { AssignmentRoute } from '../../types';
-import { AdminStackParamList } from '../../navigation/RoleNavigator';
+import { ScreenContainer } from "../../components/ScreenContainer";
+import { AppText } from "../../components/AppText";
+import { AppCard } from "../../components/AppCard";
+import { AppButton } from "../../components/AppButton";
+import { StatusBadge } from "../../components/StatusBadge";
+import { theme } from "../../theme";
+import { assignmentService } from "../../services/routeService";
+import { AssignmentRoute } from "../../types";
+import { AdminStackParamList } from "../../navigation/RoleNavigator";
 
-type NavigationProp = NativeStackNavigationProp<AdminStackParamList, 'AdminTabs'>;
+type NavigationProp = NativeStackNavigationProp<
+  AdminStackParamList,
+  "AdminTabs"
+>;
 
 export const AdminAssignmentsScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
@@ -46,16 +55,20 @@ export const AdminAssignmentsScreen: React.FC = () => {
   };
 
   const renderItem = ({ item }: { item: AssignmentRoute }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       activeOpacity={0.7}
-      onPress={() => navigation.navigate('AdminAssignmentDetails', { routeId: item.id })}
+      onPress={() =>
+        navigation.navigate("AdminAssignmentDetails", { routeId: item.id })
+      }
     >
       <AppCard style={styles.card}>
         <View style={styles.cardHeader}>
           <View>
-            <AppText variant="body" weight="600" style={{ marginBottom: 4 }}>{item.area} Street</AppText>
+            <AppText variant="body" weight="600" style={{ marginBottom: 4 }}>
+              {item.area} Street
+            </AppText>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-              Driver: {item.driverName || item.driverId || 'Unassigned'}
+              Driver: {item.driverName || item.driverId || "Unassigned"}
             </AppText>
           </View>
           <StatusBadge status={item.status as any} />
@@ -63,7 +76,11 @@ export const AdminAssignmentsScreen: React.FC = () => {
 
         <View style={styles.infoRow}>
           <Map color={theme.colors.textSecondary} size={16} />
-          <AppText variant="bodySmall" color={theme.colors.textSecondary} style={styles.infoText}>
+          <AppText
+            variant="bodySmall"
+            color={theme.colors.textSecondary}
+            style={styles.infoText}
+          >
             {item.title}
           </AppText>
         </View>
@@ -83,27 +100,33 @@ export const AdminAssignmentsScreen: React.FC = () => {
   return (
     <ScreenContainer scrollable={false}>
       <View style={styles.header}>
-        <AppText variant="h1">Assignments</AppText>
-        <TouchableOpacity 
+        <AppText variant="h1">Tasks</AppText>
+        <TouchableOpacity
           style={styles.createBtn}
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('CreateAssignment')}
+          onPress={() => navigation.navigate("CreateAssignment")}
         >
           <View style={styles.createBtnIcon}>
             <Plus color={theme.colors.surface} size={18} />
           </View>
-          <AppText variant="bodySmall" weight="600" color={theme.colors.surface}>
-            New Assignment
+          <AppText
+            variant="bodySmall"
+            weight="600"
+            color={theme.colors.surface}
+          >
+            New Task
           </AppText>
         </TouchableOpacity>
       </View>
 
       <FlatList
         data={assignments}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       />
     </ScreenContainer>
   );
@@ -111,9 +134,9 @@ export const AdminAssignmentsScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: theme.spacing.lg,
   },
   list: {
@@ -123,31 +146,31 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.md,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: theme.spacing.sm,
   },
   infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: theme.spacing.xs,
   },
   infoText: {
     marginLeft: 6,
   },
   footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: theme.spacing.sm,
     paddingTop: theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
   },
   createBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: theme.colors.primary,
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -156,5 +179,5 @@ const styles = StyleSheet.create({
   },
   createBtnIcon: {
     marginRight: 6,
-  }
+  },
 });

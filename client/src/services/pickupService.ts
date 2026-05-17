@@ -21,11 +21,20 @@ export const pickupService = {
   },
 
   async getAvailablePickups(): Promise<PickupRequestData[]> {
-    const { data } = await apiClient.get("/pickup");
-    return (data.data as any[]).map((raw) => ({
-      ...raw,
-      id: raw._id ?? raw.id,
-    }));
+    try {
+      console.log("req");
+      const { data } = await apiClient.get("/pickup");
+      return (data.data as any[]).map((raw) => ({
+        ...raw,
+        id: raw._id ?? raw.id,
+      }));
+    } catch (error: any) {
+      console.error(
+        "Error fetching available pickups:",
+        error.response?.data || error.message || error.response,
+      );
+      return [];
+    }
   },
 
   async getDriverPickups(): Promise<{
@@ -68,7 +77,7 @@ export const pickupService = {
   async completePickupByResident(id: string): Promise<void> {
     await apiClient.post(`/pickup/${id}/complete`);
   },
- 
+
   async cancelPickupByResident(id: string): Promise<void> {
     await apiClient.post(`/pickup/${id}/cancel`);
   },

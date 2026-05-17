@@ -17,6 +17,7 @@ import { tokenStorage } from "../utils/tokenStorage";
 // Change this to your machine's LAN IP when testing on a physical device,
 // e.g. 'http://192.168.1.100:5000/api'
 export const BASE_URL = "http://localhost:5001/api";
+// export const BASE_URL = "https://computational-small-public-causing.trycloudflare.com/api";
 
 // ─── INSTANCE ────────────────────────────────────────────────────────────────
 export const apiClient = axios.create({

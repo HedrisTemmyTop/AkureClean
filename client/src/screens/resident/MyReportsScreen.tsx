@@ -166,7 +166,7 @@ export const MyPickupsScreen: React.FC = () => {
   return (
     <ScreenContainer>
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
-        <AppText variant="h2">My Pickups</AppText>
+        <AppText variant="h2">My Pickup Requests</AppText>
       </Animatable.View>
 
       <Animatable.View animation="fadeIn" delay={200}>

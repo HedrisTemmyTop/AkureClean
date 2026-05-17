@@ -79,9 +79,9 @@ exports.register = asyncHandler(async (req, res) => {
 
   // If resident, generate bill for current year and create Household record
   if (user.role.toLowerCase() === "resident") {
-    const currentYear = new Date().getFullYear();
+    // const currentYear = new Date().getFullYear();
     const Household = require("../models/Household");
-    const Bill = require("../models/Bill");
+    // const Bill = require("../models/Bill");
 
     await Household.create({
       userId: user._id,
@@ -93,12 +93,12 @@ exports.register = asyncHandler(async (req, res) => {
       location,
     });
 
-    await Bill.create({
-      userId: user._id,
-      year: currentYear,
-      amount: 5000, // Hardcoded for now
-      status: "unpaid",
-    });
+    // await Bill.create({
+    //   userId: user._id,
+    //   year: currentYear,
+    //   amount: 5000, // Hardcoded for now
+    //   status: "unpaid",
+    // });
   }
 
   await logActivity(user._id, "Register", `User registered as ${user.role}`);
@@ -346,7 +346,11 @@ exports.deactivateMe = asyncHandler(async (req, res) => {
     { new: true },
   );
 
-  await logActivity(req.user._id, "Deactivate Account", `User deactivated their own account`);
+  await logActivity(
+    req.user._id,
+    "Deactivate Account",
+    `User deactivated their own account`,
+  );
 
   res.json({
     success: true,
@@ -366,7 +370,11 @@ exports.deleteMe = asyncHandler(async (req, res) => {
     { new: true },
   );
 
-  await logActivity(req.user._id, "Delete Account", `User deleted their own account`);
+  await logActivity(
+    req.user._id,
+    "Delete Account",
+    `User deleted their own account`,
+  );
 
   res.json({
     success: true,

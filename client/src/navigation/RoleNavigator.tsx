@@ -1,64 +1,72 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Home, List, Settings, Calendar, Bell, MapPin, Inbox } from 'lucide-react-native';
+import React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {
+  Home,
+  List,
+  Settings,
+  Calendar,
+  Bell,
+  MapPin,
+  Inbox,
+} from "lucide-react-native";
 
-import { useAuth } from '../context/AuthContext';
-import { theme } from '../theme';
+import { useAuth } from "../context/AuthContext";
+import { theme } from "../theme";
 
 // Shared Screens
-import { ProfileScreen } from '../screens/shared/ProfileScreen';
-import { EditProfileScreen } from '../screens/shared/EditProfileScreen';
+import { ProfileScreen } from "../screens/shared/ProfileScreen";
+import { EditProfileScreen } from "../screens/shared/EditProfileScreen";
 
 // Resident Screens
-import { ResidentDashboard } from '../screens/resident/ResidentDashboard';
-import { RequestPickupScreen } from '../screens/resident/ReportWasteScreen';
-import { MyPickupsScreen } from '../screens/resident/MyReportsScreen';
-import { PickupDetailsScreen } from '../screens/resident/ReportDetailsScreen';
-import { PaymentScreen } from '../screens/resident/PaymentScreen';
-import { WasteBillScreen } from '../screens/resident/WasteBillScreen';
-import { WasteBillPaymentScreen } from '../screens/resident/WasteBillPaymentScreen';
-import { TransactionDetailsScreen } from '../screens/resident/TransactionDetailsScreen';
-import { NotificationsScreen } from '../screens/resident/NotificationsScreen';
-import { PaystackCheckoutScreen } from '../screens/resident/PaystackCheckoutScreen';
+import { ResidentDashboard } from "../screens/resident/ResidentDashboard";
+import { RequestPickupScreen } from "../screens/resident/ReportWasteScreen";
+import { MyPickupsScreen } from "../screens/resident/MyReportsScreen";
+import { PickupDetailsScreen } from "../screens/resident/ReportDetailsScreen";
+import { PaymentScreen } from "../screens/resident/PaymentScreen";
+import { WasteBillScreen } from "../screens/resident/WasteBillScreen";
+import { WasteBillPaymentScreen } from "../screens/resident/WasteBillPaymentScreen";
+import { TransactionDetailsScreen } from "../screens/resident/TransactionDetailsScreen";
+import { NotificationsScreen } from "../screens/resident/NotificationsScreen";
+import { PaystackCheckoutScreen } from "../screens/resident/PaystackCheckoutScreen";
 
 // Driver Screens
-import { DriverDashboard } from '../screens/driver/DriverDashboard';
-import { DriverAssignmentsScreen } from '../screens/driver/DriverAssignmentsScreen';
-import { RequestedPickupsScreen } from '../screens/driver/RequestedPickupsScreen';
-import { DriverRequestDetailsScreen } from '../screens/driver/DriverRequestDetailsScreen';
-import { AssignmentDetailsScreen } from '../screens/driver/AssignmentDetailsScreen';
-import { RouteScreen } from '../screens/driver/RouteScreen';
-import { StopDetailsScreen } from '../screens/driver/StopDetailsScreen';
-import { RouteCompletionSummaryScreen } from '../screens/driver/RouteCompletionSummaryScreen';
-import { DriverNotificationsScreen } from '../screens/driver/DriverNotificationsScreen';
-import { AdminDashboard } from '../screens/admin/AdminDashboard';
-import { AdminAssignmentsScreen } from '../screens/admin/AdminAssignmentsScreen';
-import { AdminAssignmentDetailsScreen } from '../screens/admin/AdminAssignmentDetailsScreen';
-import { AdminStopDetailsScreen } from '../screens/admin/AdminStopDetailsScreen';
-import { CreateAssignmentScreen } from '../screens/admin/CreateAssignmentScreen';
-import { CreateZoneScreen } from '../screens/admin/CreateZoneScreen';
-import { AdminZonesScreen } from '../screens/admin/AdminZonesScreen';
-import { AdminUsersScreen } from '../screens/admin/AdminUsersScreen';
-import { AdminLogsScreen } from '../screens/admin/AdminLogsScreen';
-import { AdminCollectorsScreen } from '../screens/admin/AdminCollectorsScreen';
-import { AdminCollectorDetailsScreen } from '../screens/admin/AdminCollectorDetailsScreen';
-import { AdminPickupsScreen } from '../screens/admin/AdminPickupsScreen';
-import { AdminPickupDetailsScreen } from '../screens/admin/AdminPickupDetailsScreen';
-import { AdminLogDetailsScreen } from '../screens/admin/AdminLogDetailsScreen';
-import { AdminResidentsScreen } from '../screens/admin/AdminResidentsScreen';
-import { AdminResidentDetailsScreen } from '../screens/admin/AdminResidentDetailsScreen';
-import { AdminPaymentsScreen } from '../screens/admin/AdminPaymentsScreen';
-import { AdminPaymentDetailsScreen } from '../screens/admin/AdminPaymentDetailsScreen';
+import { DriverDashboard } from "../screens/driver/DriverDashboard";
+import { DriverAssignmentsScreen } from "../screens/driver/DriverAssignmentsScreen";
+import { RequestedPickupsScreen } from "../screens/driver/RequestedPickupsScreen";
+import { DriverRequestDetailsScreen } from "../screens/driver/DriverRequestDetailsScreen";
+import { AssignmentDetailsScreen } from "../screens/driver/AssignmentDetailsScreen";
+import { RouteScreen } from "../screens/driver/RouteScreen";
+import { StopDetailsScreen } from "../screens/driver/StopDetailsScreen";
+import { RouteCompletionSummaryScreen } from "../screens/driver/RouteCompletionSummaryScreen";
+import { DriverNotificationsScreen } from "../screens/driver/DriverNotificationsScreen";
+import { AdminDashboard } from "../screens/admin/AdminDashboard";
+import { AdminAssignmentsScreen } from "../screens/admin/AdminAssignmentsScreen";
+import { AdminAssignmentDetailsScreen } from "../screens/admin/AdminAssignmentDetailsScreen";
+import { AdminStopDetailsScreen } from "../screens/admin/AdminStopDetailsScreen";
+import { CreateAssignmentScreen } from "../screens/admin/CreateAssignmentScreen";
+import { CreateZoneScreen } from "../screens/admin/CreateZoneScreen";
+import { AdminZonesScreen } from "../screens/admin/AdminZonesScreen";
+import { AdminUsersScreen } from "../screens/admin/AdminUsersScreen";
+import { AdminLogsScreen } from "../screens/admin/AdminLogsScreen";
+import { AdminCollectorsScreen } from "../screens/admin/AdminCollectorsScreen";
+import { AdminCollectorDetailsScreen } from "../screens/admin/AdminCollectorDetailsScreen";
+import { AdminPickupsScreen } from "../screens/admin/AdminPickupsScreen";
+import { AdminPickupDetailsScreen } from "../screens/admin/AdminPickupDetailsScreen";
+import { AdminLogDetailsScreen } from "../screens/admin/AdminLogDetailsScreen";
+import { AdminResidentsScreen } from "../screens/admin/AdminResidentsScreen";
+import { AdminResidentDetailsScreen } from "../screens/admin/AdminResidentDetailsScreen";
+import { AdminPaymentsScreen } from "../screens/admin/AdminPaymentsScreen";
+import { AdminPaymentDetailsScreen } from "../screens/admin/AdminPaymentDetailsScreen";
 
 export type ResidentStackParamList = {
   ResidentTabs: undefined;
   RequestPickup: undefined;
   PickupDetails: { reportId: string };
   Payment: { reportId: string };
-  PaystackCheckout: { 
-    amount: number; 
-    metadata: any; 
+  PaystackCheckout: {
+    amount: number;
+    metadata: any;
     onSuccess: () => void;
     onCancel: () => void;
   };
@@ -108,11 +116,14 @@ const ResidentTabs = () => (
       tabBarActiveTintColor: theme.colors.primary,
       tabBarInactiveTintColor: theme.colors.textSecondary,
       tabBarIcon: ({ color, size }) => {
-        if (route.name === 'Dashboard') return <Home color={color} size={size} />;
-        if (route.name === 'Pickups') return <List color={color} size={size} />;
-        if (route.name === 'Waste Bill') return <Calendar color={color} size={size} />;
-        if (route.name === 'Alerts') return <Bell color={color} size={size} />;
-        if (route.name === 'Profile') return <Settings color={color} size={size} />;
+        if (route.name === "Dashboard")
+          return <Home color={color} size={size} />;
+        if (route.name === "Pickups") return <List color={color} size={size} />;
+        if (route.name === "Waste Bill")
+          return <Calendar color={color} size={size} />;
+        if (route.name === "Alerts") return <Bell color={color} size={size} />;
+        if (route.name === "Profile")
+          return <Settings color={color} size={size} />;
       },
     })}
   >
@@ -132,7 +143,10 @@ const ResidentStackNav = () => (
     <Stack.Screen name="Payment" component={PaymentScreen} />
     <Stack.Screen name="PaystackCheckout" component={PaystackCheckoutScreen} />
     <Stack.Screen name="WasteBillPayment" component={WasteBillPaymentScreen} />
-    <Stack.Screen name="TransactionDetails" component={TransactionDetailsScreen} />
+    <Stack.Screen
+      name="TransactionDetails"
+      component={TransactionDetailsScreen}
+    />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>
 );
@@ -144,17 +158,20 @@ const DriverTabs = () => (
       tabBarActiveTintColor: theme.colors.primary,
       tabBarInactiveTintColor: theme.colors.textSecondary,
       tabBarIcon: ({ color, size }) => {
-        if (route.name === 'Dashboard') return <Home color={color} size={size} />;
-        if (route.name === 'Assignments') return <List color={color} size={size} />;
-        if (route.name === 'Requests') return <Inbox color={color} size={size} />;
-        if (route.name === 'Alerts') return <Bell color={color} size={size} />;
-        if (route.name === 'Profile') return <Settings color={color} size={size} />;
+        if (route.name === "Dashboard")
+          return <Home color={color} size={size} />;
+        if (route.name === "Tasks") return <List color={color} size={size} />;
+        if (route.name === "Pickup Requests")
+          return <Inbox color={color} size={size} />;
+        if (route.name === "Alerts") return <Bell color={color} size={size} />;
+        if (route.name === "Profile")
+          return <Settings color={color} size={size} />;
       },
     })}
   >
     <Tab.Screen name="Dashboard" component={DriverDashboard} />
-    <Tab.Screen name="Assignments" component={DriverAssignmentsScreen} />
-    <Tab.Screen name="Requests" component={RequestedPickupsScreen} />
+    <Tab.Screen name="Tasks" component={DriverAssignmentsScreen} />
+    <Tab.Screen name="Pickup Requests" component={RequestedPickupsScreen} />
     <Tab.Screen name="Alerts" component={DriverNotificationsScreen} />
     <Tab.Screen name="Profile" component={ProfileScreen} />
   </Tab.Navigator>
@@ -163,11 +180,20 @@ const DriverTabs = () => (
 const DriverStackNav = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="DriverTabs" component={DriverTabs} />
-    <Stack.Screen name="AssignmentDetails" component={AssignmentDetailsScreen} />
+    <Stack.Screen
+      name="AssignmentDetails"
+      component={AssignmentDetailsScreen}
+    />
     <Stack.Screen name="Route" component={RouteScreen} />
     <Stack.Screen name="StopDetails" component={StopDetailsScreen} />
-    <Stack.Screen name="RequestDetails" component={DriverRequestDetailsScreen} />
-    <Stack.Screen name="RouteSummary" component={RouteCompletionSummaryScreen} />
+    <Stack.Screen
+      name="RequestDetails"
+      component={DriverRequestDetailsScreen}
+    />
+    <Stack.Screen
+      name="RouteSummary"
+      component={RouteCompletionSummaryScreen}
+    />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>
 );
@@ -179,14 +205,16 @@ const AdminTabs = () => (
       tabBarActiveTintColor: theme.colors.primary,
       tabBarInactiveTintColor: theme.colors.textSecondary,
       tabBarIcon: ({ color, size }) => {
-        if (route.name === 'Dashboard') return <Home color={color} size={size} />;
-        if (route.name === 'Assignments') return <List color={color} size={size} />;
-        if (route.name === 'Profile') return <Settings color={color} size={size} />;
+        if (route.name === "Dashboard")
+          return <Home color={color} size={size} />;
+        if (route.name === "Tasks") return <List color={color} size={size} />;
+        if (route.name === "Profile")
+          return <Settings color={color} size={size} />;
       },
     })}
   >
     <Tab.Screen name="Dashboard" component={AdminDashboard} />
-    <Tab.Screen name="Assignments" component={AdminAssignmentsScreen} />
+    <Tab.Screen name="Tasks" component={AdminAssignmentsScreen} />
     <Tab.Screen name="Profile" component={ProfileScreen} />
   </Tab.Navigator>
 );
@@ -194,7 +222,10 @@ const AdminTabs = () => (
 const AdminStackNav = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="AdminTabs" component={AdminTabs} />
-    <Stack.Screen name="AdminAssignmentDetails" component={AdminAssignmentDetailsScreen} />
+    <Stack.Screen
+      name="AdminAssignmentDetails"
+      component={AdminAssignmentDetailsScreen}
+    />
     <Stack.Screen name="CreateAssignment" component={CreateAssignmentScreen} />
     <Stack.Screen name="CreateZone" component={CreateZoneScreen} />
     <Stack.Screen name="ZonesList" component={AdminZonesScreen} />
@@ -202,13 +233,28 @@ const AdminStackNav = () => (
     <Stack.Screen name="LogsList" component={AdminLogsScreen} />
     <Stack.Screen name="AdminLogDetails" component={AdminLogDetailsScreen} />
     <Stack.Screen name="AdminResidentsList" component={AdminResidentsScreen} />
-    <Stack.Screen name="AdminResidentDetails" component={AdminResidentDetailsScreen} />
+    <Stack.Screen
+      name="AdminResidentDetails"
+      component={AdminResidentDetailsScreen}
+    />
     <Stack.Screen name="AdminPaymentsList" component={AdminPaymentsScreen} />
-    <Stack.Screen name="AdminPaymentDetails" component={AdminPaymentDetailsScreen} />
-    <Stack.Screen name="AdminCollectorsList" component={AdminCollectorsScreen} />
-    <Stack.Screen name="AdminCollectorDetails" component={AdminCollectorDetailsScreen} />
+    <Stack.Screen
+      name="AdminPaymentDetails"
+      component={AdminPaymentDetailsScreen}
+    />
+    <Stack.Screen
+      name="AdminCollectorsList"
+      component={AdminCollectorsScreen}
+    />
+    <Stack.Screen
+      name="AdminCollectorDetails"
+      component={AdminCollectorDetailsScreen}
+    />
     <Stack.Screen name="AdminPickupsList" component={AdminPickupsScreen} />
-    <Stack.Screen name="AdminPickupDetails" component={AdminPickupDetailsScreen} />
+    <Stack.Screen
+      name="AdminPickupDetails"
+      component={AdminPickupDetailsScreen}
+    />
     <Stack.Screen name="AdminStopDetails" component={AdminStopDetailsScreen} />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>
@@ -219,11 +265,11 @@ export const RoleNavigator = () => {
   if (!user) return null;
 
   switch (user.role.toLowerCase()) {
-    case 'resident':
+    case "resident":
       return <ResidentStackNav />;
-    case 'driver':
+    case "driver":
       return <DriverStackNav />;
-    case 'admin':
+    case "admin":
       return <AdminStackNav />;
     default:
       return null;

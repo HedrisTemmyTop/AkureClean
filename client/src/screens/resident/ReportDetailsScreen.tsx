@@ -1,18 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { MapPin, Calendar, AlertTriangle, FileText, CheckCircle, Clock, CreditCard } from 'lucide-react-native';
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import {
+  MapPin,
+  Calendar,
+  AlertTriangle,
+  FileText,
+  CheckCircle,
+  Clock,
+  CreditCard,
+} from "lucide-react-native";
 
-import { ScreenContainer } from '../../components/ScreenContainer';
-import { AppText } from '../../components/AppText';
-import { AppCard } from '../../components/AppCard';
-import { AppButton } from '../../components/AppButton';
-import { StatusBadge } from '../../components/StatusBadge';
-import { theme } from '../../theme';
-import { reportService } from '../../services/reportService';
-import { pickupService } from '../../services/pickupService';
-import { WasteRequest } from '../../types';
-import * as Animatable from 'react-native-animatable';
+import { ScreenContainer } from "../../components/ScreenContainer";
+import { AppText } from "../../components/AppText";
+import { AppCard } from "../../components/AppCard";
+import { AppButton } from "../../components/AppButton";
+import { StatusBadge } from "../../components/StatusBadge";
+import { theme } from "../../theme";
+import { reportService } from "../../services/reportService";
+import { pickupService } from "../../services/pickupService";
+import { WasteRequest } from "../../types";
+import * as Animatable from "react-native-animatable";
 
 export const PickupDetailsScreen: React.FC = () => {
   const route = useRoute<any>();
@@ -30,13 +38,14 @@ export const PickupDetailsScreen: React.FC = () => {
           data = {
             id: pickup.id,
             residentId: pickup.userId?._id || pickup.userId,
-            status: (pickup.status.charAt(0).toUpperCase() + pickup.status.slice(1)) as RequestStatus,
+            status: (pickup.status.charAt(0).toUpperCase() +
+              pickup.status.slice(1)) as RequestStatus,
             type: pickup.type,
-            street: pickup.address || 'Special Pickup',
+            street: pickup.address || "Special Pickup",
             requestedDate: pickup.createdAt,
             notes: pickup.notes,
-            severity: 'Medium',
-            locationId: '',
+            severity: "Medium",
+            locationId: "",
             cost: pickup.extraFee,
           };
         } else {
@@ -64,36 +73,54 @@ export const PickupDetailsScreen: React.FC = () => {
     return (
       <ScreenContainer style={styles.centered}>
         <AppText variant="bodyLarge">Pickup not found.</AppText>
-        <AppButton title="Go Back" onPress={() => navigation.goBack()} style={{ marginTop: 16 }} />
+        <AppButton
+          title="Go Back"
+          onPress={() => navigation.goBack()}
+          style={{ marginTop: 16 }}
+        />
       </ScreenContainer>
     );
   }
 
-  const requestedDate = new Date(report.requestedDate).toLocaleDateString(undefined, {
-    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
-  });
+  const requestedDate = new Date(report.requestedDate).toLocaleDateString(
+    undefined,
+    {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
 
   return (
     <ScreenContainer scrollable>
       <View style={styles.header}>
-        <AppButton 
-          title="Back" 
-          variant="ghost" 
-          size="small" 
-          onPress={() => navigation.goBack()} 
+        <AppButton
+          title="Back"
+          variant="ghost"
+          size="small"
+          onPress={() => navigation.goBack()}
           style={styles.backBtn}
         />
         <StatusBadge status={report.status} />
       </View>
 
-      <AppText variant="h1" style={styles.title}>{report.type} Waste</AppText>
+      <AppText variant="h1" style={styles.title}>
+        {report.type} Waste
+      </AppText>
 
       <AppCard elevation="sm" style={styles.detailCard}>
         <View style={styles.detailRow}>
           <MapPin color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Location</AppText>
-            <AppText variant="body">{report.street} {report.landmark ? `(${report.landmark})` : ''}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Location
+            </AppText>
+            <AppText variant="body">
+              {report.street} {report.landmark ? `(${report.landmark})` : ""}
+            </AppText>
           </View>
         </View>
 
@@ -102,7 +129,9 @@ export const PickupDetailsScreen: React.FC = () => {
         <View style={styles.detailRow}>
           <AlertTriangle color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Severity</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Severity
+            </AppText>
             <AppText variant="body">{report.severity}</AppText>
           </View>
         </View>
@@ -112,7 +141,9 @@ export const PickupDetailsScreen: React.FC = () => {
         <View style={styles.detailRow}>
           <Calendar color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Requested On</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Requested On
+            </AppText>
             <AppText variant="body">{requestedDate}</AppText>
           </View>
         </View>
@@ -122,7 +153,9 @@ export const PickupDetailsScreen: React.FC = () => {
         <View style={styles.detailRow}>
           <CreditCard color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Payment Method</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Payment Method
+            </AppText>
             <AppText variant="body">Physical Payment (Pay to Driver)</AppText>
           </View>
         </View>
@@ -132,13 +165,17 @@ export const PickupDetailsScreen: React.FC = () => {
         <View style={styles.detailRow}>
           <FileText color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailTextContainer}>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Additional Notes</AppText>
-            <AppText variant="body">{report.notes || 'None provided.'}</AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Additional Notes
+            </AppText>
+            <AppText variant="body">{report.notes || "None provided."}</AppText>
           </View>
         </View>
       </AppCard>
 
-      <AppText variant="h3" style={styles.timelineTitle}>Progress</AppText>
+      <AppText variant="h3" style={styles.timelineTitle}>
+        Progress
+      </AppText>
 
       <View style={styles.timeline}>
         {/* Step 1: Submitted */}
@@ -147,48 +184,95 @@ export const PickupDetailsScreen: React.FC = () => {
             <CheckCircle color={theme.colors.primary} size={20} />
           </View>
           <View style={styles.timelineContent}>
-            <AppText variant="body" weight="600">Request Submitted</AppText>
-            <AppText variant="bodySmall" color={theme.colors.textSecondary}>We received your request.</AppText>
+            <AppText variant="body" weight="600">
+              Request Submitted
+            </AppText>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              We received your request.
+            </AppText>
           </View>
         </View>
-        
+
         {/* Step 2: Scheduled/Assigned */}
         <View style={styles.timelineStep}>
-          <View style={report.status !== 'Pending' ? styles.timelineIconWrapperActive : styles.timelineIconWrapperInactive}>
-            {report.status !== 'Pending' ? 
-              <CheckCircle color={theme.colors.primary} size={20} /> :
-              <Clock color={theme.colors.textSecondary} size={20} />
+          <View
+            style={
+              report.status !== "Pending"
+                ? styles.timelineIconWrapperActive
+                : styles.timelineIconWrapperInactive
             }
+          >
+            {report.status !== "Pending" ? (
+              <CheckCircle color={theme.colors.primary} size={20} />
+            ) : (
+              <Clock color={theme.colors.textSecondary} size={20} />
+            )}
           </View>
           <View style={styles.timelineContent}>
-            <AppText variant="body" weight="600" color={report.status === 'Pending' ? theme.colors.textSecondary : theme.colors.text}>Assigned</AppText>
+            <AppText
+              variant="body"
+              weight="600"
+              color={
+                report.status === "Pending"
+                  ? theme.colors.textSecondary
+                  : theme.colors.text
+              }
+            >
+              Assigned
+            </AppText>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-              {report.driverId ? 'A driver has been assigned.' : 'Pending assignment.'}
+              {report.driverId
+                ? "A driver has been assigned."
+                : "Pending task."}
             </AppText>
           </View>
         </View>
 
         {/* Step 3: Completed */}
         <View style={[styles.timelineStep, { borderLeftWidth: 0 }]}>
-          <View style={report.status === 'Completed' ? styles.timelineIconWrapperActive : styles.timelineIconWrapperInactive}>
-             {report.status === 'Completed' ? 
-              <CheckCircle color={theme.colors.primary} size={20} /> :
-              <Clock color={theme.colors.textSecondary} size={20} />
+          <View
+            style={
+              report.status === "Completed"
+                ? styles.timelineIconWrapperActive
+                : styles.timelineIconWrapperInactive
             }
+          >
+            {report.status === "Completed" ? (
+              <CheckCircle color={theme.colors.primary} size={20} />
+            ) : (
+              <Clock color={theme.colors.textSecondary} size={20} />
+            )}
           </View>
           <View style={styles.timelineContent}>
-            <AppText variant="body" weight="600" color={report.status !== 'Completed' ? theme.colors.textSecondary : theme.colors.text}>Completed</AppText>
+            <AppText
+              variant="body"
+              weight="600"
+              color={
+                report.status !== "Completed"
+                  ? theme.colors.textSecondary
+                  : theme.colors.text
+              }
+            >
+              Completed
+            </AppText>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-              {report.completedDate ? `Completed on ${new Date(report.completedDate).toLocaleDateString()}` : 'Awaiting completion.'}
+              {report.completedDate
+                ? `Completed on ${new Date(report.completedDate).toLocaleDateString()}`
+                : "Awaiting completion."}
             </AppText>
           </View>
         </View>
       </View>
 
-      {(report.status === 'Pending' || (report as any).status === 'pending') && (
-        <Animatable.View animation="fadeInUp" delay={300} style={{ marginTop: 24, marginBottom: 40 }}>
-          <AppButton 
-            title="Cancel Pickup Request" 
+      {(report.status === "Pending" ||
+        (report as any).status === "pending") && (
+        <Animatable.View
+          animation="fadeInUp"
+          delay={300}
+          style={{ marginTop: 24, marginBottom: 40 }}
+        >
+          <AppButton
+            title="Cancel Pickup Request"
             variant="outline"
             style={{ borderColor: theme.colors.status.cancelled }}
             onPress={async () => {
@@ -202,11 +286,16 @@ export const PickupDetailsScreen: React.FC = () => {
           />
         </Animatable.View>
       )}
- 
-      {(report.status === 'Accepted' || (report as any).status === 'accepted') && (
-        <Animatable.View animation="fadeInUp" delay={300} style={{ marginTop: 24, marginBottom: 40 }}>
-          <AppButton 
-            title="Mark as Picked Up" 
+
+      {(report.status === "Accepted" ||
+        (report as any).status === "accepted") && (
+        <Animatable.View
+          animation="fadeInUp"
+          delay={300}
+          style={{ marginTop: 24, marginBottom: 40 }}
+        >
+          <AppButton
+            title="Mark as Picked Up"
             style={{ backgroundColor: theme.colors.success }}
             onPress={async () => {
               try {
@@ -217,25 +306,29 @@ export const PickupDetailsScreen: React.FC = () => {
               }
             }}
           />
-          <AppText variant="caption" color={theme.colors.textSecondary} align="center" style={{ marginTop: 8 }}>
+          <AppText
+            variant="caption"
+            color={theme.colors.textSecondary}
+            align="center"
+            style={{ marginTop: 8 }}
+          >
             Click this only after the driver has physically collected the waste.
           </AppText>
         </Animatable.View>
       )}
-
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
   centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: theme.spacing.lg,
   },
   backBtn: {
@@ -248,8 +341,8 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xl,
   },
   detailRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginVertical: theme.spacing.sm,
   },
   detailTextContainer: {
@@ -268,7 +361,7 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing.sm,
   },
   timelineStep: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderLeftWidth: 2,
     borderColor: theme.colors.border,
     paddingBottom: theme.spacing.lg,
@@ -278,8 +371,8 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     backgroundColor: theme.colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginLeft: -13, // center the icon over the border
     marginTop: -2,
   },
@@ -288,8 +381,8 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     backgroundColor: theme.colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginLeft: -13,
     marginTop: -2,
   },

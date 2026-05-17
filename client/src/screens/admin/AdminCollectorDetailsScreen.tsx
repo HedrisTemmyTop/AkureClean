@@ -39,7 +39,9 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
   const [assignments, setAssignments] = useState<AssignmentRoute[]>([]);
   const [pickups, setPickups] = useState<PickupRequestData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'assignments' | 'pickups'>('assignments');
+  const [activeTab, setActiveTab] = useState<"assignments" | "pickups">(
+    "assignments",
+  );
   const [isDeactivationModalVisible, setIsDeactivationModalVisible] =
     useState(false);
   const [deactivationReason, setDeactivationReason] = useState("");
@@ -48,7 +50,9 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
   const loadDetails = async () => {
     try {
       const drivers = await adminService.getAllDrivers();
-      const foundDriver = drivers.find((d) => String(d.id) === String(driverId));
+      const foundDriver = drivers.find(
+        (d) => String(d.id) === String(driverId),
+      );
       if (foundDriver) {
         setDriver(foundDriver);
       }
@@ -84,11 +88,18 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
     setIsActionLoading(true);
     try {
       const newStatus = !driver.isDeactivated;
-      await adminService.updateDriverStatus(driver.id, newStatus, deactivationReason);
+      await adminService.updateDriverStatus(
+        driver.id,
+        newStatus,
+        deactivationReason,
+      );
       await loadDetails();
       setIsDeactivationModalVisible(false);
       setDeactivationReason("");
-      RNAlert.alert("Success", `Collector ${newStatus ? 'deactivated' : 'activated'} successfully`);
+      RNAlert.alert(
+        "Success",
+        `Collector ${newStatus ? "deactivated" : "activated"} successfully`,
+      );
     } catch (e) {
       RNAlert.alert("Error", parseApiError(e));
     } finally {
@@ -155,7 +166,7 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
               {item.type} Pickup
             </AppText>
             <AppText variant="caption" color={theme.colors.textSecondary}>
-              {(item as any).userId?.name || 'Resident'}
+              {(item as any).userId?.name || "Resident"}
             </AppText>
           </View>
           <StatusBadge status={item.status as any} />
@@ -193,83 +204,123 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
         {driver && (
           <>
             <View style={styles.driverProfile}>
-            <View style={styles.iconBox}>
-              <Truck color={theme.colors.secondary} size={24} />
+              <View style={styles.iconBox}>
+                <Truck color={theme.colors.secondary} size={24} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <AppText variant="h3">{driver.name || driver.email}</AppText>
+                <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+                  {driver.email}
+                </AppText>
+                <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+                  {driver.phone || "No phone"}
+                </AppText>
+                {driver.isDeactivated && (
+                  <View style={styles.deactivatedBadge}>
+                    <AppText
+                      variant="caption"
+                      color={theme.colors.status.cancelled}
+                      weight="600"
+                    >
+                      DEACTIVATED: {driver.deactivationReason}
+                    </AppText>
+                  </View>
+                )}
+              </View>
+              <AppButton
+                variant="outline"
+                size="small"
+                onPress={handleToggleStatus}
+                title={driver.isDeactivated ? "Activate" : "Deactivate"}
+                style={
+                  driver.isDeactivated
+                    ? styles.activateBtn
+                    : styles.deactivateBtn
+                }
+                textStyle={{
+                  color: driver.isDeactivated
+                    ? theme.colors.primary
+                    : theme.colors.status.cancelled,
+                }}
+                icon={
+                  driver.isDeactivated ? (
+                    <ShieldCheck size={16} color={theme.colors.primary} />
+                  ) : (
+                    <ShieldAlert
+                      size={16}
+                      color={theme.colors.status.cancelled}
+                    />
+                  )
+                }
+              />
             </View>
-            <View style={{ flex: 1 }}>
-              <AppText variant="h3">{driver.name || driver.email}</AppText>
-              <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-                {driver.email}
-              </AppText>
-              <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-                {driver.phone || "No phone"}
-              </AppText>
-              {driver.isDeactivated && (
-                <View style={styles.deactivatedBadge}>
-                  <AppText
-                    variant="caption"
-                    color={theme.colors.status.cancelled}
-                    weight="600"
-                  >
-                    DEACTIVATED: {driver.deactivationReason}
+
+            {/* Collector Stats & Info Card */}
+            <AppCard style={styles.infoCard} elevation="sm">
+              <View style={styles.infoGrid}>
+                <View style={styles.infoItem}>
+                  <AppText variant="caption" color={theme.colors.textSecondary}>
+                    Truck Plate
+                  </AppText>
+                  <AppText variant="body" weight="600">
+                    {driver.truckPlateNumber || "N/A"}
                   </AppText>
                 </View>
-              )}
-            </View>
-            <AppButton
-              variant="outline"
-              size="small"
-              onPress={handleToggleStatus}
-              title={driver.isDeactivated ? "Activate" : "Deactivate"}
-              style={
-                driver.isDeactivated ? styles.activateBtn : styles.deactivateBtn
-              }
-              textStyle={{
-                color: driver.isDeactivated
-                  ? theme.colors.primary
-                  : theme.colors.status.cancelled,
-              }}
-              icon={
-                driver.isDeactivated ? (
-                  <ShieldCheck size={16} color={theme.colors.primary} />
-                ) : (
-                  <ShieldAlert
-                    size={16}
-                    color={theme.colors.status.cancelled}
-                  />
-                )
-              }
-            />
-          </View>
-
-          {/* Collector Stats & Info Card */}
-          <AppCard style={styles.infoCard} elevation="sm">
-            <View style={styles.infoGrid}>
-              <View style={styles.infoItem}>
-                <AppText variant="caption" color={theme.colors.textSecondary}>Truck Plate</AppText>
-                <AppText variant="body" weight="600">{driver.truckPlateNumber || 'N/A'}</AppText>
+                <View style={styles.infoItem}>
+                  <AppText variant="caption" color={theme.colors.textSecondary}>
+                    Capacity
+                  </AppText>
+                  <AppText variant="body" weight="600">
+                    {driver.truckCapacity || "N/A"}
+                  </AppText>
+                </View>
               </View>
-              <View style={styles.infoItem}>
-                <AppText variant="caption" color={theme.colors.textSecondary}>Capacity</AppText>
-                <AppText variant="body" weight="600">{driver.truckCapacity || 'N/A'}</AppText>
+              <View
+                style={[
+                  styles.infoGrid,
+                  {
+                    marginTop: 12,
+                    borderTopWidth: 1,
+                    borderTopColor: theme.colors.border,
+                    paddingTop: 12,
+                  },
+                ]}
+              >
+                <View style={{ flex: 1 }}>
+                  <AppText variant="caption" color={theme.colors.textSecondary}>
+                    Operating Address
+                  </AppText>
+                  <AppText variant="body">
+                    {driver.address || "Not specified"}
+                  </AppText>
+                </View>
               </View>
-            </View>
-            <View style={[styles.infoGrid, { marginTop: 12, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 12 }]}>
-              <View style={{ flex: 1 }}>
-                <AppText variant="caption" color={theme.colors.textSecondary}>Operating Address</AppText>
-                <AppText variant="body">{driver.address || 'Not specified'}</AppText>
+              <View
+                style={[
+                  styles.infoGrid,
+                  {
+                    marginTop: 12,
+                    borderTopWidth: 1,
+                    borderTopColor: theme.colors.border,
+                    paddingTop: 12,
+                  },
+                ]}
+              >
+                <View style={{ flex: 1 }}>
+                  <AppText variant="caption" color={theme.colors.textSecondary}>
+                    Joined Date
+                  </AppText>
+                  <AppText variant="body">
+                    {new Date(driver.createdAt).toLocaleDateString(undefined, {
+                      dateStyle: "long",
+                    })}
+                  </AppText>
+                </View>
               </View>
-            </View>
-            <View style={[styles.infoGrid, { marginTop: 12, borderTopWidth: 1, borderTopColor: theme.colors.border, paddingTop: 12 }]}>
-              <View style={{ flex: 1 }}>
-                <AppText variant="caption" color={theme.colors.textSecondary}>Joined Date</AppText>
-                <AppText variant="body">{new Date(driver.createdAt).toLocaleDateString(undefined, { dateStyle: 'long' })}</AppText>
-              </View>
-            </View>
-          </AppCard>
-        </>
-      )}
-    </View>
+            </AppCard>
+          </>
+        )}
+      </View>
 
       <Modal
         visible={isDeactivationModalVisible}
@@ -294,7 +345,7 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
               {driver?.isDeactivated ? "reactivating" : "deactivating"} this
               collector.
             </AppText>
- 
+
             <AppInput
               placeholder="Enter reason..."
               value={deactivationReason}
@@ -303,7 +354,7 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
               numberOfLines={4}
               style={{ height: 100, textAlignVertical: "top" }}
             />
- 
+
             <View style={styles.modalButtons}>
               <AppButton
                 title="Cancel"
@@ -332,25 +383,33 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
 
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'assignments' && styles.activeTab]}
-          onPress={() => setActiveTab('assignments')}
+          style={[styles.tab, activeTab === "assignments" && styles.activeTab]}
+          onPress={() => setActiveTab("assignments")}
         >
           <AppText
             variant="bodySmall"
             weight="600"
-            color={activeTab === 'assignments' ? theme.colors.primary : theme.colors.textSecondary}
+            color={
+              activeTab === "assignments"
+                ? theme.colors.primary
+                : theme.colors.textSecondary
+            }
           >
-            ASSIGNMENTS
+            TASKS
           </AppText>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.tab, activeTab === 'pickups' && styles.activeTab]}
-          onPress={() => setActiveTab('pickups')}
+          style={[styles.tab, activeTab === "pickups" && styles.activeTab]}
+          onPress={() => setActiveTab("pickups")}
         >
           <AppText
             variant="bodySmall"
             weight="600"
-            color={activeTab === 'pickups' ? theme.colors.primary : theme.colors.textSecondary}
+            color={
+              activeTab === "pickups"
+                ? theme.colors.primary
+                : theme.colors.textSecondary
+            }
           >
             PICKUP HISTORY
           </AppText>
@@ -361,7 +420,7 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
         <AppText variant="body" color={theme.colors.textSecondary}>
           Loading details...
         </AppText>
-      ) : activeTab === 'assignments' ? (
+      ) : activeTab === "assignments" ? (
         <FlatList
           data={assignments}
           keyExtractor={(item) => item.id}
@@ -369,7 +428,7 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
           scrollEnabled={false}
           ListEmptyComponent={
             <AppText variant="body" color={theme.colors.textSecondary}>
-              No assignments found for this collector.
+              No tasks found for this collector.
             </AppText>
           }
         />
@@ -473,14 +532,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
   },
   infoGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   infoItem: {
     flex: 1,
   },
   tabContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: theme.spacing.lg,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
@@ -489,9 +548,9 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.lg,
     borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    borderBottomColor: "transparent",
   },
   activeTab: {
     borderBottomColor: theme.colors.primary,
-  }
+  },
 });

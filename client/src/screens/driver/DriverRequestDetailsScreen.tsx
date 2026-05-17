@@ -109,7 +109,7 @@ export const DriverRequestDetailsScreen: React.FC = () => {
 
       <Animatable.View animation="fadeInDown" delay={100}>
         <AppText variant="h1" style={styles.title}>
-          {request.type} Pick-up
+          {request.type} Pickup Request
         </AppText>
         <View style={styles.metaRow}>
           <MapPin color={theme.colors.textSecondary} size={16} />
@@ -125,7 +125,7 @@ export const DriverRequestDetailsScreen: React.FC = () => {
 
       <AppCard style={styles.card} animation="fadeInUp" delay={200}>
         <AppText variant="h3" style={styles.sectionTitle}>
-          Request Details
+          Pickup Request Details
         </AppText>
 
         <View style={styles.detailRow}>

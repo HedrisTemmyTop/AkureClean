@@ -23,10 +23,10 @@ import { parseApiError } from "../../services/api";
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList, "Signup">;
 
 export const SignupScreen: React.FC = () => {
-  const [name, setName] = useState("Resident One");
-  const [email, setEmail] = useState("resident1@gmail.com");
-  const [phone, setPhone] = useState("08000000000");
-  const [password, setPassword] = useState("test1234");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>("resident");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -105,10 +105,7 @@ export const SignupScreen: React.FC = () => {
             </AppText>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.roleBtn,
-              role === "driver" && styles.roleBtnActive,
-            ]}
+            style={[styles.roleBtn, role === "driver" && styles.roleBtnActive]}
             onPress={() => setRole("driver")}
           >
             <AppText
@@ -118,14 +115,11 @@ export const SignupScreen: React.FC = () => {
                 role === "driver" ? theme.colors.surface : theme.colors.text
               }
             >
-              Driver
+              Collector
             </AppText>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.roleBtn,
-              role === "admin" && styles.roleBtnActive,
-            ]}
+            style={[styles.roleBtn, role === "admin" && styles.roleBtnActive]}
             onPress={() => setRole("admin")}
           >
             <AppText

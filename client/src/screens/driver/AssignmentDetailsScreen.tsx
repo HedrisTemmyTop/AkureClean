@@ -155,7 +155,8 @@ export const AssignmentDetailsScreen: React.FC = () => {
           />
           <View>
             <AppText variant="bodySmall" weight="600">
-              {traffic?.condition || assignment.traffic.condition} Traffic ({traffic?.delay || "No delay"})
+              {traffic?.condition || assignment.traffic.condition} Traffic (
+              {traffic?.delay || "No delay"})
             </AppText>
             <AppText variant="caption" color={theme.colors.textSecondary}>
               {traffic?.message || assignment.traffic.message}
@@ -185,7 +186,7 @@ export const AssignmentDetailsScreen: React.FC = () => {
 
       {/* Map Preview Placeholder */}
       <AppText variant="h3" style={styles.sectionTitle}>
-        Route Preview
+        Task Preview
       </AppText>
       <AppCard style={styles.mapPlaceholder}>
         <Map color={theme.colors.textSecondary} size={32} />
@@ -202,7 +203,7 @@ export const AssignmentDetailsScreen: React.FC = () => {
       <View style={styles.footer}>
         {!isCompleted ? (
           <AppButton
-            title={isActive ? "Resume Route" : "Start Route"}
+            title={isActive ? "Resume Task" : "Start Task"}
             onPress={() =>
               navigation.navigate("Route", { routeId: assignment.id })
             }
