@@ -298,6 +298,8 @@ export const AdminDashboard: React.FC = () => {
             </AppText>
           </View>
         </TouchableOpacity>
+
+        <View style={styles.quickLinksRow}>
           <TouchableOpacity
             style={styles.quickLinkBtn}
             onPress={() => navigation.navigate("AdminDriverAvailability")}

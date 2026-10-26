@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
   centered: { flex: 1, justifyContent: "center", alignItems: "center" },
   mapContainer: { flex: 1 },
-  map: { ...StyleSheet.absoluteFillObject },
+  map: { ...StyleSheet.absoluteFill },
 
   headerOverlay: {
     position: "absolute",

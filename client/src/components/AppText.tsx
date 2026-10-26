@@ -5,7 +5,7 @@ import { theme } from '../theme';
 interface AppTextProps extends TextProps {
   variant?: keyof typeof theme.typography;
   color?: string;
-  weight?: 'normal' | 'bold' | '400' | '600' | '700';
+  weight?: 'normal' | 'bold' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
   align?: 'auto' | 'left' | 'right' | 'center' | 'justify';
 }
 

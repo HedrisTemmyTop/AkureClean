@@ -363,13 +363,13 @@ const styles = StyleSheet.create({
     marginRight: theme.spacing.md,
   },
   successOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: theme.colors.primary,
     opacity: 0.95,
     zIndex: 10,
   },
   successContent: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "center",
     alignItems: "center",
     zIndex: 11,

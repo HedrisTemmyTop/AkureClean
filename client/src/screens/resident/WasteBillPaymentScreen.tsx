@@ -84,7 +84,7 @@ export const WasteBillPaymentScreen: React.FC = () => {
   return (
     <ScreenContainer scrollable>
       {paymentSuccess && (
-        <View style={StyleSheet.absoluteFillObject}>
+        <View style={StyleSheet.absoluteFill}>
           <View style={styles.successOverlay} />
           <View style={styles.successContent}>
             <CheckCircle color={theme.colors.success} size={80} />
@@ -272,13 +272,13 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   successOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: theme.colors.primary,
     opacity: 0.95,
     zIndex: 10,
   },
   successContent: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 11,

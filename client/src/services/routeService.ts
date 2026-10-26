@@ -86,6 +86,7 @@ export const assignmentService = {
     driverId: string;
     title: string;
     collectionDate: string;
+    collectionTime?: string;
     lga: string;
     ward: string;
     pollingUnits: string[];

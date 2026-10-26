@@ -431,7 +431,7 @@ export const FreeMapView = forwardRef<FreeMapViewRef, FreeMapViewProps>(
     return (
       <View style={[styles.container, style]}>
         <WebView
-          ref={webViewRef}
+          ref={webViewRef as any}
           originWhitelist={["*"]}
           source={{ html: htmlContent }}
           style={styles.webview}

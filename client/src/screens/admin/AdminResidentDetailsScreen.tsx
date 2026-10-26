@@ -9,7 +9,7 @@ import { theme } from '../../theme';
 import { adminService } from '../../services/adminService';
 import { pickupService } from '../../services/pickupService';
 import { parseApiError } from '../../services/api';
-import { User, PickupRequestData } from '../../types';
+import { User } from '../../types';
 import { User as UserIcon, MapPin, Phone, Mail, Clock, Home } from 'lucide-react-native';
 
 export const AdminResidentDetailsScreen: React.FC = () => {

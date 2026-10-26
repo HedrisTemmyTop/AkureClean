@@ -10,7 +10,7 @@ import { adminService } from '../../services/adminService';
 export const AdminLogsScreen: React.FC = () => {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
     const loadLogs = async () => {

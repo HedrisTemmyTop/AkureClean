@@ -277,7 +277,7 @@ export const NotificationsScreen: React.FC = () => {
                 Official announcements and notices from Akure Clean administration will appear here.
               </AppText>
             </View>
-          ) : null
+          ) : undefined
         }
       />
 

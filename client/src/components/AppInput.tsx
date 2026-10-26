@@ -15,12 +15,14 @@ interface AppInputProps extends TextInputProps {
   label?: string;
   error?: string;
   isPassword?: boolean;
+  icon?: React.ReactNode;
 }
 
 export const AppInput: React.FC<AppInputProps> = ({
   label,
   error,
   isPassword,
+  icon,
   style,
   ...props
 }) => {

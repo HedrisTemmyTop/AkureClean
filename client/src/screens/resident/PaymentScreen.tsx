@@ -11,12 +11,14 @@ import { theme } from '../../theme';
 import { reportService } from '../../services/reportService';
 import { pickupService } from '../../services/pickupService';
 import { parseApiError } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { WasteRequest } from '../../types';
 import { ResidentStackParamList } from '../../navigation/RoleNavigator';
 
 type PaymentScreenRouteProp = RouteProp<ResidentStackParamList, 'Payment'>;
 
 export const PaymentScreen: React.FC = () => {
+  const { user } = useAuth();
   const route = useRoute<PaymentScreenRouteProp>();
   const navigation = useNavigation<any>();
   const { reportId } = route.params;
@@ -55,7 +57,7 @@ export const PaymentScreen: React.FC = () => {
       metadata: {
         type: 'pickup_fee',
         pickupId: reportId,
-        userId: report.userId,
+        userId: (report as any).userId || user?.id,
       },
       onSuccess: () => {
         setPaymentSuccess(true);
@@ -80,7 +82,7 @@ export const PaymentScreen: React.FC = () => {
   return (
     <ScreenContainer>
       {paymentSuccess && (
-        <View style={StyleSheet.absoluteFillObject}>
+        <View style={StyleSheet.absoluteFill}>
           <View style={styles.successOverlay} />
           <View style={styles.successContent}>
             <CheckCircle color={theme.colors.success} size={80} />
@@ -222,13 +224,13 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.xl,
   },
   successOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: theme.colors.primary,
     opacity: 0.95,
     zIndex: 10,
   },
   successContent: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 11,

@@ -708,10 +708,13 @@ export const mockAssignmentRoutes: AssignmentRoute[] = [
 export const mockAdminStats: AdminStats = {
   totalReports: 142,
   pendingReports: 28,
+  completedReports: 95,
   resolvedReports: 95,
   totalDrivers: 12,
   activeRoutes: 5,
-  activeSchedules: 24
+  activeSchedules: 24,
+  totalResidents: 50,
+  totalPayments: 120000,
 };
 
 export const mockAreaNodes: AreaNode[] = [

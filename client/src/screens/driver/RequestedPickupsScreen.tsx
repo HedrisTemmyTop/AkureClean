@@ -182,7 +182,7 @@ export const RequestedPickupsScreen: React.FC = () => {
                   : "No pending paid pickup requests at the moment."}
               </AppText>
             </View>
-          ) : null
+          ) : undefined
         }
       />
     </ScreenContainer>

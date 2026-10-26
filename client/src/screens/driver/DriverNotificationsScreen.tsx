@@ -125,7 +125,7 @@ export const DriverNotificationsScreen: React.FC = () => {
              <AppText variant="body" color={theme.colors.textSecondary} align="center" style={styles.empty}>
                No alerts or dispatches at this time.
              </AppText>
-          ) : null
+          ) : undefined
         }
       />
     </ScreenContainer>

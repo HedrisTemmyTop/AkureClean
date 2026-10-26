@@ -157,7 +157,7 @@ export const DriverAssignmentsScreen: React.FC = () => {
                 No routes assigned for today.
               </AppText>
             </View>
-          ) : null
+          ) : undefined
         }
       />
     </ScreenContainer>

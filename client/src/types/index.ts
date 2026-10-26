@@ -115,6 +115,7 @@ export interface RouteStop {
   street: string;
   ward: string;
   lga: string;
+  pollingUnit?: string;
   coordinates: { latitude: number; longitude: number };
   wasteType: WasteRequest['type'];
   severity: Severity;
@@ -152,6 +153,7 @@ export interface AdminStats {
   totalReports: number;
   pendingReports: number;
   completedReports: number;
+  resolvedReports?: number;
   totalDrivers: number;
   activeRoutes: number;
   activeSchedules: number;

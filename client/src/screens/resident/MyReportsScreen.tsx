@@ -227,7 +227,7 @@ export const MyPickupsScreen: React.FC = () => {
                 No pickups found matching your criteria.
               </AppText>
             </View>
-          ) : null
+          ) : undefined
         }
       />
     </ScreenContainer>
