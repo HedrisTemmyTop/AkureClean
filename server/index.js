@@ -75,6 +75,7 @@ app.use("/api/schedules", require("./src/routes/schedules"));
 app.use("/api/verification", require("./src/routes/verification"));
 app.use("/api/availability", require("./src/routes/availability"));
 app.use("/api/locations", require("./src/routes/location"));
+app.use("/api/broadcasts", require("./src/routes/broadcast"));
 
 app.get("/api/health", (req, res) => {
   console.log("Health check");

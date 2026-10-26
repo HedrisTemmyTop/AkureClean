@@ -19,6 +19,7 @@ import {
   LogOut,
   Plus,
   CreditCard,
+  Megaphone,
 } from "lucide-react-native";
 import * as Animatable from "react-native-animatable";
 
@@ -280,8 +281,23 @@ export const AdminDashboard: React.FC = () => {
           style={{ marginBottom: theme.spacing.md }}
         />
 
-
-        <View style={styles.quickLinksRow}>
+        <TouchableOpacity
+          style={styles.broadcastBanner}
+          onPress={() => navigation.navigate("AdminBroadcast" as any)}
+          activeOpacity={0.85}
+        >
+          <View style={styles.broadcastIconBox}>
+            <Megaphone color="#fff" size={20} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <AppText variant="body" weight="700" color="#fff">
+              Broadcast Message
+            </AppText>
+            <AppText variant="caption" color="rgba(255,255,255,0.85)">
+              Send notices (e.g. driver delays) to all residents
+            </AppText>
+          </View>
+        </TouchableOpacity>
           <TouchableOpacity
             style={styles.quickLinkBtn}
             onPress={() => navigation.navigate("AdminDriverAvailability")}
@@ -481,5 +497,26 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: theme.colors.border,
     paddingTop: theme.spacing.sm,
+  },
+  broadcastBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#059669",
+    borderRadius: theme.borderRadius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    shadowColor: "#059669",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  broadcastIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

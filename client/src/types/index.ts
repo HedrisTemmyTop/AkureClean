@@ -54,7 +54,7 @@ export interface WasteRequest {
   cost?: number; // Added for payment flow
 }
 
-export type NotificationType = 'StatusUpdate' | 'Reminder' | 'System';
+export type NotificationType = 'StatusUpdate' | 'Reminder' | 'System' | 'Broadcast';
 
 export interface Notification {
   id: string;
@@ -63,7 +63,27 @@ export interface Notification {
   message: string;
   date: string;
   type: NotificationType;
+  priority?: 'normal' | 'urgent' | 'info';
+  relatedId?: string;
   read: boolean;
+}
+
+export interface Broadcast {
+  id: string;
+  senderId?: string | { _id: string; name: string; email: string };
+  senderName?: string;
+  title: string;
+  message: string;
+  priority: 'normal' | 'urgent' | 'info';
+  targetAudience: 'all_residents' | 'all_users' | 'ward' | 'pollingUnit' | 'drivers';
+  targetFilter?: {
+    localGovt?: string;
+    ward?: string;
+    pollingUnit?: string;
+  };
+  recipientsCount: number;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CollectionSchedule {

@@ -61,6 +61,7 @@ import { AdminPaymentsScreen } from "../screens/admin/AdminPaymentsScreen";
 import { AdminPaymentDetailsScreen } from "../screens/admin/AdminPaymentDetailsScreen";
 import { AdminVerificationsScreen } from "../screens/admin/AdminVerificationsScreen";
 import { AdminDriverAvailabilityScreen } from "../screens/admin/AdminDriverAvailabilityScreen";
+import { AdminBroadcastScreen } from "../screens/admin/AdminBroadcastScreen";
 import { ConfirmCollectionScreen } from "../screens/resident/ConfirmCollectionScreen";
 
 export type ResidentStackParamList = {
@@ -111,6 +112,7 @@ export type AdminStackParamList = {
   AdminStopDetails: { routeId: string; stopId: string };
   AdminVerifications: undefined;
   AdminDriverAvailability: undefined;
+  AdminBroadcast: undefined;
   EditProfile: undefined;
 };
 
@@ -288,6 +290,10 @@ const AdminStackNav = () => (
     <Stack.Screen
       name="AdminDriverAvailability"
       component={AdminDriverAvailabilityScreen}
+    />
+    <Stack.Screen
+      name="AdminBroadcast"
+      component={AdminBroadcastScreen}
     />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>

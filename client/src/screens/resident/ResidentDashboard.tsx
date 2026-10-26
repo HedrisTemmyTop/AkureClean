@@ -16,6 +16,7 @@ import {
   List,
   LogOut,
   AlertTriangle,
+  Megaphone,
 } from "lucide-react-native";
 import * as Animatable from "react-native-animatable";
 
@@ -30,6 +31,8 @@ import { routeService } from "../../services/routeService";
 import { pickupService } from "../../services/pickupService";
 import { billService } from "../../services/billService";
 import { verificationService } from "../../services/verificationService";
+import { broadcastService } from "../../services/broadcastService";
+import { Broadcast } from "../../types";
 import { ResidentStackParamList } from "../../navigation/RoleNavigator";
 
 type NavigationProp = NativeStackNavigationProp<
@@ -55,10 +58,15 @@ export const ResidentDashboard: React.FC = () => {
   };
 
   const [activePickup, setActivePickup] = useState<any>(null);
+  const [latestBroadcast, setLatestBroadcast] = useState<Broadcast | null>(null);
 
   const loadDashboardData = async () => {
     if (!user) return;
     try {
+      broadcastService.getLatestBroadcast()
+        .then((b) => setLatestBroadcast(b))
+        .catch(() => {});
+
       const pickups = await pickupService.getMyPickups();
       setActiveReports(
         pickups.filter(
@@ -184,6 +192,74 @@ export const ResidentDashboard: React.FC = () => {
           </TouchableOpacity>
         </View>
       </Animatable.View>
+
+      {latestBroadcast && (
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() =>
+            navigation.navigate("ResidentTabs" as any, { screen: "Alerts" })
+          }
+          style={[
+            styles.broadcastNoticeCard,
+            latestBroadcast.priority === "urgent" && styles.urgentNoticeCard,
+          ]}
+        >
+          <View
+            style={[
+              styles.noticeIconCircle,
+              {
+                backgroundColor:
+                  latestBroadcast.priority === "urgent"
+                    ? "#dc2626"
+                    : "#059669",
+              },
+            ]}
+          >
+            <Megaphone size={16} color="#fff" />
+          </View>
+          <View style={{ flex: 1, marginLeft: 10 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 2,
+              }}
+            >
+              <AppText
+                variant="caption"
+                weight="700"
+                style={{
+                  color:
+                    latestBroadcast.priority === "urgent"
+                      ? "#dc2626"
+                      : "#059669",
+                  fontSize: 10,
+                }}
+              >
+                {latestBroadcast.priority === "urgent"
+                  ? "URGENT NOTICE"
+                  : "OFFICIAL ANNOUNCEMENT"}
+              </AppText>
+            </View>
+            <AppText
+              variant="bodySmall"
+              weight="700"
+              numberOfLines={1}
+              color="#0f172a"
+            >
+              {latestBroadcast.title}
+            </AppText>
+            <AppText
+              variant="caption"
+              numberOfLines={2}
+              color="#475569"
+              style={{ marginTop: 2 }}
+            >
+              {latestBroadcast.message}
+            </AppText>
+          </View>
+        </TouchableOpacity>
+      )}
 
       {activePickup && (
         <Animatable.View
@@ -528,5 +604,29 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.sm,
     marginTop: theme.spacing.sm,
     alignSelf: "flex-start",
+  },
+  broadcastNoticeCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ecfdf5",
+    borderWidth: 1,
+    borderColor: "#a7f3d0",
+    borderRadius: theme.borderRadius.md,
+    padding: 12,
+    marginBottom: theme.spacing.md,
+    borderLeftWidth: 4,
+    borderLeftColor: "#059669",
+  },
+  urgentNoticeCard: {
+    backgroundColor: "#fff5f5",
+    borderColor: "#fecaca",
+    borderLeftColor: "#dc2626",
+  },
+  noticeIconCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

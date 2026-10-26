@@ -15,6 +15,7 @@ import {
   Sparkles,
   Calendar,
   MapPin,
+  Megaphone,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -40,6 +41,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         { name: 'Collector Availability', path: '/availability', icon: Calendar },
         { name: 'Live Driver Tracking', path: '/tracking', icon: Navigation },
         { name: 'Pickup Requests', path: '/pickups', icon: Trash2 },
+        { name: 'Broadcast Notices', path: '/broadcasts', icon: Megaphone },
         { name: 'LGAs, Wards & Polling Units', path: '/locations', icon: MapPin },
       ],
     },

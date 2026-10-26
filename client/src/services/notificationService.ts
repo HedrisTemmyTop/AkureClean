@@ -13,6 +13,8 @@ function normaliseNotification(raw: any): Notification {
     message: raw.message,
     date: raw.createdAt ?? raw.date,
     type: (raw.type ?? 'System') as NotificationType,
+    priority: raw.priority ?? 'normal',
+    relatedId: raw.relatedId,
     read: raw.read ?? false,
   };
 }

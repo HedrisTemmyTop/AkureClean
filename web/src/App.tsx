@@ -19,6 +19,7 @@ import Profile from './pages/Profile';
 import LiveTracking from './pages/Tracking/LiveTracking';
 import DriverAvailabilityList from './pages/Availability/DriverAvailabilityList';
 import LocationsManagement from './pages/Locations/LocationsManagement';
+import BroadcastList from './pages/Broadcasts/BroadcastList';
 
 export const App: React.FC = () => {
   return (
@@ -36,6 +37,7 @@ export const App: React.FC = () => {
           <Route path="/availability" element={<DriverAvailabilityList />} />
           <Route path="/tracking" element={<LiveTracking />} />
           <Route path="/pickups" element={<PickupsList />} />
+          <Route path="/broadcasts" element={<BroadcastList />} />
           <Route path="/locations" element={<LocationsManagement />} />
           <Route path="/collectors" element={<CollectorsList />} />
           <Route path="/residents" element={<ResidentsList />} />

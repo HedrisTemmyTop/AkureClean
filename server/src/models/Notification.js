@@ -20,21 +20,26 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['StatusUpdate', 'Reminder', 'System'],
+    enum: ['StatusUpdate', 'Reminder', 'System', 'Broadcast'],
     default: 'System',
+  },
+  priority: {
+    type: String,
+    enum: ['normal', 'urgent', 'info'],
+    default: 'normal',
   },
   read: {
     type: Boolean,
     default: false,
   },
-  // Optional link back to a report or assignment
+  // Optional link back to a report, assignment or broadcast
   relatedId: {
     type: mongoose.Schema.Types.ObjectId,
     default: null,
   },
   relatedModel: {
     type: String,
-    enum: ['Report', 'Assignment', 'PickupRequest', null],
+    enum: ['Report', 'Assignment', 'PickupRequest', 'Broadcast', null],
     default: null,
   },
 }, { timestamps: true });

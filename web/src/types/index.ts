@@ -323,3 +323,23 @@ export interface ResidentBillingLedger {
   outstandingAmount: number;
   bills: Bill[];
 }
+
+export interface Broadcast {
+  id: string;
+  _id?: string;
+  senderId?: any;
+  senderName?: string;
+  title: string;
+  message: string;
+  priority: 'normal' | 'urgent' | 'info';
+  targetAudience: 'all_residents' | 'all_users' | 'ward' | 'pollingUnit' | 'drivers';
+  targetFilter?: {
+    localGovt?: string;
+    ward?: string;
+    pollingUnit?: string;
+  };
+  recipientsCount: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
