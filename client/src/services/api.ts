@@ -17,7 +17,7 @@ import { tokenStorage } from "../utils/tokenStorage";
 // Change this to your machine's LAN IP when testing on a physical device,
 const rawApiUrl = (
   process.env.EXPO_PUBLIC_API_URL ||
-  "https://akureclean.onrender.com/api"
+  "http://localhost:5001/api"
 ).trim();
 export const BASE_URL = rawApiUrl
   .replace(/^h+ttps:\/\//i, "https://")

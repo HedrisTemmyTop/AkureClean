@@ -233,7 +233,7 @@ export const LiveTracking: React.FC = () => {
       return;
     }
 
-    const base = import.meta.env.VITE_API_BASE_URL || 'https://akureclean.onrender.com/api';
+    const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
     const wsBase = base
       .replace(/^http:\/\//i, 'ws://')
       .replace(/^https:\/\//i, 'wss://')
