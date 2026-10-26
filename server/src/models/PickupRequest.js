@@ -1,5 +1,15 @@
 const mongoose = require('mongoose');
+const { verificationFields } = require('./verificationFields');
 
+/**
+ * Status lifecycle:
+ *   pending   -> resident created, waiting for a driver on that route
+ *   accepted  -> driver accepted (drivers may hold several at once)
+ *   collected -> driver marked collected, awaiting resident confirm + admin approval
+ *   completed -> admin approved
+ *   rejected  -> driver could not collect, or admin rejected the collection
+ *   cancelled -> resident cancelled while pending
+ */
 const pickupRequestSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -20,6 +30,10 @@ const pickupRequestSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  image: {
+    type: String,
+    default: null,
+  },
   address: String,
   localGovt: String,
   ward: String,
@@ -28,7 +42,7 @@ const pickupRequestSchema = new mongoose.Schema({
   scheduledTime: String,
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'completed', 'cancelled'],
+    enum: ['pending', 'accepted', 'collected', 'completed', 'rejected', 'cancelled'],
     default: 'pending',
   },
   driverId: {
@@ -36,10 +50,14 @@ const pickupRequestSchema = new mongoose.Schema({
     ref: 'User',
     default: null,
   },
+  acceptedAt: { type: Date, default: null },
+  collectedAt: { type: Date, default: null },
+  driverRejectReason: { type: String, default: null },
   extraFee: {
     type: Number,
-    required: true,
-  }
+    default: 0,
+  },
+  ...verificationFields,
 }, { timestamps: true });
 
 const PickupRequest = mongoose.model('PickupRequest', pickupRequestSchema);

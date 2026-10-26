@@ -31,6 +31,7 @@ import { theme } from "../../theme";
 import { useAuth } from "../../context/AuthContext";
 import { adminService } from "../../services/adminService";
 import { assignmentService } from "../../services/routeService";
+import { verificationService } from "../../services/verificationService";
 import { AdminStats, AssignmentRoute } from "../../types";
 import { AdminStackParamList } from "../../navigation/RoleNavigator";
 
@@ -55,6 +56,16 @@ export const AdminDashboard: React.FC = () => {
     [],
   );
   const [refreshing, setRefreshing] = useState(false);
+  const [pendingApprovals, setPendingApprovals] = useState(0);
+
+  const loadPendingApprovals = async () => {
+    try {
+      const items = await verificationService.getAdminPending();
+      setPendingApprovals(items.filter((i) => i.canReview).length);
+    } catch (e) {
+      console.error("Approvals count error:", e);
+    }
+  };
 
   const loadDashboard = async () => {
     try {
@@ -67,11 +78,17 @@ export const AdminDashboard: React.FC = () => {
     } catch (e) {
       console.error("Dashboard load error:", e);
     }
+    loadPendingApprovals();
   };
 
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", loadPendingApprovals);
+    return unsubscribe;
+  }, [navigation]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -263,7 +280,20 @@ export const AdminDashboard: React.FC = () => {
           style={{ marginBottom: theme.spacing.md }}
         />
 
+
         <View style={styles.quickLinksRow}>
+          <TouchableOpacity
+            style={styles.quickLinkBtn}
+            onPress={() => navigation.navigate("AdminDriverAvailability")}
+          >
+            <AppText
+              variant="bodySmall"
+              weight="600"
+              color={theme.colors.primary}
+            >
+              Availability
+            </AppText>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.quickLinkBtn}
             onPress={() => navigation.navigate("UsersList")}

@@ -13,7 +13,7 @@ type PaystackCheckoutRouteProp = RouteProp<
 >;
 
 // A dummy URL to detect when payment is complete
-const CALLBACK_URL = "https://akureclean.com/payment-success";
+const CALLBACK_URL = "https://smartenv.com/payment-success";
 
 export const PaystackCheckoutScreen: React.FC = () => {
   const route = useRoute<PaystackCheckoutRouteProp>();

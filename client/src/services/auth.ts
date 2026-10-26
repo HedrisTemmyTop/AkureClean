@@ -70,24 +70,58 @@ async function persistSession(data: AuthResponse): Promise<User> {
   return user;
 }
 
+export interface RegisterInitResponse {
+  requiresVerification: boolean;
+  email: string;
+}
+
 export const authService = {
-  async register(payload: RegisterPayload): Promise<User> {
+  async register(payload: RegisterPayload): Promise<RegisterInitResponse> {
     const { data } = await apiClient.post("/auth/register", payload);
-    const user = await persistSession(data.data);
-    if (payload.role === "resident") {
-      try {
-        await apiClient.post("/household", {
-          address: payload.address,
-          location: payload.location,
-          houseDescription: payload.houseDescription,
-          localGovt: payload.localGovt,
-          ward: payload.ward,
-        });
-      } catch (e) {
-        console.log("Failed to create household", e);
-      }
-    }
-    return user;
+    return {
+      requiresVerification: true,
+      email: data.data?.email || payload.email.trim().toLowerCase(),
+    };
+  },
+
+  async verifyEmail(
+    email: string,
+    otp: string,
+    expoPushToken?: string,
+  ): Promise<User> {
+    const { data } = await apiClient.post("/auth/verify-email", {
+      email: email.trim().toLowerCase(),
+      otp: otp.trim(),
+      expoPushToken,
+    });
+    return persistSession(data.data);
+  },
+
+  async resendVerificationOtp(email: string): Promise<string> {
+    const { data } = await apiClient.post("/auth/resend-verification", {
+      email: email.trim().toLowerCase(),
+    });
+    return data.message || "Verification code sent to your email.";
+  },
+
+  async forgotPassword(email: string): Promise<string> {
+    const { data } = await apiClient.post("/auth/forgot-password", {
+      email: email.trim().toLowerCase(),
+    });
+    return data.message || "Password reset code sent to your email.";
+  },
+
+  async resetPassword(
+    email: string,
+    otp: string,
+    newPassword: string,
+  ): Promise<string> {
+    const { data } = await apiClient.post("/auth/reset-password", {
+      email: email.trim().toLowerCase(),
+      otp: otp.trim(),
+      newPassword,
+    });
+    return data.message || "Password reset successful.";
   },
 
   async login(payload: LoginPayload): Promise<User> {

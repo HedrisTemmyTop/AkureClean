@@ -19,21 +19,21 @@ const twoMonthsAgo = new Date();
 twoMonthsAgo.setMonth(today.getMonth() - 2);
 // 3. Array containing all 15 resident emails
 const residentEmails = [
-  "resident01@akureclean.test",
-  "resident02@akureclean.test",
-  "resident03@akureclean.test",
-  "resident04@akureclean.test",
-  "resident05@akureclean.test",
-  "resident06@akureclean.test",
-  "resident07@akureclean.test",
-  "resident08@akureclean.test",
-  "resident09@akureclean.test",
-  "resident10@akureclean.test",
-  "resident11@akureclean.test",
-  "resident12@akureclean.test",
-  "resident13@akureclean.test",
-  "resident14@akureclean.test",
-  "resident15@akureclean.test",
+  "resident01@smartenv.test",
+  "resident02@smartenv.test",
+  "resident03@smartenv.test",
+  "resident04@smartenv.test",
+  "resident05@smartenv.test",
+  "resident06@smartenv.test",
+  "resident07@smartenv.test",
+  "resident08@smartenv.test",
+  "resident09@smartenv.test",
+  "resident10@smartenv.test",
+  "resident11@smartenv.test",
+  "resident12@smartenv.test",
+  "resident13@smartenv.test",
+  "resident14@smartenv.test",
+  "resident15@smartenv.test",
 ];
 
 async function runRandomDateMigration() {

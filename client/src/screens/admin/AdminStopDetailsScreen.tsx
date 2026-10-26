@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, ScrollView, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MapPin, Info, Users, Clock, Hash, Check, AlertCircle, Trash2, Calendar } from 'lucide-react-native';
@@ -107,6 +107,17 @@ export const AdminStopDetailsScreen: React.FC = () => {
         <View style={styles.divider} />
 
         <View style={styles.detailRow}>
+          <Users color={theme.colors.textSecondary} size={20} />
+          <View style={styles.detailText}>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>Resident Details</AppText>
+            <AppText variant="body" weight="600">{stop.residentName || "Unknown"}</AppText>
+            {stop.residentPhone ? <AppText variant="body">{stop.residentPhone}</AppText> : null}
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.detailRow}>
           <Hash color={theme.colors.textSecondary} size={20} />
           <View style={styles.detailText}>
             <AppText variant="bodySmall" color={theme.colors.textSecondary}>Reports Count</AppText>
@@ -115,12 +126,32 @@ export const AdminStopDetailsScreen: React.FC = () => {
         </View>
       </AppCard>
 
-      {stop.residentNote ? (
+      {stop.verificationStatus && stop.verificationStatus !== "None" && (
+        <AppCard style={styles.noteCard} elevation="none">
+          <AppText variant="bodySmall" weight="600" color={theme.colors.textSecondary}>
+            Verification Status
+          </AppText>
+          <AppText variant="body" weight="600" style={{ marginTop: 4, color: theme.colors.primary }}>
+            {stop.verificationStatus.replace(/([A-Z])/g, ' $1').trim()}
+          </AppText>
+        </AppCard>
+      )}
+
+      {(stop.residentNote || stop.residentImage) ? (
         <AppCard style={styles.noteCard} elevation="none">
           <AppText variant="bodySmall" weight="600" color={theme.colors.textSecondary} style={{ marginBottom: 4 }}>
-            Resident Note:
+            Resident Dispute/Note:
           </AppText>
-          <AppText variant="body" style={{ fontStyle: 'italic' }}>"{stop.residentNote}"</AppText>
+          {stop.residentNote ? (
+            <AppText variant="body" style={{ fontStyle: 'italic', marginBottom: 8 }}>"{stop.residentNote}"</AppText>
+          ) : null}
+          {stop.residentImage ? (
+            <Image 
+              source={{ uri: stop.residentImage }} 
+              style={{ width: '100%', height: 200, borderRadius: 8, marginTop: 8 }}
+              resizeMode="cover"
+            />
+          ) : null}
         </AppCard>
       ) : null}
 
@@ -150,6 +181,48 @@ export const AdminStopDetailsScreen: React.FC = () => {
             {stop.collectionNote}
           </AppText>
         </AppCard>
+      )}
+
+      {stop.verificationStatus && ["AwaitingResident", "ResidentConfirmed", "Disputed"].includes(stop.verificationStatus) && (
+        <View style={{ marginTop: 10, marginBottom: 30 }}>
+          <AppButton 
+            title="Approve Collection" 
+            disabled={stop.verificationStatus === "AwaitingResident" && stop.collectedAt ? (Date.now() - new Date(stop.collectedAt).getTime() < 24 * 60 * 60 * 1000) : false}
+            onPress={async () => {
+              try {
+                setLoading(true);
+                await require('../../services/verificationService').verificationService.review({ kind: 'stop', id: stop.id, assignmentId: routeId }, 'approve');
+                Alert.alert("Success", "Collection approved.");
+                navigation.goBack();
+              } catch (e: any) {
+                Alert.alert("Error", e.message || "Failed to approve.");
+                setLoading(false);
+              }
+            }}
+            style={{ marginBottom: 10 }}
+          />
+          <AppButton 
+            title="Reject Collection" 
+            variant="outline"
+            disabled={stop.verificationStatus === "AwaitingResident" && stop.collectedAt ? (Date.now() - new Date(stop.collectedAt).getTime() < 24 * 60 * 60 * 1000) : false}
+            onPress={async () => {
+              try {
+                setLoading(true);
+                await require('../../services/verificationService').verificationService.review({ kind: 'stop', id: stop.id, assignmentId: routeId }, 'reject');
+                Alert.alert("Success", "Collection rejected.");
+                navigation.goBack();
+              } catch (e: any) {
+                Alert.alert("Error", e.message || "Failed to reject.");
+                setLoading(false);
+              }
+            }}
+          />
+          {stop.verificationStatus === "AwaitingResident" && stop.collectedAt && (Date.now() - new Date(stop.collectedAt).getTime() < 24 * 60 * 60 * 1000) && (
+            <AppText variant="bodySmall" color={theme.colors.textSecondary} style={{ textAlign: 'center', marginTop: 8 }}>
+              Buttons are disabled until 24 hours have passed since collection.
+            </AppText>
+          )}
+        </View>
       )}
 
     </ScreenContainer>

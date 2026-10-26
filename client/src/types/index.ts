@@ -45,6 +45,8 @@ export interface WasteRequest {
   severity: Severity;
   type: 'General' | 'Recyclables' | 'Hazardous' | 'Bulky';
   requestedDate: string;
+  scheduledDate?: string;
+  scheduledTime?: string;
   preferredDate?: string; // New field for missed schedule requests
   completedDate?: string;
   notes?: string;
@@ -101,6 +103,12 @@ export interface RouteStop {
   collectionNote?: string;
   skipReason?: string;
   reportsCount: number; // For grouping multiple bags/reports at one stop
+  verificationStatus?: string;
+  adminNote?: string;
+  collectedAt?: string;
+  residentPhone?: string;
+  residentName?: string;
+  residentImage?: string;
 }
 
 export interface AssignmentRoute {

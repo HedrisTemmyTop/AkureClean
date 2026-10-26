@@ -14,12 +14,7 @@ import {
   useIsFocused,
 } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import MapView, {
-  Marker,
-  Polyline,
-  PROVIDER_GOOGLE,
-  PROVIDER_DEFAULT,
-} from "react-native-maps";
+import { FreeMapView } from "../../components/FreeMapView";
 import { Pause, CheckCircle } from "lucide-react-native";
 import * as Animatable from "react-native-animatable";
 
@@ -257,6 +252,7 @@ export const RouteScreen: React.FC = () => {
       setLoading(true);
       await routeService.updateStopStatus(assignmentId, stopId, "Completed");
       await fetchRoute();
+      Alert.alert("Success", "Stop marked as collected.");
     } catch (e: any) {
       Alert.alert(
         "Error",
@@ -273,39 +269,27 @@ export const RouteScreen: React.FC = () => {
       {/* Map Section */}
       <View style={styles.mapContainer}>
         {mapRegion ? (
-          <MapView
-            provider={
-              Platform.OS === "android" ? PROVIDER_GOOGLE : PROVIDER_DEFAULT
-            }
+          <FreeMapView
             mapType="satellite"
             style={styles.map}
             region={mapRegion}
-            showsUserLocation
-            showsMyLocationButton={false}
-          >
-            {polylineCoords.length > 1 && (
-              <Polyline
-                coordinates={polylineCoords}
-                strokeColor="#4D7DFB"
-                strokeWidth={4}
-              />
-            )}
-            {stopsWithCoords.map(({ stop, coords }) => (
-              <Marker
-                key={stop._id}
-                coordinate={coords!}
-                title={getAddress(stop)}
-                description={getResidentName(stop)}
-                pinColor={
-                  stop._id === activeStop?._id
-                    ? theme.colors.primary
-                    : stop.status === "Completed"
-                      ? theme.colors.success
-                      : theme.colors.warning
-                }
-              />
-            ))}
-          </MapView>
+            polyline={polylineCoords}
+            polylineColor="#4D7DFB"
+            polylineWidth={4}
+            markers={stopsWithCoords.map(({ stop, coords }, idx) => ({
+              id: String(stop._id || stop.id || `stop-${idx}`),
+              latitude: coords!.latitude,
+              longitude: coords!.longitude,
+              title: getAddress(stop),
+              description: getResidentName(stop),
+              color:
+                stop._id === activeStop?._id
+                  ? theme.colors.primary
+                  : stop.status === "Completed"
+                    ? theme.colors.success
+                    : theme.colors.warning,
+            }))}
+          />
         ) : (
           <View
             style={[

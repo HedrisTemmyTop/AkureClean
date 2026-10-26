@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { View, StyleSheet, ScrollView, ActivityIndicator, Alert, Image } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import { ScreenContainer } from "../../components/ScreenContainer";
 import { AppText } from "../../components/AppText";
@@ -7,6 +7,7 @@ import { AppCard } from "../../components/AppCard";
 import { StatusBadge } from "../../components/StatusBadge";
 import { theme } from "../../theme";
 import { pickupService } from "../../services/pickupService";
+import { parseApiError } from "../../services/api";
 import {
   User as UserIcon,
   Clock,
@@ -14,6 +15,7 @@ import {
   Info,
   Phone,
   Calendar,
+  Image as ImageIcon,
 } from "lucide-react-native";
 
 export const AdminPickupDetailsScreen: React.FC = () => {
@@ -30,6 +32,7 @@ export const AdminPickupDetailsScreen: React.FC = () => {
         setPickup(data);
       } catch (e) {
         console.error(e);
+        Alert.alert("Error", parseApiError(e));
       } finally {
         setLoading(false);
       }
@@ -100,16 +103,36 @@ export const AdminPickupDetailsScreen: React.FC = () => {
           <AppText variant="bodySmall" color={theme.colors.textSecondary}>
             Address
           </AppText>
-          <AppText variant="body" weight="600">
-            {resident?.address || "N/A"}
+          <AppText variant="body" weight="600" style={{ flex: 1, textAlign: "right", marginLeft: 16 }}>
+            {pickup.address || resident?.address || "N/A"}
           </AppText>
         </View>
+        {(resident?.houseDescription || pickup.houseDescription) && (
+          <View style={styles.infoRow}>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              House Description
+            </AppText>
+            <AppText variant="body" weight="600" style={{ flex: 1, textAlign: "right", marginLeft: 16 }}>
+              {resident?.houseDescription || pickup.houseDescription}
+            </AppText>
+          </View>
+        )}
+        {(resident?.pollingUnit || pickup.pollingUnit) && (
+          <View style={styles.infoRow}>
+            <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+              Polling Unit
+            </AppText>
+            <AppText variant="body" weight="600" style={{ flex: 1, textAlign: "right", marginLeft: 16 }}>
+              {resident?.pollingUnit || pickup.pollingUnit}
+            </AppText>
+          </View>
+        )}
         <View style={styles.infoRow}>
           <AppText variant="bodySmall" color={theme.colors.textSecondary}>
             Ward / LGA
           </AppText>
           <AppText variant="body" weight="600">
-            {resident?.ward} / {resident?.localGovt}
+            {resident?.ward || pickup.ward || "N/A"} / {resident?.localGovt || pickup.localGovt || "N/A"}
           </AppText>
         </View>
       </AppCard>
@@ -163,6 +186,24 @@ export const AdminPickupDetailsScreen: React.FC = () => {
           </AppText>
         </View>
       </AppCard>
+
+      {(pickup.image || pickup.proofImage) && (
+        <AppCard style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <ImageIcon size={20} color={theme.colors.primary} />
+            <AppText variant="h3" style={styles.sectionTitle}>
+              Pickup Request Picture
+            </AppText>
+          </View>
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: pickup.image || pickup.proofImage }}
+              style={styles.pickupImage}
+              resizeMode="cover"
+            />
+          </View>
+        </AppCard>
+      )}
     </ScreenContainer>
   );
 };
@@ -195,5 +236,16 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.background,
+  },
+  imageContainer: {
+    borderRadius: theme.borderRadius.md,
+    overflow: "hidden",
+    marginTop: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
+  },
+  pickupImage: {
+    width: "100%",
+    height: 220,
+    borderRadius: theme.borderRadius.md,
   },
 });

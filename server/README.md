@@ -1,6 +1,6 @@
-# AkureClean - Smart Municipal Waste Collection System Backend
+# SmartEnv - Smart Municipal Waste Collection System Backend
 
-This is the backend for AkureClean, a smart municipal waste collection system tailored for Akure, Nigeria. It is built using Node.js, Express.js, MongoDB (Mongoose), and integrates with Paystack for payments, OSRM for route optimization, and Expo for push notifications.
+This is the backend for SmartEnv, a smart municipal waste collection system tailored for Akure, Nigeria. It is built using Node.js, Express.js, MongoDB (Mongoose), and integrates with Paystack for payments, OSRM for route optimization, and Expo for push notifications.
 
 ## Tech Stack
 - Node.js & Express.js

@@ -5,8 +5,7 @@ const asyncHandler = require("../utils/asyncHandler");
 
 exports.initialize = asyncHandler(async (req, res) => {
   const { amount, metadata, callback_url } = req.body;
-  const email = "hedristemitope2001@gmail.com";
-  console.log("this is the email", email);
+  const email = req.user.email;
 
   if (!amount) {
     return res
@@ -14,33 +13,41 @@ exports.initialize = asyncHandler(async (req, res) => {
       .json({ success: false, message: "Amount is required" });
   }
 
-  try {
-    const response = await paystackService.initializeTransaction(
-      email,
-      Number(amount),
-      metadata,
-      callback_url,
-    );
-
-    res.json({
-      success: true,
-      data: {
-        authorizationUrl: response.data.authorization_url,
-        reference: response.data.reference,
-      },
-    });
-  } catch (error) {
-    console.error("[Paystack Init] Error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message || "Error initializing Paystack transaction",
-      details: error.response?.data || null,
+  // Reuse existing unpaid bill or create a fresh one
+  let bill = await Bill.findOne({ userId: req.user._id, status: "unpaid" });
+  if (bill) {
+    bill.amount = amount;
+    bill.month = new Date().getMonth() + 1;
+    bill.year = new Date().getFullYear();
+    await bill.save();
+  } else {
+    bill = await Bill.create({
+      userId: req.user._id,
+      month: new Date().getMonth() + 1,
+      year: new Date().getFullYear(),
+      amount,
+      status: "unpaid",
     });
   }
-});
 
+  const response = await paystackService.initializeTransaction(
+    email,
+    Number(amount),
+    { ...metadata, billId: bill._id.toString() },
+    callback_url,
+  );
+
+  res.json({
+    success: true,
+    data: {
+      authorizationUrl: response.data.authorization_url,
+      reference: response.data.reference,
+    },
+  });
+});
 exports.verify = asyncHandler(async (req, res) => {
   const { reference } = req.body;
+  console.log("[Verify] Reference received:", reference);
 
   if (!reference) {
     return res
@@ -49,6 +56,10 @@ exports.verify = asyncHandler(async (req, res) => {
   }
 
   const verification = await paystackService.verifyTransaction(reference);
+  console.log(
+    "[Verify] Paystack response:",
+    JSON.stringify(verification.data, null, 2),
+  );
 
   if (verification.data.status === "success") {
     const { metadata } = verification.data;

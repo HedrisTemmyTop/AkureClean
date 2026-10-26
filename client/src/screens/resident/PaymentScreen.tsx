@@ -122,10 +122,12 @@ export const PaymentScreen: React.FC = () => {
             </AppText>
           </View>
 
+          {/* Fee display commented out per requirements
           <View style={[styles.invoiceRow, styles.totalRow]}>
             <AppText variant="h3">Total Amount:</AppText>
             <AppText variant="h2" color={theme.colors.primary}>₦{report.cost || 2500}</AppText>
           </View>
+          */}
         </AppCard>
       </View>
 

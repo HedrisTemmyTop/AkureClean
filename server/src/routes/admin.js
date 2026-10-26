@@ -84,7 +84,10 @@ router.get("/stats", adminController.getDashboardStats);
  *         description: Server error
  */
 router.get("/drivers", adminController.getDrivers);
+router.get("/tracking/drivers", adminController.getLiveDrivers);
 router.get("/residents", adminController.getAllResidents);
+router.get("/billing/residents", adminController.getResidentsBillingSummary);
+router.get("/billing/residents/:id/history", adminController.getResidentBillingHistory);
 router.get("/payments", adminController.getAllPayments);
 router.patch("/drivers/:id/status", adminController.updateDriverStatus);
 

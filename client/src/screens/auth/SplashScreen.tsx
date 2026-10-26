@@ -15,7 +15,7 @@ export const SplashScreen: React.FC = () => {
       
       <Animatable.View animation="fadeInUp" delay={800}>
         <AppText variant="h1" color={theme.colors.primary} style={styles.title}>
-            SmartWaste
+            SmartEnv
         </AppText>
       </Animatable.View>
       

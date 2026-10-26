@@ -16,13 +16,11 @@ import {
   useIsFocused,
   useRoute,
 } from "@react-navigation/native";
-import MapView, {
-  Marker,
-  Polyline,
-  Callout,
-  PROVIDER_GOOGLE,
-  MapType,
-} from "react-native-maps";
+import {
+  FreeMapView,
+  FreeMapViewRef,
+  FreeMapType,
+} from "../../components/FreeMapView";
 import {
   CheckCircle,
   Pause,
@@ -37,14 +35,13 @@ import {
 } from "lucide-react-native";
 import * as Animatable from "react-native-animatable";
 import * as Location from "expo-location";
-import polylineDecoder from "@mapbox/polyline";
-import { Ionicons } from "@expo/vector-icons";
 
 import { AppText } from "../../components/AppText";
 import { AppButton } from "../../components/AppButton";
 import { theme } from "../../theme";
 import { driverService } from "../../services/driverService";
 import { parseApiError } from "../../services/api";
+import { driverLocationSocket } from "../../services/driverLocationSocket";
 
 const { width, height } = Dimensions.get("window");
 
@@ -69,7 +66,7 @@ export const RouteScreen: React.FC = () => {
   const route = useRoute<any>();
   const isFocused = useIsFocused();
   const { routeId } = route.params || {};
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<FreeMapViewRef>(null);
 
   const [assignment, setAssignment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -99,13 +96,22 @@ export const RouteScreen: React.FC = () => {
   const [skipReason, setSkipReason] = useState("");
   const [skipError, setSkipError] = useState("");
   const [activeStopToSkip, setActiveStopToSkip] = useState<any>(null);
-  const [mapType, setMapType] = useState<MapType>("standard");
+  const [mapType, setMapType] = useState<FreeMapType>("standard");
   const [isMapExpanded, setIsMapExpanded] = useState(false);
+
+  const assignmentRef = useRef<any>(null);
+  const lastTransmittedRef = useRef<number>(0);
+  const lastTransmittedCoords = useRef<{ latitude: number; longitude: number } | null>(null);
+
+  useEffect(() => {
+    assignmentRef.current = assignment;
+  }, [assignment]);
 
   useEffect(() => {
     if (isFocused) {
       loadRoute();
       startTracking();
+      driverLocationSocket.connect();
     }
     return () => {
       if (locationSubscription) {
@@ -159,31 +165,40 @@ export const RouteScreen: React.FC = () => {
       const pos = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
-      const initialCoords = {
+      const rawCoords = {
         latitude: pos.coords.latitude,
         longitude: pos.coords.longitude,
       };
 
-      // Simulator Guard: Don't jump to US if we are supposed to be in Akure
-      const isUS = IS_SIMULATOR_US(
-        initialCoords.latitude,
-        initialCoords.longitude,
-      );
+      const isUS = IS_SIMULATOR_US(rawCoords.latitude, rawCoords.longitude);
+      const initialCoords = isUS
+        ? { latitude: 7.2507, longitude: 5.2103 } // Fallback to Akure center for simulators
+        : rawCoords;
 
-      if (!isUS) {
-        setDriverPos(initialCoords);
-        if (!hasFollowedInitial) {
-          mapRef.current?.animateToRegion(
-            {
-              ...initialCoords,
-              latitudeDelta: 0.015,
-              longitudeDelta: 0.015,
-            },
-            1000,
-          );
-          setHasFollowedInitial(true);
-        }
+      setDriverPos(initialCoords);
+      if (!hasFollowedInitial) {
+        mapRef.current?.animateToRegion(
+          {
+            ...initialCoords,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.015,
+          },
+          1000,
+        );
+        setHasFollowedInitial(true);
       }
+
+      // Send initial location ping immediately upon acquiring position
+      lastTransmittedRef.current = Date.now();
+      lastTransmittedCoords.current = initialCoords;
+      driverLocationSocket.sendLocationUpdate({
+        latitude: initialCoords.latitude,
+        longitude: initialCoords.longitude,
+        speed: 0,
+        heading: 0,
+        timestamp: Date.now(),
+        taskId: assignmentRef.current?._id || assignmentRef.current?.id || null,
+      });
 
       const sub = await Location.watchPositionAsync(
         {
@@ -193,12 +208,37 @@ export const RouteScreen: React.FC = () => {
         },
         (loc) => {
           if (!isAnimating) {
-            const newCoords = {
-              latitude: loc.coords.latitude,
-              longitude: loc.coords.longitude,
-            };
-            if (!IS_SIMULATOR_US(newCoords.latitude, newCoords.longitude)) {
-              setDriverPos(newCoords);
+            const isSimUS = IS_SIMULATOR_US(loc.coords.latitude, loc.coords.longitude);
+            const newCoords = isSimUS
+              ? { latitude: 7.2507, longitude: 5.2103 }
+              : {
+                  latitude: loc.coords.latitude,
+                  longitude: loc.coords.longitude,
+                };
+
+            setDriverPos(newCoords);
+
+            // Real-time tracking transmission over WebSocket:
+            // Transmit every 10 seconds (10,000ms) for any active task
+            const now = Date.now();
+            const curAssignment = assignmentRef.current;
+            const isTaskActive = !curAssignment || curAssignment.status !== "Completed";
+
+            const rawSpeed = loc.coords.speed || 0;
+            const hasElapsed10s = now - lastTransmittedRef.current >= 10000;
+
+            if (isTaskActive && hasElapsed10s) {
+              lastTransmittedRef.current = now;
+              lastTransmittedCoords.current = newCoords;
+
+              driverLocationSocket.sendLocationUpdate({
+                latitude: newCoords.latitude,
+                longitude: newCoords.longitude,
+                speed: rawSpeed > 0 ? rawSpeed * 3.6 : 0, // km/h
+                heading: loc.coords.heading || 0,
+                timestamp: loc.timestamp || now,
+                taskId: curAssignment?._id || curAssignment?.id || null,
+              });
             }
           }
         },
@@ -209,7 +249,7 @@ export const RouteScreen: React.FC = () => {
     }
   };
 
-  // When driverPos or pending stops change, fetch Google Directions
+  // When driverPos or pending stops change, fetch road directions via free OSRM
   useEffect(() => {
     if (assignment && driverPos) {
       fetchDirections();
@@ -227,65 +267,40 @@ export const RouteScreen: React.FC = () => {
       return;
     }
 
-    const API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_KEY;
-    if (!API_KEY) {
-      console.warn(
-        "EXPO_PUBLIC_GOOGLE_MAPS_KEY is missing. Falling back to straight lines.",
-      );
-      const coords = [
-        driverPos,
-        ...pendingStops.map(getCoords).filter(Boolean),
-      ] as any;
-      setRoadPolyline(coords);
-      return;
-    }
+    const validPendingStops = pendingStops.filter(getCoords);
+    if (validPendingStops.length === 0) return;
+
+    const stopsToRoute = validPendingStops.slice(0, 24);
+    const fallbackCoords = [
+      driverPos,
+      ...stopsToRoute.map(getCoords).filter(Boolean),
+    ] as { latitude: number; longitude: number }[];
 
     try {
       setFetchingDirections(true);
 
-      const origin = `${driverPos.latitude},${driverPos.longitude}`;
-
-      // We will only query up to 23 waypoints at once + destination (API Limit is 25 total)
-      const validPendingStops = pendingStops.filter(getCoords);
-      if (validPendingStops.length === 0) return;
-
-      const stopsToRoute = validPendingStops.slice(0, 24);
-      const destinationCoords = getCoords(
-        stopsToRoute[stopsToRoute.length - 1],
-      )!;
-      const destination = `${destinationCoords.latitude},${destinationCoords.longitude}`;
-
-      const waypoints = stopsToRoute
-        .slice(0, -1)
-        .map((s: any) => {
-          const c = getCoords(s)!;
-          return `${c.latitude},${c.longitude}`;
-        })
-        .join("|");
-
-      const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}${waypoints ? `&waypoints=${waypoints}` : ""}&key=${API_KEY}`;
+      // OSRM expects coordinates as lng,lat pairs separated by ;
+      const waypoints = fallbackCoords
+        .map((c) => `${c.longitude},${c.latitude}`)
+        .join(";");
+      const url = `https://router.project-osrm.org/route/v1/driving/${waypoints}?overview=full&geometries=geojson`;
 
       const response = await fetch(url);
       const json = await response.json();
 
-      if (json.status === "OK" && json.routes.length > 0) {
-        const points = polylineDecoder.decode(
-          json.routes[0].overview_polyline.points,
+      if (json.code === "Ok" && json.routes?.[0]?.geometry?.coordinates) {
+        const coords = json.routes[0].geometry.coordinates.map(
+          ([lng, lat]: [number, number]) => ({
+            latitude: lat,
+            longitude: lng,
+          }),
         );
-        const coords = points.map((point: any) => ({
-          latitude: point[0],
-          longitude: point[1],
-        }));
         setRoadPolyline(coords);
       } else {
-        console.warn("Google Directions API failed:", json.status);
-        // Fallback to straight lines
-        const fallback = [driverPos, ...stopsToRoute.map(getCoords)] as any;
-        setRoadPolyline(fallback);
+        setRoadPolyline(fallbackCoords);
       }
-    } catch (e) {
-      console.error(e);
-      // Fallback
+    } catch {
+      setRoadPolyline(fallbackCoords);
     } finally {
       setFetchingDirections(false);
     }
@@ -483,7 +498,7 @@ export const RouteScreen: React.FC = () => {
   };
 
   const toggleMapType = () => {
-    const types: MapType[] = ["standard", "satellite", "terrain", "hybrid"];
+    const types: FreeMapType[] = ["standard", "satellite", "terrain", "hybrid"];
     const nextIndex = (types.indexOf(mapType) + 1) % types.length;
     setMapType(types[nextIndex]);
   };
@@ -543,10 +558,9 @@ export const RouteScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <MapView
+      <FreeMapView
         ref={mapRef}
-        provider={PROVIDER_GOOGLE}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
         mapType={mapType}
         initialRegion={{
           latitude: 7.2507, // Default Akure Center
@@ -554,56 +568,33 @@ export const RouteScreen: React.FC = () => {
           latitudeDelta: 0.05,
           longitudeDelta: 0.05,
         }}
-      >
-        {driverPos && (
-          <Marker coordinate={driverPos} anchor={{ x: 0.5, y: 0.5 }}>
-            <View style={styles.driverMarker}>
-              <AppText style={{ fontSize: 24 }}>🚛</AppText>
-            </View>
-          </Marker>
-        )}
-
-        {stops.map((stop: any, index: number) => {
-          const coords = getCoords(stop);
-          if (!coords) return null;
-          const markerKey =
-            stop._id?.$oid || stop._id || stop.id || `stop-${index}`;
-
-          return (
-            <Marker
-              key={markerKey}
-              coordinate={coords}
-              pinColor={
+        driverPos={driverPos}
+        polyline={roadPolyline}
+        polylineColor="#2196F3"
+        polylineWidth={4}
+        markers={stops
+          .map((stop: any, index: number) => {
+            const coords = getCoords(stop);
+            if (!coords) return null;
+            const markerKey = String(
+              stop._id?.$oid || stop._id || stop.id || `stop-${index}`,
+            );
+            return {
+              id: markerKey,
+              latitude: coords.latitude,
+              longitude: coords.longitude,
+              title: stop.address || "Unknown Address",
+              description: stop.status || "Pending",
+              color:
                 stop.status === "Completed"
                   ? "#9E9E9E"
                   : stop.status === "Skipped"
                     ? "#FF6D00"
-                    : "#F44336"
-              }
-            >
-              <Callout tooltip={false}>
-                <View style={{ padding: 10, minWidth: 150 }}>
-                  <AppText
-                    variant="bodySmall"
-                    weight="600"
-                    style={{ color: "#000" }}
-                  >
-                    {stop.address || "Unknown Address"}
-                  </AppText>
-                </View>
-              </Callout>
-            </Marker>
-          );
-        })}
-
-        {roadPolyline.length > 0 && (
-          <Polyline
-            coordinates={roadPolyline}
-            strokeColor="#2196F3"
-            strokeWidth={4}
-          />
-        )}
-      </MapView>
+                    : "#F44336",
+            };
+          })
+          .filter(Boolean)}
+      />
 
       <TouchableOpacity
         style={styles.backBtn}
@@ -629,11 +620,11 @@ export const RouteScreen: React.FC = () => {
         style={styles.expandBtn}
         onPress={() => setIsMapExpanded(!isMapExpanded)}
       >
-        <Ionicons
-          name={isMapExpanded ? "contract-outline" : "expand-outline"}
-          color="#fff"
-          size={24}
-        />
+        {isMapExpanded ? (
+          <Minimize2 color="#fff" size={24} />
+        ) : (
+          <Maximize2 color="#fff" size={24} />
+        )}
       </TouchableOpacity>
 
       <View style={styles.legend}>

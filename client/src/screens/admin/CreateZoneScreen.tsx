@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import MapView, { Marker, Polygon, MapPressEvent } from 'react-native-maps';
+import { FreeMapView } from '../../components/FreeMapView';
 import { AppText } from '../../components/AppText';
 import { AppInput } from '../../components/AppInput';
 import { AppButton } from '../../components/AppButton';
@@ -12,7 +12,7 @@ export const CreateZoneScreen: React.FC = () => {
   const [coordinates, setCoordinates] = useState<{latitude: number, longitude: number}[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleMapPress = (e: MapPressEvent) => {
+  const handleMapPress = (e: { nativeEvent: { coordinate: { latitude: number; longitude: number } } }) => {
     setCoordinates([...coordinates, e.nativeEvent.coordinate]);
   };
 
@@ -82,7 +82,7 @@ export const CreateZoneScreen: React.FC = () => {
       </View>
 
       <View style={styles.mapContainer}>
-        <MapView
+        <FreeMapView
           style={styles.map}
           initialRegion={{
             latitude: 7.250771, // Akure
@@ -91,19 +91,15 @@ export const CreateZoneScreen: React.FC = () => {
             longitudeDelta: 0.05,
           }}
           onPress={handleMapPress}
-        >
-          {coordinates.length > 0 && (
-            <Polygon
-              coordinates={coordinates}
-              fillColor="rgba(33, 150, 243, 0.3)"
-              strokeColor={theme.colors.primary}
-              strokeWidth={2}
-            />
-          )}
-          {coordinates.map((coord, index) => (
-            <Marker key={index} coordinate={coord} />
-          ))}
-        </MapView>
+          polygon={coordinates}
+          markers={coordinates.map((coord, index) => ({
+            id: `zone-pt-${index}`,
+            latitude: coord.latitude,
+            longitude: coord.longitude,
+            color: theme.colors.primary,
+            title: `Point ${index + 1}`,
+          }))}
+        />
         
         <View style={styles.mapOverlayControls}>
           <TouchableOpacity style={styles.overlayBtn} onPress={handleUndo} disabled={coordinates.length === 0}>

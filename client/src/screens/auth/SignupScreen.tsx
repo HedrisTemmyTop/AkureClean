@@ -52,14 +52,14 @@ export const SignupScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await register({
+      const result = await register({
         name,
         email,
         phone,
         password,
         role,
       });
-      // The context will automatically update user state and switch navigators
+      navigation.navigate("VerifyEmail", { email: result.email });
     } catch (e) {
       Alert.alert("Registration Failed", parseApiError(e));
     } finally {
@@ -72,7 +72,7 @@ export const SignupScreen: React.FC = () => {
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
         <AppText variant="h1">Create Account</AppText>
         <AppText variant="bodyLarge" color={theme.colors.textSecondary}>
-          Join the Smart Waste network
+          Join the Smart Waste Network
         </AppText>
       </Animatable.View>
 
@@ -118,7 +118,7 @@ export const SignupScreen: React.FC = () => {
               Collector
             </AppText>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.roleBtn, role === "admin" && styles.roleBtnActive]}
             onPress={() => setRole("admin")}
           >
@@ -131,7 +131,7 @@ export const SignupScreen: React.FC = () => {
             >
               Admin
             </AppText>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <AppInput

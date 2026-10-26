@@ -1,7 +1,3 @@
-/**
- * billService.ts — Bill & Payment API service
- * Maps to /api/bills endpoints.
- */
 import { apiClient } from "./api";
 
 export interface Bill {
@@ -13,6 +9,12 @@ export interface Bill {
   paystackReference?: string | null;
   paidAt?: string | null;
   createdAt: string;
+}
+
+export interface BillsResponse {
+  bills: Bill[];
+  outstandingAmount: number;
+  outstandingMonths: number;
 }
 
 export interface PaymentInit {
@@ -34,12 +36,15 @@ function normaliseBill(raw: any): Bill {
 }
 
 export const billService = {
-  async getMyBills(): Promise<Bill[]> {
+  async getMyBills(): Promise<BillsResponse> {
     const { data } = await apiClient.get("/bills/mine");
-    return (data.data as any[]).map(normaliseBill);
+    return {
+      bills: (data.data as any[]).map(normaliseBill),
+      outstandingAmount: data.outstandingAmount,
+      outstandingMonths: data.outstandingMonths,
+    };
   },
 
-  /** Initiates a Paystack transaction. Returns the authorization URL to open in a WebView/browser. */
   async payBill(billId: string): Promise<PaymentInit> {
     const { data } = await apiClient.post("/bills/pay", { billId });
     return data.data as PaymentInit;

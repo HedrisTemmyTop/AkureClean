@@ -11,7 +11,7 @@ import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import * as Animatable from "react-native-animatable";
 import * as Location from "expo-location";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { TextInput, ActivityIndicator } from "react-native";
 
 import { ScreenContainer } from "../../components/ScreenContainer";
 import { AppText } from "../../components/AppText";
@@ -22,8 +22,10 @@ import { useAuth } from "../../context/AuthContext";
 import { AuthStackParamList } from "../../navigation/AuthStack";
 import { MapPin } from "lucide-react-native";
 import { parseApiError } from "../../services/api";
-
-const GOOGLE_MAPS_API_KEY = "AIzaSyAQdeXGkqghgJhYHsiPiHeiu-Hz_x8pQzc";
+import {
+  locationService,
+  StructuredLocationsMap,
+} from "../../services/locationService";
 
 type NavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -32,7 +34,13 @@ type NavigationProp = NativeStackNavigationProp<
 type SignupLocationRouteProp = RouteProp<AuthStackParamList, "SignupLocation">;
 
 export const SignupLocationScreen: React.FC = () => {
+  const [locationsMap, setLocationsMap] = useState<StructuredLocationsMap>({});
   const [address, setAddress] = useState("");
+  const [addressSearchQuery, setAddressSearchQuery] = useState("");
+  const [addressSuggestions, setAddressSuggestions] = useState<
+    { display_name: string; lat: string; lon: string }[]
+  >([]);
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
   const [location, setLocation] = useState<{
     type: string;
     coordinates: number[];
@@ -63,6 +71,25 @@ export const SignupLocationScreen: React.FC = () => {
 
   const { name, email, phone, password, role } = route.params;
 
+  useEffect(() => {
+    locationService
+      .getStructuredLocations()
+      .then((res) => setLocationsMap(res))
+      .catch((err) => console.error("Failed to fetch locations:", err));
+  }, []);
+
+  const getWards = (lga: string): string[] => {
+    return Object.keys(locationsMap[lga] || {}).filter(
+      (w) => w !== "Unknown Ward"
+    );
+  };
+
+  const getPUs = (lga: string, w: string): string[] => {
+    return (locationsMap[lga]?.[w] || [])
+      .filter((p) => p.name)
+      .map((p) => p.name);
+  };
+
   const handleGetCurrentLocation = async () => {
     setIsLocating(true);
     try {
@@ -90,7 +117,7 @@ export const SignupLocationScreen: React.FC = () => {
           `https://nominatim.openstreetmap.org/reverse?format=json&lat=${currentLocation.coords.latitude}&lon=${currentLocation.coords.longitude}&zoom=18&addressdetails=1`,
           {
             headers: {
-              "User-Agent": "FUTA_SmartWasteApp/1.0",
+              "User-Agent": "SmartEnv/1.0",
               "Accept-Language": "en-US,en;q=0.9",
             },
           },
@@ -179,18 +206,18 @@ export const SignupLocationScreen: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await register({
+      const result = await register({
         name,
         email,
         phone,
         password: password || "",
         role,
         address,
-        houseDescription,
+        houseDescription: role === "resident" ? houseDescription : undefined,
         localGovt,
         ward,
         pollingUnit,
-        houseType,
+        houseType: role === "resident" ? houseType : undefined,
         numberOfRooms:
           houseType === "Residential building"
             ? parseInt(numberOfRooms)
@@ -203,7 +230,7 @@ export const SignupLocationScreen: React.FC = () => {
         truckPlateNumber: role === "driver" ? truckPlateNumber : undefined,
         truckCapacity: role === "driver" ? truckCapacity : undefined,
       });
-      // AuthContext sets user → RoleNavigator auto-switches screens
+      navigation.navigate("VerifyEmail", { email: result.email });
     } catch (e) {
       Alert.alert("Registration Failed", parseApiError(e));
     } finally {
@@ -313,39 +340,83 @@ export const SignupLocationScreen: React.FC = () => {
             SEARCH FOR ADDRESS:
           </AppText>
           <View style={styles.autocompleteContainer}>
-            <GooglePlacesAutocomplete
-              placeholder="Search address..."
-              onPress={(data, details = null) => {
-                setAddress(data.description);
-                if (details?.geometry?.location) {
-                  setLocation({
-                    type: "Point",
-                    coordinates: [
-                      details.geometry.location.lng,
-                      details.geometry.location.lat,
-                    ],
-                  });
-                }
-              }}
-              query={{
-                key: GOOGLE_MAPS_API_KEY,
-                language: "en",
-                components: "country:ng",
-              }}
-              onFail={(error) =>
-                console.error("Google Places API Error:", error)
-              }
-              fetchDetails={true}
-              keyboardShouldPersistTaps="handled"
-              styles={{
-                textInput: styles.searchInput,
-                container: styles.searchContainer,
-                listView: styles.listView,
-              }}
-              textInputProps={{
-                placeholderTextColor: theme.colors.textSecondary,
-              }}
-            />
+            <View style={{ position: "relative" }}>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search street or landmark in Akure..."
+                placeholderTextColor={theme.colors.textSecondary}
+                value={addressSearchQuery}
+                onChangeText={async (text) => {
+                  setAddressSearchQuery(text);
+                  setAddress(text);
+                  if (text.trim().length < 3) {
+                    setAddressSuggestions([]);
+                    return;
+                  }
+                  setIsSearchingAddress(true);
+                  try {
+                    const res = await fetch(
+                      `https://nominatim.openstreetmap.org/search?format=json&countrycodes=ng&limit=5&q=${encodeURIComponent(
+                        text.trim(),
+                      )}`,
+                      {
+                        headers: {
+                          "User-Agent": "FUTA_SmartWasteApp/1.0",
+                          "Accept-Language": "en-US,en;q=0.9",
+                        },
+                      },
+                    );
+                    const results = await res.json();
+                    if (Array.isArray(results)) {
+                      setAddressSuggestions(results);
+                    }
+                  } catch {
+                    // Ignore network errors while typing
+                  } finally {
+                    setIsSearchingAddress(false);
+                  }
+                }}
+              />
+              {isSearchingAddress && (
+                <ActivityIndicator
+                  size="small"
+                  color={theme.colors.primary}
+                  style={{ position: "absolute", right: 14, top: 15 }}
+                />
+              )}
+            </View>
+            {addressSuggestions.length > 0 && (
+              <View style={styles.listView}>
+                {addressSuggestions.map((item, idx) => (
+                  <TouchableOpacity
+                    key={`${item.lat}-${item.lon}-${idx}`}
+                    style={{
+                      paddingVertical: 12,
+                      paddingHorizontal: 14,
+                      borderBottomWidth:
+                        idx < addressSuggestions.length - 1 ? 1 : 0,
+                      borderBottomColor: theme.colors.border,
+                    }}
+                    onPress={() => {
+                      setAddress(item.display_name);
+                      setAddressSearchQuery(item.display_name);
+                      setLocation({
+                        type: "Point",
+                        coordinates: [
+                          parseFloat(item.lon),
+                          parseFloat(item.lat),
+                        ],
+                      });
+                      setAddressSuggestions([]);
+                    }}
+                  >
+                    <AppText variant="bodySmall" numberOfLines={2}>
+                      {item.display_name}
+                    </AppText>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
         </View>
 
@@ -536,36 +607,7 @@ export const SignupLocationScreen: React.FC = () => {
               Select Ward ({localGovt})
             </AppText>
             <FlatList
-              data={
-                localGovt === "Akure North"
-                  ? [
-                      "WARD 01 - AGAMO/OKE-OORE/AKOMOW A",
-                      "WARD 02 - AYEDE/OGBESE",
-                      "WARD 03 - AYET ORO",
-                      "WARD 04 - IGBA TORO",
-                      "WARD 05 - IGOBA/ISINIGBO",
-                      "WARD 06 - ILUABO/ELEYEWO/BOLORUNDURO",
-                      "WARD 07 - ISIMIJA/IRADO",
-                      "WARD 08 - MOFERERE",
-                      "WARD 09 - OBA-ILE",
-                      "WARD 10 - ODO-OJA/IJIGBO",
-                      "WARD 11 - OKE-AF A/OWODE",
-                      "WARD 12 - OKE IJU",
-                    ]
-                  : [
-                      "WARD 01 - APONMU",
-                      "WARD 02 - GBOGI/ISIKAN I",
-                      "WARD 03 - GBOGI/ISIKAN II",
-                      "WARD 04 - IJOMU/OBANLA",
-                      "WARD 05 - LISA",
-                      "WARD 06 - ODA",
-                      "WARD 07 - ODOPETU",
-                      "WARD 08 - OKE ARO/URO I",
-                      "WARD 09 - OKE ARO/URO II",
-                      "WARD 10 - OSHODI/ISOLO",
-                      "WARD 11 - OWODE/IMUAGUN",
-                    ]
-              }
+              data={getWards(localGovt)}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -601,7 +643,7 @@ export const SignupLocationScreen: React.FC = () => {
               Select Local Government
             </AppText>
             <FlatList
-              data={["Akure South", "Akure North"]}
+              data={Object.keys(locationsMap)}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -643,22 +685,21 @@ export const SignupLocationScreen: React.FC = () => {
               onChangeText={setPuSearchQuery}
             />
             <FlatList
-              data={(require("../../data/polling_units.json")["General"] || [])
-                .filter((pu: any) =>
-                  pu.name.toLowerCase().includes(puSearchQuery.toLowerCase()),
-                )
-                .slice(0, 50)}
-              keyExtractor={(item: any, index) => `${item.name}-${index}`}
+              // AFTER (correct)
+              data={getPUs(localGovt, ward).filter((name) =>
+                name.toLowerCase().includes(puSearchQuery.toLowerCase()),
+              )}
+              keyExtractor={(item, index) => `${item}-${index}`}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.wardItem}
                   onPress={() => {
-                    setPollingUnit(item.name);
+                    setPollingUnit(item);
                     setIsPuModalVisible(false);
                     setPuSearchQuery("");
                   }}
                 >
-                  <AppText variant="body">{item.name}</AppText>
+                  <AppText variant="body">{item}</AppText>
                 </TouchableOpacity>
               )}
             />

@@ -2,10 +2,20 @@ import { apiClient } from "./api";
 
 export interface PickupRequestData {
   id: string;
-  userId: string;
+  userId: any; // User object populated
+  driverId?: any; // User object populated
   householdId: any;
   status: string;
   extraFee: number;
+  type?: string;
+  address?: string;
+  notes?: string;
+  ward?: string;
+  pollingUnit?: string;
+  scheduledDate?: string;
+  scheduledTime?: string;
+  createdAt?: string;
+  driverRejectReason?: string;
 }
 
 export const pickupService = {
@@ -40,6 +50,7 @@ export const pickupService = {
   async getDriverPickups(): Promise<{
     data: PickupRequestData[];
     hasActive: boolean;
+    count: number;
   }> {
     const { data } = await apiClient.get("/pickup/driver");
     return {
@@ -48,6 +59,7 @@ export const pickupService = {
         id: raw._id ?? raw.id,
       })),
       hasActive: data.hasActive,
+      count: data.count ?? (data.data as any[]).length,
     };
   },
 
@@ -74,8 +86,12 @@ export const pickupService = {
     await apiClient.put(`/pickup/${id}/respond`, { action });
   },
 
-  async completePickupByResident(id: string): Promise<void> {
-    await apiClient.post(`/pickup/${id}/complete`);
+  async markCollected(id: string): Promise<void> {
+    await apiClient.post(`/pickup/${id}/collect`);
+  },
+
+  async rejectPickup(id: string, reason: string): Promise<void> {
+    await apiClient.post(`/pickup/${id}/reject`, { reason });
   },
 
   async cancelPickupByResident(id: string): Promise<void> {
@@ -89,6 +105,7 @@ export const pickupService = {
       scheduledDate?: string;
       scheduledTime?: string;
       amount?: number;
+      image?: string | null;
     },
   ): Promise<any> {
     const { data } = await apiClient.post("/pickup", {

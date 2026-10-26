@@ -1,6 +1,6 @@
-# AkureClean - Smart Waste Management System
+# SmartEnv - Smart Waste Management System
 
-AkureClean is a comprehensive Smart Waste Management System designed to streamline waste collection and management in Akure. The project consists of a mobile application for residents, collectors, and admins, along with a backend server to manage data and transactions.
+SmartEnv is a comprehensive Smart Waste Management System designed to streamline waste collection and management in Akure. The project consists of a mobile application for residents, collectors, and admins, along with a backend server to manage data and transactions.
 
 ## 🚀 Project Overview
 
@@ -26,7 +26,7 @@ The system aims to improve urban sanitation by providing:
 ## 📁 Project Structure
 
 ```bash
-AkureClean/
+SmartEnv/
 ├── client/          # React Native mobile application
 │   ├── src/         # Application source code
 │   ├── assets/      # Images and static files
@@ -48,8 +48,8 @@ AkureClean/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/HedrisTemmyTop/AkureClean.git
-   cd AkureClean
+   git clone https://github.com/HedrisTemmyTop/SmartEnv.git
+   cd SmartEnv
    ```
 
 2. **Setup Client**

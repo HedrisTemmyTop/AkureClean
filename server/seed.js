@@ -9,7 +9,7 @@ async function seed() {
   const users = [
     { name: 'Admin User', email: 'admin@example.com', password: 'securepassword123', role: 'admin', phone: '08000000000' },
     { name: 'Driver User', email: 'driver@example.com', password: 'securepassword123', role: 'driver', phone: '08000000001' },
-    { name: 'Resident User', email: 'resident01@akureclean.test', password: 'test1234', role: 'resident', phone: '08000000002' }
+    { name: 'Resident User', email: 'resident01@smartenv.test', password: 'test1234', role: 'resident', phone: '08000000002' }
   ];
 
   for (let u of users) {

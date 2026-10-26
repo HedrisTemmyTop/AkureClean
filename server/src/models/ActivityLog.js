@@ -4,7 +4,7 @@ const activityLogSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true,
+    required: false,
   },
   action: {
     type: String,
@@ -17,6 +17,10 @@ const activityLogSchema = new mongoose.Schema({
   details: {
     type: mongoose.Schema.Types.Mixed,
     default: {},
+  },
+  ipAddress: {
+    type: String,
+    default: '127.0.0.1',
   }
 }, { timestamps: true });
 

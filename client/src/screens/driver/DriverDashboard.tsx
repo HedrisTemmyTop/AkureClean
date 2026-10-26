@@ -19,6 +19,7 @@ import {
   Clock,
   LogOut,
   CheckCircle,
+  Calendar,
 } from "lucide-react-native";
 import * as Animatable from "react-native-animatable";
 
@@ -31,6 +32,8 @@ import { pickupService } from "../../services/pickupService";
 import { driverService } from "../../services/driverService";
 import { weatherService } from "../../services/weatherService";
 import { trafficService } from "../../services/trafficService";
+import { driverLocationSocket } from "../../services/driverLocationSocket";
+import * as Location from "expo-location";
 import { DriverStackParamList } from "../../navigation/RoleNavigator";
 
 type NavigationProp = NativeStackNavigationProp<
@@ -78,6 +81,91 @@ export const DriverDashboard: React.FC = () => {
   useEffect(() => {
     loadDashboard();
   }, [user]);
+
+  // Connect to tracking socket and transmit collector position
+  useEffect(() => {
+    if (!user) return;
+
+    let locationSub: any = null;
+    let isMounted = true;
+
+    const initTracking = async () => {
+      try {
+        await driverLocationSocket.connect();
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") return;
+
+        const pos = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Balanced,
+        });
+
+        const isSimUS =
+          pos.coords.latitude > 37 &&
+          pos.coords.latitude < 38 &&
+          pos.coords.longitude < -122 &&
+          pos.coords.longitude > -123;
+
+        const coords = isSimUS
+          ? { latitude: 7.2507, longitude: 5.2103 }
+          : { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+
+        if (!isMounted) return;
+
+        driverLocationSocket.sendLocationUpdate({
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+          speed: 0,
+          heading: 0,
+          timestamp: Date.now(),
+          taskId: activeRoute?._id || null,
+        });
+
+        locationSub = await Location.watchPositionAsync(
+          {
+            accuracy: Location.Accuracy.High,
+            timeInterval: 10000,
+            distanceInterval: 10,
+          },
+          (loc) => {
+            if (!isMounted) return;
+            const isUS =
+              loc.coords.latitude > 37 &&
+              loc.coords.latitude < 38 &&
+              loc.coords.longitude < -122 &&
+              loc.coords.longitude > -123;
+
+            const curCoords = isUS
+              ? { latitude: 7.2507, longitude: 5.2103 }
+              : {
+                  latitude: loc.coords.latitude,
+                  longitude: loc.coords.longitude,
+                };
+
+            const rawSpeed = loc.coords.speed || 0;
+            driverLocationSocket.sendLocationUpdate({
+              latitude: curCoords.latitude,
+              longitude: curCoords.longitude,
+              speed: rawSpeed > 0 ? rawSpeed * 3.6 : 0,
+              heading: loc.coords.heading || 0,
+              timestamp: loc.timestamp || Date.now(),
+              taskId: activeRoute?._id || null,
+            });
+          },
+        );
+      } catch (err) {
+        console.warn("[DriverDashboard] Location init error:", err);
+      }
+    };
+
+    initTracking();
+
+    return () => {
+      isMounted = false;
+      if (locationSub) {
+        locationSub.remove();
+      }
+    };
+  }, [user, activeRoute?._id]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -148,6 +236,47 @@ export const DriverDashboard: React.FC = () => {
           </TouchableOpacity>
         </Animatable.View>
       )}
+
+      {/* Monthly Pickup Availability Card */}
+      <Animatable.View animation="fadeInUp" delay={180}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate("DriverAvailability")}
+        >
+          <AppCard
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: theme.spacing.md,
+              borderWidth: 1,
+              borderColor: theme.colors.primary + "35",
+              backgroundColor: theme.colors.primary + "08",
+            }}
+          >
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: theme.colors.primary + "20",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: theme.spacing.md,
+              }}
+            >
+              <Calendar color={theme.colors.primary} size={22} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <AppText variant="body" weight="600" color={theme.colors.primary}>
+                Monthly Pickup Availability
+              </AppText>
+              <AppText variant="caption" color={theme.colors.textSecondary}>
+                Pick 1 day per week for this month so residents can book pickups.
+              </AppText>
+            </View>
+          </AppCard>
+        </TouchableOpacity>
+      </Animatable.View>
 
       {/* Hero Active Route Section */}
       {activeRoute ? (
@@ -279,7 +408,7 @@ export const DriverDashboard: React.FC = () => {
             <Truck color={theme.colors.primary} size={32} />
           </View>
           <AppText variant="h3" align="center" style={{ marginTop: 16 }}>
-            Ready to Roll?
+            Ready to Work?
           </AppText>
           <AppText
             variant="bodySmall"

@@ -1,6 +1,6 @@
 /**
  * apiClient.ts
- * Centralised Axios instance for AkureClean.
+ * Centralised Axios instance for SmartEnv.
  *
  * - Attaches JWT access token to every protected request via request interceptor
  * - Silently refreshes expired access tokens using the refresh token (token rotation)
@@ -15,20 +15,27 @@ import { tokenStorage } from "../utils/tokenStorage";
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
 // Change this to your machine's LAN IP when testing on a physical device,
-// e.g. 'http://192.168.1.100:5000/api'
-export const BASE_URL = "http://localhost:5001/api";
-// export const BASE_URL = "https://computational-small-public-causing.trycloudflare.com/api";
+const rawApiUrl = (
+  process.env.EXPO_PUBLIC_API_URL ||
+  "http://localhost:5001/api"
+).trim();
+export const BASE_URL = rawApiUrl
+  .replace(/^h+ttps:\/\//i, "https://")
+  .replace(/^h+ttp:\/\//i, "http://");
 
 // ─── INSTANCE ────────────────────────────────────────────────────────────────
 export const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 15000, // 15-second timeout
+  timeout: 30000, // 30-second timeout
   headers: { "Content-Type": "application/json" },
 });
 
 // ─── REQUEST INTERCEPTOR — attach access token ────────────────────────────────
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
+    console.log(
+      `[FRONTEND] Outgoing Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`,
+    );
     const token = await tokenStorage.getAccessToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -58,20 +65,29 @@ const processQueue = (error: unknown, token: string | null = null) => {
 
 // ─── RESPONSE INTERCEPTOR — silent token refresh ─────────────────────────────
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`[FRONTEND] Successful Response from: ${response.config.url}`);
+    return response;
+  },
   async (error: AxiosError) => {
+    console.log(
+      `[FRONTEND] Request Error for ${error.config?.url}:`,
+      error.message,
+    );
     const originalRequest = error.config as AxiosRequestConfig & {
       _retry?: boolean;
     };
 
     const is401 = error.response?.status === 401;
     const isRefreshEndpoint = originalRequest?.url?.includes("/auth/refresh");
+    const isLoginEndpoint = originalRequest?.url?.includes("/auth/login");
 
     if (
       is401 &&
       originalRequest &&
       !originalRequest._retry &&
-      !isRefreshEndpoint
+      !isRefreshEndpoint &&
+      !isLoginEndpoint
     ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

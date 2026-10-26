@@ -10,16 +10,19 @@ interface StatusBadgeProps {
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
   const getStatusColor = () => {
-    switch (status) {
-      case 'Pending':
+    switch ((status as string).toLowerCase()) {
+      case 'pending':
         return theme.colors.status.pending;
-      case 'Scheduled':
+      case 'scheduled':
+      case 'accepted':
         return theme.colors.status.active;
-      case 'In Progress':
+      case 'in progress':
+      case 'collected':
         return theme.colors.primary;
-      case 'Completed':
+      case 'completed':
         return theme.colors.status.completed;
-      case 'Cancelled':
+      case 'cancelled':
+      case 'rejected':
         return theme.colors.status.cancelled;
       default:
         return theme.colors.textSecondary;

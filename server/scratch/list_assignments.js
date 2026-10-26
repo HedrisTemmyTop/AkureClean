@@ -7,7 +7,7 @@ const Assignment = require('../src/models/Assignment');
 
 async function listAssignments() {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/akureclean');
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/smartenv');
     const assignments = await Assignment.find({}, { _id: 1, title: 1, status: 1 });
     console.log('Assignments in DB:');
     assignments.forEach(a => {

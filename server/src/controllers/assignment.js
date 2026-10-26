@@ -6,6 +6,8 @@ const notificationService = require("../services/notification");
 const { logActivity } = require("../utils/logger");
 const asyncHandler = require("../utils/asyncHandler");
 const { validationResult } = require("express-validator");
+const { startStopVerification } = require("./verification");
+const { filterPaidResidents } = require("../utils/billing");
 
 /**
  * @desc    Create a new assignment (admin only)
@@ -32,22 +34,54 @@ exports.createAssignment = asyncHandler(async (req, res) => {
     ward,
   } = req.body;
 
-  // STEP 1 — Fetch all residents matching the area
-  const residents = await User.find({
-    role: "resident",
-    localGovt: lga,
-    ward: ward,
-    pollingUnit: { $in: pollingUnits },
-    "location.type": "Point",
-    "location.coordinates": { $size: 2 },
-  }).select(
-    "_id name phone address houseDescription ward localGovt pollingUnit location",
+  // STEP 1 — Fetch residents matching the area, or fallback to polling units waypoints
+  const cleanLga = (lga || "").trim();
+  const cleanWard = (ward || "").trim();
+
+  const puNames = Array.isArray(pollingUnits)
+    ? pollingUnits
+        .map((p) => (typeof p === "string" ? p.trim() : (p?.name || "").trim()))
+        .filter(Boolean)
+    : [];
+
+  const lgaRegex = new RegExp(`^${cleanLga.replace(/\s+/g, "\\s+")}$`, "i");
+  const wardRegex = new RegExp(`^${cleanWard.replace(/\s+/g, "\\s+")}$`, "i");
+  const puRegexes = puNames.map(
+    (p) =>
+      new RegExp(
+        `^${p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+")}$`,
+        "i"
+      )
   );
+
+  let areaResidents = [];
+  if (puRegexes.length > 0) {
+    areaResidents = await User.find({
+      role: "resident",
+      localGovt: lgaRegex,
+      ward: wardRegex,
+      pollingUnit: { $in: puRegexes },
+      "location.type": "Point",
+      "location.coordinates": { $size: 2 },
+    }).select(
+      "_id name phone address houseDescription ward localGovt pollingUnit location houseType numberOfWorkersRange createdAt"
+    );
+  }
+
+  if (areaResidents.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: `No registered residents found in ${cleanWard}, ${cleanLga} for the selected polling unit(s). Please select an area where residents are registered.`,
+    });
+  }
+
+  // Only include residents who have paid their waste bill (up-to-date)
+  const residents = await filterPaidResidents(areaResidents);
 
   if (residents.length === 0) {
     return res.status(400).json({
       success: false,
-      message: "No residents found for the selected area.",
+      message: `No paid residents found in ${cleanWard}, ${cleanLga} for the selected polling unit(s). (${areaResidents.length} registered resident${areaResidents.length === 1 ? "" : "s"} found, but none have paid their waste bill.)`,
     });
   }
 
@@ -59,17 +93,14 @@ exports.createAssignment = asyncHandler(async (req, res) => {
       .json({ success: false, message: "Driver not found" });
   }
 
-  let driverCoords = [0, 0];
+  let driverCoords = [5.138, 7.303]; // Safe fallback Akure coordinates
   if (
     driver.location &&
     driver.location.coordinates &&
-    driver.location.coordinates.length === 2
+    driver.location.coordinates.length === 2 &&
+    (driver.location.coordinates[0] !== 0 || driver.location.coordinates[1] !== 0)
   ) {
     driverCoords = driver.location.coordinates;
-  } else {
-    return res
-      .status(400)
-      .json({ success: false, message: "Driver has no valid location." });
   }
 
   // STEP 3 — Build the distance matrix
@@ -110,7 +141,7 @@ exports.createAssignment = asyncHandler(async (req, res) => {
   }
 
   // STEP 4 — Run nearest-neighbor heuristic
-  let unvisited = residents.map((r, idx) => idx);
+  let unvisited = residents.map((_, idx) => idx);
   let optimizedRouteIndices = [];
   let currentIdx = -1;
 
@@ -154,16 +185,16 @@ exports.createAssignment = asyncHandler(async (req, res) => {
     currentIdx = nearestIdx;
   }
 
-  // STEP 5 — Build stops array
+  // STEP 5 — Build stops array from residents
   const stops = optimizedRouteIndices.map((idx) => {
     const u = residents[idx];
     return {
       userId: u._id,
       address: u.address || "Unknown Address",
       street: u.houseDescription || "",
-      ward: u.ward || "",
-      lga: u.localGovt || "",
-      pollingUnit: u.pollingUnit || "",
+      ward: u.ward || cleanWard,
+      lga: u.localGovt || cleanLga,
+      pollingUnit: u.pollingUnit || (puNames[0] || ""),
       location: u.location,
       status: "Pending",
       collectedAt: null,
@@ -213,6 +244,9 @@ exports.createAssignment = asyncHandler(async (req, res) => {
     driverId: driver._id,
     title: title || `${ward} Collection`,
     area: `${lga} - ${ward}`,
+    lga: cleanLga,
+    ward: cleanWard,
+    pollingUnits: puNames,
     collectionDate: new Date(collectionDate),
     collectionTime: collectionTime || "08:00 AM",
     estimatedDistance: estDistance,
@@ -283,8 +317,16 @@ exports.getAssignmentById = asyncHandler(async (req, res) => {
   const assignment = await Assignment.findById(req.params.id)
     .populate("driverId", "name email phone")
     .populate("zoneId", "name")
-    .populate("stops.householdId")
-    .populate("stops.reportId");
+    .populate({
+      path: "stops.householdId",
+      populate: { path: "userId", select: "name phone email houseType housingType houseDescription numberOfRooms numberOfShops numberOfWorkersRange address ward localGovt pollingUnit" }
+    })
+    .populate({
+      path: "stops.reportId",
+      populate: { path: "userId", select: "name phone email" }
+    })
+    .populate("stops.userId", "name phone email houseType housingType houseDescription numberOfRooms numberOfShops numberOfWorkersRange address ward localGovt pollingUnit")
+    .populate("stops.adminReviewedBy", "name email");
 
   if (!assignment) {
     return res
@@ -427,12 +469,16 @@ exports.updateStopStatus = asyncHandler(async (req, res) => {
       .json({ success: false, message: "Stop not found in this assignment" });
   }
 
+  const wasCompleted = stop.status === "Completed";
   stop.status = status;
   if (collectionNote) {
     stop.collectionNote = collectionNote;
     if (status === "Skipped") stop.skipReason = collectionNote;
   }
-  if (status === "Completed") stop.collectedAt = new Date();
+  if (status === "Completed") {
+    stop.collectedAt = new Date();
+    if (!wasCompleted) await startStopVerification(assignment, stop);
+  }
 
   // If all stops are done, auto-complete the assignment
   const allDone = assignment.stops.every(
@@ -444,13 +490,8 @@ exports.updateStopStatus = asyncHandler(async (req, res) => {
 
   await assignment.save();
 
-  // If the stop is linked to a report, update the report status too
-  if (stop.reportId && status === "Completed") {
-    await Report.findByIdAndUpdate(stop.reportId, {
-      status: "Completed",
-      completedDate: new Date(),
-    });
-  }
+  // NOTE: a linked report is completed only once the admin approves the
+  // collection (see controllers/verification.js -> reviewCollection).
 
   res.json({ success: true, message: "Stop status updated", data: assignment });
 });
@@ -463,23 +504,12 @@ exports.updateStopStatus = asyncHandler(async (req, res) => {
 exports.getNextCollectionDate = asyncHandler(async (req, res) => {
   const user = req.user;
 
-  // Try to find an assignment where this user is explicitly a stop
-  let assignment = await Assignment.findOne({
+  // Find an assignment where this user is explicitly included as a stop
+  const assignment = await Assignment.findOne({
     "stops.userId": user._id,
     collectionDate: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) },
     status: { $in: ["Pending", "InProgress"] },
   }).sort({ collectionDate: 1 });
-
-  // If not found, fall back to matching lga, ward, pollingUnit
-  if (!assignment) {
-    assignment = await Assignment.findOne({
-      "stops.lga": user.localGovt,
-      "stops.ward": user.ward,
-      "stops.pollingUnit": user.pollingUnit,
-      collectionDate: { $gte: new Date(new Date().setHours(0, 0, 0, 0)) },
-      status: { $in: ["Pending", "InProgress"] },
-    }).sort({ collectionDate: 1 });
-  }
 
   if (!assignment) {
     return res.status(404).json({

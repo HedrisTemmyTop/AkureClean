@@ -11,6 +11,7 @@ import { AppButton } from '../../components/AppButton';
 import { AppInput } from '../../components/AppInput';
 import { theme } from '../../theme';
 import { routeService } from '../../services/routeService';
+import { parseApiError } from '../../services/api';
 import { RouteStop } from '../../types';
 import { DriverStackParamList } from '../../navigation/RoleNavigator';
 
@@ -39,6 +40,7 @@ export const StopDetailsScreen: React.FC = () => {
         }
       } catch (e) {
         console.error(e);
+        Alert.alert('Error', parseApiError(e));
       } finally {
         setLoading(false);
       }
@@ -55,10 +57,16 @@ export const StopDetailsScreen: React.FC = () => {
     setIsUpdating(true);
     try {
       await routeService.updateStopStatus(routeId, stopId, status, notes);
-      navigation.goBack();
+      Alert.alert(
+        status === 'Completed' ? 'Stop Completed' : 'Stop Skipped',
+        status === 'Completed'
+          ? 'Stop has been marked as completed.'
+          : 'Stop has been marked as skipped.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
     } catch (e) {
       console.error(e);
-      Alert.alert('Error', 'Could not update stop status.');
+      Alert.alert('Error', parseApiError(e));
       setIsUpdating(false);
     }
   };

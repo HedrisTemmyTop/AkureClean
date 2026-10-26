@@ -1,7 +1,7 @@
-const express = require('express');
-const pickupController = require('../controllers/pickup');
-const protect = require('../middleware/auth');
-const roleGuard = require('../middleware/roleGuard');
+const express = require("express");
+const pickupController = require("../controllers/pickup");
+const protect = require("../middleware/auth");
+const roleGuard = require("../middleware/roleGuard");
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ const router = express.Router();
 // I already handled it in bill.js for both but let's mount it here as well if needed. Actually, paystack uses ONE webhook URL. So we will point it to /api/bills/verify. We can ignore /api/pickup/verify or point it to the same verify handler.
 // I will just point it to the bill webhook for simplicity or import the same controller.
 
-const billController = require('../controllers/bill');
+const billController = require("../controllers/bill");
 /**
  * @swagger
  * /api/pickup/verify:
@@ -25,7 +25,7 @@ const billController = require('../controllers/bill');
  *       500:
  *         description: Server error
  */
-router.post('/verify', billController.verifyWebhook);
+router.post("/verify", billController.verifyWebhook);
 
 router.use(protect);
 
@@ -62,11 +62,37 @@ router.use(protect);
  *       500:
  *         description: Server error
  */
-router.get('/all', roleGuard('admin'), pickupController.getAllPickups);
-router.get('/', roleGuard('driver'), pickupController.getAllAvailablePickups);
-router.post('/', roleGuard('resident'), pickupController.createPickupRequest);
-router.post('/:id/cancel', roleGuard('resident'), pickupController.cancelPickup);
-router.post('/:id/complete', roleGuard('resident'), pickupController.completePickupByResident);
+const availabilityController = require("../controllers/availability");
+
+router.get("/all", roleGuard("admin"), pickupController.getAllPickups);
+router.get(
+  "/available",
+  roleGuard("driver"),
+  pickupController.getAllAvailablePickups,
+);
+router.get(
+  "/available-dates",
+  roleGuard("resident"),
+  availabilityController.getResidentAvailableDates,
+);
+router.get("/", roleGuard("admin", "driver"), (req, res, next) => {
+  if (req.user.role === "admin") {
+    return pickupController.getAllPickups(req, res, next);
+  }
+  return pickupController.getAllAvailablePickups(req, res, next);
+});
+router.post("/", roleGuard("resident"), pickupController.createPickupRequest);
+router.post(
+  "/:id/cancel",
+  roleGuard("resident"),
+  pickupController.cancelPickup,
+);
+router.post(
+  "/:id/collect",
+  roleGuard("driver"),
+  pickupController.markPickupCollected,
+);
+router.post("/:id/reject", roleGuard("driver"), pickupController.rejectPickup);
 /**
  * @swagger
  * /api/pickup/{id}/pay:
@@ -115,7 +141,7 @@ router.post('/:id/complete', roleGuard('resident'), pickupController.completePic
  *       500:
  *         description: Server error
  */
-router.get('/mine', roleGuard('resident'), pickupController.getMyPickups);
+router.get("/mine", roleGuard("resident"), pickupController.getMyPickups);
 
 /**
  * @swagger
@@ -135,9 +161,13 @@ router.get('/mine', roleGuard('resident'), pickupController.getMyPickups);
  *       500:
  *         description: Server error
  */
-router.get('/driver', roleGuard('driver'), pickupController.getDriverPickups);
-router.get('/collector/:id', roleGuard('admin'), pickupController.getCollectorPickups);
-router.get('/:id', pickupController.getPickupById);
+router.get("/driver", roleGuard("driver"), pickupController.getDriverPickups);
+router.get(
+  "/collector/:id",
+  roleGuard("admin"),
+  pickupController.getCollectorPickups,
+);
+router.get("/:id", pickupController.getPickupById);
 /**
  * @swagger
  * /api/pickup/{id}/respond:
@@ -177,6 +207,10 @@ router.get('/:id', pickupController.getPickupById);
  *       500:
  *         description: Server error
  */
-router.put('/:id/respond', roleGuard('driver'), pickupController.respondToPickup);
+router.put(
+  "/:id/respond",
+  roleGuard("driver"),
+  pickupController.respondToPickup,
+);
 
 module.exports = router;

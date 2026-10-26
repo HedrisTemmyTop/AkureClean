@@ -191,6 +191,11 @@ export const AdminAssignmentDetailsScreen: React.FC = () => {
                 <AppText variant="body" weight="600">
                   {stop.address}
                 </AppText>
+                {stop.residentName ? (
+                  <AppText variant="caption" color={theme.colors.textSecondary}>
+                    Resident: {stop.residentName}
+                  </AppText>
+                ) : null}
                 <AppText variant="caption" color={theme.colors.textSecondary}>
                   Waste Type: {stop.wasteType}
                 </AppText>

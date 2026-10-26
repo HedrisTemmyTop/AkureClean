@@ -28,11 +28,28 @@ export const LoginScreen: React.FC = () => {
     }
     setIsLoading(true);
     try {
-      console.log("login response", email.trim().toLowerCase(), password);
-      await login(email.trim().toLowerCase(), password);
+      const normalizedEmail = email.trim().toLowerCase();
+      await login(normalizedEmail, password);
       // Navigation handled automatically by AuthContext state change
-    } catch (e) {
-      Alert.alert("Login Failed", parseApiError(e));
+    } catch (e: any) {
+      if (e?.response?.data?.requiresVerification) {
+        const unverifiedEmail =
+          e?.response?.data?.email || email.trim().toLowerCase();
+        Alert.alert(
+          "Verify Your Email",
+          e?.response?.data?.message ||
+            "Please verify your email address with the 6-digit code sent to your inbox.",
+          [
+            {
+              text: "Enter OTP",
+              onPress: () =>
+                navigation.navigate("VerifyEmail", { email: unverifiedEmail }),
+            },
+          ],
+        );
+      } else {
+        Alert.alert("Login Failed", parseApiError(e));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +86,7 @@ export const LoginScreen: React.FC = () => {
             autoCapitalize="none"
           />
         </View>
-        <View style={{ marginBottom: theme.spacing.md }}>
+        <View style={{ marginBottom: theme.spacing.xs }}>
           <AppInput
             label="Password"
             placeholder="Enter your password"
@@ -78,6 +95,19 @@ export const LoginScreen: React.FC = () => {
             isPassword
           />
         </View>
+
+        <TouchableOpacity
+          style={{ alignSelf: "flex-end", marginBottom: theme.spacing.md }}
+          onPress={() =>
+            navigation.navigate("ForgotPassword", {
+              email: email.trim() || undefined,
+            })
+          }
+        >
+          <AppText variant="bodySmall" weight="600" color={theme.colors.primary}>
+            Forgot Password?
+          </AppText>
+        </TouchableOpacity>
 
         <AppButton
           title="Sign In"
@@ -88,7 +118,7 @@ export const LoginScreen: React.FC = () => {
         />
       </View>
 
-      <View style={styles.demoSection}>
+      {/* <View style={styles.demoSection}>
         <View style={styles.dividerContainer}>
           <View style={styles.divider} />
           <AppText
@@ -113,7 +143,7 @@ export const LoginScreen: React.FC = () => {
             textStyle={{ textTransform: 'capitalize' }}
           />
         ))}
-      </View>
+      </View> */}
 
       <View style={styles.footer}>
         <AppText variant="body" color={theme.colors.textSecondary}>

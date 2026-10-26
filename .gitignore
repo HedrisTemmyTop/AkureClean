@@ -28,3 +28,9 @@ client/android/
 server/node_modules/
 server/dist/
 server/.env
+
+# Web
+web/node_modules/
+web/dist/
+web/.env
+web/.env*.local

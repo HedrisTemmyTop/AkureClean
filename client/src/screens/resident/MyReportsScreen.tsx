@@ -64,8 +64,10 @@ export const MyPickupsScreen: React.FC = () => {
             status: (p.status.charAt(0).toUpperCase() +
               p.status.slice(1)) as RequestStatus,
             type: p.type as any,
-            street: p.address,
+            street: p.address || (p.userId as any)?.address || "Special Pickup",
             requestedDate: (p as any).createdAt || new Date().toISOString(),
+            scheduledDate: p.scheduledDate,
+            scheduledTime: p.scheduledTime,
             severity: "Medium",
             locationId: "",
             cost: p.extraFee,

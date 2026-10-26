@@ -65,6 +65,7 @@ export const AdminCollectorDetailsScreen: React.FC = () => {
       setPickups(driverPickups);
     } catch (e) {
       console.error(e);
+      RNAlert.alert("Error", parseApiError(e));
     } finally {
       setLoading(false);
     }

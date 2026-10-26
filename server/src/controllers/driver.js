@@ -1,6 +1,7 @@
 const Assignment = require("../models/Assignment");
 const User = require("../models/User");
 const asyncHandler = require("../utils/asyncHandler");
+const { startStopVerification } = require("./verification");
 
 exports.getMyRoute = asyncHandler(async (req, res) => {
   const { assignmentId } = req.query;
@@ -61,8 +62,10 @@ exports.collectHousehold = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: "Stop not found" });
   }
 
+  const wasCompleted = stop.status === 'Completed';
   stop.status = 'Completed';
   stop.collectedAt = new Date();
+  if (!wasCompleted) await startStopVerification(assignment, stop);
 
   const allDone = assignment.stops.every(
     (s) => s.status === "Completed" || s.status === "Skipped"

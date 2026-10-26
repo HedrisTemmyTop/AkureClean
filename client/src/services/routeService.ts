@@ -28,6 +28,12 @@ function normaliseStop(raw: any) {
     collectionNote: raw.collectionNote,
     skipReason: raw.skipReason,
     reportsCount: raw.reportsCount ?? 1,
+    verificationStatus: raw.verificationStatus ?? 'None',
+    adminNote: raw.adminNote,
+    collectedAt: raw.collectedAt,
+    residentName: raw.userId?.name || raw.householdId?.userId?.name || raw.reportId?.userId?.name,
+    residentPhone: raw.userId?.phone || raw.householdId?.userId?.phone || raw.reportId?.userId?.phone,
+    residentImage: raw.residentImage,
   };
 }
 

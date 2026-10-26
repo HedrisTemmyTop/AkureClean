@@ -61,7 +61,7 @@ export const DriverDashboard: React.FC = () => {
       setActiveRoute(routeData);
 
       const pickups = await pickupService.getDriverPickups();
-      setPendingRequests(pickups.length);
+      setPendingRequests(pickups.count);
     } catch (e) {
       console.error("CollectorDashboard load error:", e);
     }
@@ -209,7 +209,7 @@ export const DriverDashboard: React.FC = () => {
             <Truck color={theme.colors.primary} size={32} />
           </View>
           <AppText variant="h3" align="center" style={{ marginTop: 16 }}>
-            Ready to Roll?
+            Ready to Workl?
           </AppText>
           <AppText
             variant="bodySmall"

@@ -29,6 +29,7 @@ import { scheduleService } from "../../services/scheduleService";
 import { routeService } from "../../services/routeService";
 import { pickupService } from "../../services/pickupService";
 import { billService } from "../../services/billService";
+import { verificationService } from "../../services/verificationService";
 import { ResidentStackParamList } from "../../navigation/RoleNavigator";
 
 type NavigationProp = NativeStackNavigationProp<
@@ -115,6 +116,23 @@ export const ResidentDashboard: React.FC = () => {
     loadDashboardData();
   }, [user]);
 
+  const [pendingConfirmations, setPendingConfirmations] = useState(0);
+
+  const loadPendingConfirmations = async () => {
+    try {
+      const items = await verificationService.getResidentPending();
+      setPendingConfirmations(items.length);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    loadPendingConfirmations();
+    const unsubscribe = navigation.addListener("focus", loadPendingConfirmations);
+    return unsubscribe;
+  }, [navigation]);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await loadDashboardData();
@@ -130,6 +148,29 @@ export const ResidentDashboard: React.FC = () => {
         ),
       }}
     >
+      {pendingConfirmations > 0 && (
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate("ConfirmCollection" as any)}
+          style={{
+            backgroundColor: theme.colors.primary + "15",
+            borderColor: theme.colors.primary + "40",
+            borderWidth: 1,
+            borderRadius: theme.borderRadius.md,
+            padding: theme.spacing.md,
+            marginBottom: theme.spacing.md,
+          }}
+        >
+          <AppText variant="body" weight="600" color={theme.colors.primary}>
+            {pendingConfirmations} collection
+            {pendingConfirmations > 1 ? "s" : ""} to confirm
+          </AppText>
+          <AppText variant="caption" color={theme.colors.textSecondary}>
+            The driver marked your waste as collected. Tap to confirm.
+          </AppText>
+        </TouchableOpacity>
+      )}
+
       <Animatable.View animation="fadeInDown" delay={100} style={styles.header}>
         <View style={styles.headerTop}>
           <View>
@@ -150,47 +191,60 @@ export const ResidentDashboard: React.FC = () => {
           iterationCount="infinite"
           delay={150}
         >
-          <AppCard
-            style={[
-              styles.alertCard,
-              {
-                backgroundColor: theme.colors.success + "10",
-                borderColor: theme.colors.success + "40",
-              },
-            ]}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() =>
+              navigation.navigate("PickupDetails" as any, {
+                reportId: activePickup.id || activePickup._id,
+                isSpecialPickup: true,
+              })
+            }
           >
-            <View style={{ flex: 1 }}>
-              <AppText variant="body" weight="600" color={theme.colors.success}>
-                Collector is on the way!
-              </AppText>
-              <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-                Your {activePickup.type} pickup was accepted.
-              </AppText>
-              <TouchableOpacity
-                style={styles.pickedUpBtn}
-                onPress={async () => {
-                  try {
-                    await pickupService.completePickupByResident(
-                      activePickup.id,
-                    );
-                    Alert.alert("Success", "Pickup confirmed! Thank you.");
-                    loadDashboardData();
-                  } catch (e) {
-                    Alert.alert("Error", "Could not complete pickup.");
-                  }
-                }}
-              >
+            <AppCard
+              style={[
+                styles.alertCard,
+                {
+                  backgroundColor:
+                    activePickup.status === "collected"
+                      ? theme.colors.status.pending + "15"
+                      : theme.colors.success + "10",
+                  borderColor:
+                    activePickup.status === "collected"
+                      ? theme.colors.status.pending + "50"
+                      : theme.colors.success + "40",
+                },
+              ]}
+            >
+              <View style={{ flex: 1 }}>
                 <AppText
-                  variant="bodySmall"
-                  weight="700"
-                  color={theme.colors.surface}
+                  variant="body"
+                  weight="600"
+                  color={
+                    activePickup.status === "collected"
+                      ? theme.colors.status.pending
+                      : theme.colors.success
+                  }
                 >
-                  MARK AS PICKED UP
+                  {activePickup.status === "collected"
+                    ? "Waste Picked Up — Please Confirm!"
+                    : "Collector is on the way!"}
                 </AppText>
-              </TouchableOpacity>
-            </View>
-            <Truck color={theme.colors.success} size={24} />
-          </AppCard>
+                <AppText variant="bodySmall" color={theme.colors.textSecondary}>
+                  {activePickup.status === "collected"
+                    ? "Tap to confirm collection or report an issue."
+                    : `Your ${activePickup.type || "waste"} pickup was accepted.`}
+                </AppText>
+              </View>
+              <Truck
+                color={
+                  activePickup.status === "collected"
+                    ? theme.colors.status.pending
+                    : theme.colors.success
+                }
+                size={24}
+              />
+            </AppCard>
+          </TouchableOpacity>
         </Animatable.View>
       )}
 
@@ -265,7 +319,7 @@ export const ResidentDashboard: React.FC = () => {
             {resolvedReports}
           </AppText>
           <AppText variant="bodySmall" color={theme.colors.textSecondary}>
-            Resolved
+            Resolved Pickup Request
           </AppText>
         </AppCard>
       </View>

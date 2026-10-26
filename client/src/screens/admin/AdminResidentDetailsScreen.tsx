@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { ScreenContainer } from '../../components/ScreenContainer';
 import { AppText } from '../../components/AppText';
@@ -8,6 +8,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { theme } from '../../theme';
 import { adminService } from '../../services/adminService';
 import { pickupService } from '../../services/pickupService';
+import { parseApiError } from '../../services/api';
 import { User, PickupRequestData } from '../../types';
 import { User as UserIcon, MapPin, Phone, Mail, Clock, Home } from 'lucide-react-native';
 
@@ -34,6 +35,7 @@ export const AdminResidentDetailsScreen: React.FC = () => {
         setPickups(residentPickups);
       } catch (e) {
         console.error(e);
+        Alert.alert('Error', parseApiError(e));
       } finally {
         setLoading(false);
       }
@@ -54,9 +56,11 @@ export const AdminResidentDetailsScreen: React.FC = () => {
         <AppText variant="caption" color={theme.colors.textSecondary}>
           Driver: {item.driverId?.name || 'Unassigned'}
         </AppText>
+        {/* Fee commented out per requirements
         <AppText variant="caption" color={theme.colors.textSecondary}>
           Fee: ₦{item.extraFee || 0}
         </AppText>
+        */}
       </View>
     </AppCard>
   );

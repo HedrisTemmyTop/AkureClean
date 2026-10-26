@@ -81,6 +81,30 @@ router.post('/login', [
   check('password', 'Password is required').exists()
 ], authController.login);
 
+router.post('/admin/login', [
+  check('email', 'Please include a valid email').isEmail(),
+  check('password', 'Password is required').exists()
+], authController.adminLogin);
+
+router.post('/verify-email', [
+  check('email', 'Please include a valid email').isEmail(),
+  check('otp', '6-digit verification code is required').isLength({ min: 6, max: 6 })
+], authController.verifyEmail);
+
+router.post('/resend-verification', [
+  check('email', 'Please include a valid email').isEmail()
+], authController.resendVerificationOtp);
+
+router.post('/forgot-password', [
+  check('email', 'Please include a valid email').isEmail()
+], authController.forgotPassword);
+
+router.post('/reset-password', [
+  check('email', 'Please include a valid email').isEmail(),
+  check('otp', '6-digit reset code is required').isLength({ min: 6, max: 6 }),
+  check('newPassword', 'Please enter a password with 6 or more characters').isLength({ min: 6 })
+], authController.resetPassword);
+
 /**
  * @swagger
  * /api/auth/refresh:

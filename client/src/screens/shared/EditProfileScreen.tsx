@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert, ScrollView, Modal, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Animatable from 'react-native-animatable';
@@ -9,10 +9,18 @@ import { AppInput } from '../../components/AppInput';
 import { AppButton } from '../../components/AppButton';
 import { theme } from '../../theme';
 import { useAuth } from '../../context/AuthContext';
+import { parseApiError } from '../../services/api';
+import { locationService, StructuredLocationsMap } from '../../services/locationService';
 
 export const EditProfileScreen: React.FC = () => {
   const { user } = useAuth();
   const navigation = useNavigation();
+
+  const [locationsMap, setLocationsMap] = useState<StructuredLocationsMap>({});
+  const [isLgaModalVisible, setIsLgaModalVisible] = useState(false);
+  const [isWardModalVisible, setIsWardModalVisible] = useState(false);
+  const [isPuModalVisible, setIsPuModalVisible] = useState(false);
+  const [puSearchQuery, setPuSearchQuery] = useState('');
 
   // Initialize state with current user data
   const [name, setName] = useState(user?.name || '');
@@ -34,6 +42,21 @@ export const EditProfileScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { updateProfile } = useAuth();
+
+  useEffect(() => {
+    locationService
+      .getStructuredLocations()
+      .then((res) => setLocationsMap(res))
+      .catch((err) => console.error('Failed to fetch locations:', err));
+  }, []);
+
+  const getWards = (lga: string): string[] => {
+    return Object.keys(locationsMap[lga] || {}).filter((w) => w !== 'Unknown Ward');
+  };
+
+  const getPUs = (lga: string, w: string): string[] => {
+    return (locationsMap[lga]?.[w] || []).filter((p) => p.name).map((p) => p.name);
+  };
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -57,7 +80,7 @@ export const EditProfileScreen: React.FC = () => {
         { text: 'OK', onPress: () => navigation.goBack() }
       ]);
     } catch (e) {
-      Alert.alert('Error', 'Failed to update profile');
+      Alert.alert('Error', parseApiError(e));
     } finally {
       setIsLoading(false);
     }
@@ -190,28 +213,70 @@ export const EditProfileScreen: React.FC = () => {
               />
             </Animatable.View>
 
-            <Animatable.View animation="fadeInLeft" delay={600}>
-              <AppInput
-                label="Local Government"
-                value={localGovt}
-                onChangeText={setLocalGovt}
-              />
+            <Animatable.View animation="fadeInLeft" delay={600} style={{ marginTop: 12 }}>
+              <AppText
+                variant="caption"
+                weight="600"
+                color={theme.colors.textSecondary}
+                style={{ marginBottom: 8 }}
+              >
+                Local Government
+              </AppText>
+              <TouchableOpacity
+                style={styles.selectorBtn}
+                onPress={() => setIsLgaModalVisible(true)}
+              >
+                <AppText
+                  variant="body"
+                  color={localGovt ? theme.colors.text : theme.colors.textSecondary}
+                >
+                  {localGovt || "Select Local Government..."}
+                </AppText>
+              </TouchableOpacity>
             </Animatable.View>
 
-            <Animatable.View animation="fadeInLeft" delay={650}>
-              <AppInput
-                label="Ward"
-                value={ward}
-                onChangeText={setWard}
-              />
+            <Animatable.View animation="fadeInLeft" delay={650} style={{ marginTop: 16 }}>
+              <AppText
+                variant="caption"
+                weight="600"
+                color={theme.colors.textSecondary}
+                style={{ marginBottom: 8 }}
+              >
+                Ward
+              </AppText>
+              <TouchableOpacity
+                style={styles.selectorBtn}
+                onPress={() => localGovt && setIsWardModalVisible(true)}
+              >
+                <AppText
+                  variant="body"
+                  color={ward ? theme.colors.text : theme.colors.textSecondary}
+                >
+                  {ward || "Select Ward..."}
+                </AppText>
+              </TouchableOpacity>
             </Animatable.View>
 
-            <Animatable.View animation="fadeInLeft" delay={700}>
-              <AppInput
-                label="Polling Unit"
-                value={pollingUnit}
-                onChangeText={setPollingUnit}
-              />
+            <Animatable.View animation="fadeInLeft" delay={700} style={{ marginTop: 16 }}>
+              <AppText
+                variant="caption"
+                weight="600"
+                color={theme.colors.textSecondary}
+                style={{ marginBottom: 8 }}
+              >
+                Polling Unit
+              </AppText>
+              <TouchableOpacity
+                style={styles.selectorBtn}
+                onPress={() => ward && setIsPuModalVisible(true)}
+              >
+                <AppText
+                  variant="body"
+                  color={pollingUnit ? theme.colors.text : theme.colors.textSecondary}
+                >
+                  {pollingUnit || "Select Polling Unit..."}
+                </AppText>
+              </TouchableOpacity>
             </Animatable.View>
           </>
         )}
@@ -254,6 +319,122 @@ export const EditProfileScreen: React.FC = () => {
           />
         </Animatable.View>
       </View>
+
+      <Modal
+        visible={isLgaModalVisible}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <AppText variant="h3" style={{ marginBottom: 16 }}>
+              Select Local Government
+            </AppText>
+            <FlatList
+              data={Object.keys(locationsMap)}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => {
+                    setLocalGovt(item);
+                    setWard('');
+                    setPollingUnit('');
+                    setIsLgaModalVisible(false);
+                  }}
+                >
+                  <AppText variant="body">{item}</AppText>
+                </TouchableOpacity>
+              )}
+            />
+            <AppButton
+              title="Close"
+              variant="outline"
+              onPress={() => setIsLgaModalVisible(false)}
+              style={{ marginTop: 16 }}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isWardModalVisible}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <AppText variant="h3" style={{ marginBottom: 16 }}>
+              Select Ward ({localGovt})
+            </AppText>
+            <FlatList
+              data={getWards(localGovt)}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => {
+                    setWard(item);
+                    setPollingUnit('');
+                    setIsWardModalVisible(false);
+                  }}
+                >
+                  <AppText variant="body">{item}</AppText>
+                </TouchableOpacity>
+              )}
+            />
+            <AppButton
+              title="Close"
+              variant="outline"
+              onPress={() => setIsWardModalVisible(false)}
+              style={{ marginTop: 16 }}
+            />
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={isPuModalVisible}
+        animationType="slide"
+        transparent={true}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <AppText variant="h3" style={{ marginBottom: 16 }}>
+              Select Polling Unit
+            </AppText>
+            <AppInput
+              placeholder="Search polling unit..."
+              value={puSearchQuery}
+              onChangeText={setPuSearchQuery}
+            />
+            <FlatList
+              data={getPUs(localGovt, ward).filter((n) =>
+                n.toLowerCase().includes(puSearchQuery.toLowerCase())
+              )}
+              keyExtractor={(item, idx) => `${item}-${idx}`}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.modalItem}
+                  onPress={() => {
+                    setPollingUnit(item);
+                    setIsPuModalVisible(false);
+                    setPuSearchQuery('');
+                  }}
+                >
+                  <AppText variant="body">{item}</AppText>
+                </TouchableOpacity>
+              )}
+            />
+            <AppButton
+              title="Close"
+              variant="outline"
+              onPress={() => setIsPuModalVisible(false)}
+              style={{ marginTop: 16 }}
+            />
+          </View>
+        </View>
+      </Modal>
 
       <Modal
         visible={isHouseTypeModalVisible}

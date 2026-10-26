@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { verificationFields } = require('./verificationFields');
 
 /**
  * Assignment model — maps to the client's `AssignmentRoute` TypeScript type.
@@ -51,6 +52,7 @@ const stopSchema = new mongoose.Schema({
   collectionNote: { type: String },
   reportsCount: { type: Number, default: 1 },
   collectedAt: { type: Date, default: null },
+  ...verificationFields,
 }, { _id: true });
 
 const assignmentSchema = new mongoose.Schema({
@@ -71,6 +73,18 @@ const assignmentSchema = new mongoose.Schema({
   area: {
     type: String,
     required: true,
+  },
+  lga: {
+    type: String,
+    default: "",
+  },
+  ward: {
+    type: String,
+    default: "",
+  },
+  pollingUnits: {
+    type: [String],
+    default: [],
   },
   collectionDate: {
     type: Date,

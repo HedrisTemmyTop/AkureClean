@@ -4,8 +4,13 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import Constants from "expo-constants";
 import { User, Role } from "../types";
-import { authService, RegisterPayload } from "../services/auth";
+import {
+  authService,
+  RegisterPayload,
+  RegisterInitResponse,
+} from "../services/auth";
 import { parseApiError } from "../services/api";
+import { driverLocationSocket } from "../services/driverLocationSocket";
 
 interface AuthContextData {
   user: User | null;
@@ -16,7 +21,8 @@ interface AuthContextData {
     password: string,
     expoPushToken?: string,
   ) => Promise<void>;
-  register: (userData: RegisterPayload) => Promise<void>;
+  register: (userData: RegisterPayload) => Promise<RegisterInitResponse>;
+  verifyEmail: (email: string, otp: string) => Promise<void>;
   updateProfile: (updates: Partial<RegisterPayload>) => Promise<void>;
   signOut: () => Promise<void>;
   deactivateAccount: () => Promise<void>;
@@ -119,7 +125,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
    */
   const signInAs = async (role: Role) => {
     const credentials: Record<Role, { email: string; password: string }> = {
-      resident: { email: "resident01@akureclean.test", password: "test1234" },
+      resident: { email: "resident01@smartenv.test", password: "test1234" },
       driver: { email: "driver@example.com", password: "securepassword123" },
       admin: { email: "admin@example.com", password: "securepassword123" },
     };
@@ -127,9 +133,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await login(email, password);
   };
 
-  const register = async (userData: RegisterPayload) => {
-    const newUser = await authService.register(userData);
-    setUser(newUser);
+  const register = async (
+    userData: RegisterPayload,
+  ): Promise<RegisterInitResponse> => {
+    return await authService.register(userData);
+  };
+
+  const verifyEmail = async (email: string, otp: string) => {
+    const verifiedUser = await authService.verifyEmail(email, otp);
+    setUser(verifiedUser);
     setupPushToken();
   };
 
@@ -139,6 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const signOut = async () => {
+    driverLocationSocket.disconnect();
     await authService.logout();
     setUser(null);
   };
@@ -161,6 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         signInAs,
         login,
         register,
+        verifyEmail,
         updateProfile,
         signOut,
         deactivateAccount,

@@ -79,8 +79,8 @@ export const RequestedPickupsScreen: React.FC = () => {
           <View style={styles.cardHeader}>
             <View>
               <AppText variant="h3" numberOfLines={1} ellipsizeMode="tail">
-                {(item.address.length > 22 &&
-                  item.address.slice(0, 22) + " ...") ||
+                {((item.address?.length || 0) > 22 &&
+                  item.address?.slice(0, 22) + " ...") ||
                   item.address}
               </AppText>
               {item.userId?.name && (
@@ -108,13 +108,6 @@ export const RequestedPickupsScreen: React.FC = () => {
           </View>
 
           <View style={styles.footerRow}>
-            <AppText
-              variant="caption"
-              color={theme.colors.primary}
-              weight="600"
-            >
-              ₦{item.extraFee?.toLocaleString() || "0"}
-            </AppText>
             <ChevronRight size={18} color={theme.colors.textSecondary} />
           </View>
         </AppCard>

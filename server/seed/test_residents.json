@@ -2,7 +2,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a1" },
     "name": "Adewale Ogundimu",
-    "email": "resident01@akureclean.test",
+    "email": "resident01@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234001",
     "role": "resident",
@@ -18,7 +18,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a2" },
     "name": "Funke Adeyemi",
-    "email": "resident02@akureclean.test",
+    "email": "resident02@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234002",
     "role": "resident",
@@ -34,7 +34,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a3" },
     "name": "Chukwuemeka Eze",
-    "email": "resident03@akureclean.test",
+    "email": "resident03@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234003",
     "role": "resident",
@@ -50,7 +50,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a4" },
     "name": "Bisi Afolabi",
-    "email": "resident04@akureclean.test",
+    "email": "resident04@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234004",
     "role": "resident",
@@ -66,7 +66,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a5" },
     "name": "Taiwo Oladele",
-    "email": "resident05@akureclean.test",
+    "email": "resident05@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234005",
     "role": "resident",
@@ -82,7 +82,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a6" },
     "name": "Ngozi Okafor",
-    "email": "resident06@akureclean.test",
+    "email": "resident06@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234006",
     "role": "resident",
@@ -98,7 +98,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a7" },
     "name": "Kehinde Babatunde",
-    "email": "resident07@akureclean.test",
+    "email": "resident07@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234007",
     "role": "resident",
@@ -114,7 +114,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a8" },
     "name": "Amina Suleiman",
-    "email": "resident08@akureclean.test",
+    "email": "resident08@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234008",
     "role": "resident",
@@ -130,7 +130,7 @@
   {
     "_id": { "$oid": "6640000000000000000000a9" },
     "name": "Samuel Adebayo",
-    "email": "resident09@akureclean.test",
+    "email": "resident09@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234009",
     "role": "resident",
@@ -146,7 +146,7 @@
   {
     "_id": { "$oid": "6640000000000000000000aa" },
     "name": "Yetunde Ajayi",
-    "email": "resident10@akureclean.test",
+    "email": "resident10@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234010",
     "role": "resident",
@@ -162,7 +162,7 @@
   {
     "_id": { "$oid": "6640000000000000000000ab" },
     "name": "Ikenna Nwosu",
-    "email": "resident11@akureclean.test",
+    "email": "resident11@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234011",
     "role": "resident",
@@ -178,7 +178,7 @@
   {
     "_id": { "$oid": "6640000000000000000000ac" },
     "name": "Folasade Martins",
-    "email": "resident12@akureclean.test",
+    "email": "resident12@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234012",
     "role": "resident",
@@ -194,7 +194,7 @@
   {
     "_id": { "$oid": "6640000000000000000000ad" },
     "name": "Rotimi Fasanya",
-    "email": "resident13@akureclean.test",
+    "email": "resident13@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234013",
     "role": "resident",
@@ -210,7 +210,7 @@
   {
     "_id": { "$oid": "6640000000000000000000ae" },
     "name": "Damilola Bakare",
-    "email": "resident14@akureclean.test",
+    "email": "resident14@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234014",
     "role": "resident",
@@ -226,7 +226,7 @@
   {
     "_id": { "$oid": "6640000000000000000000af" },
     "name": "Esther Nwofor",
-    "email": "resident15@akureclean.test",
+    "email": "resident15@smartenv.test",
     "password": "$2b$10$TMPRvvcI24tvcieKmChj1OmSK0PgpBhqYltPvG4sOiCicXpQXEDjq",
     "phone": "08031234015",
     "role": "resident",

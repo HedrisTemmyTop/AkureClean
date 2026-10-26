@@ -6,6 +6,7 @@ const osrmService = require('../services/osrm');
 const routeOptimization = require('../services/routeOptimization');
 const notificationService = require('../services/notification');
 const asyncHandler = require('../utils/asyncHandler');
+const { filterPaidResidents } = require('../utils/billing');
 
 exports.generateRoute = asyncHandler(async (req, res) => {
   const { zoneId } = req.params;
@@ -29,9 +30,28 @@ exports.generateRoute = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'A route is already in progress for this zone' });
   }
 
-  const households = await Household.find({ zoneId }).populate('userId', 'expoPushToken');
-  if (households.length === 0) {
+  const allHouseholds = await Household.find({ zoneId }).populate(
+    'userId',
+    'expoPushToken houseType numberOfWorkersRange createdAt'
+  );
+  if (allHouseholds.length === 0) {
     return res.status(400).json({ success: false, message: 'No households found in this zone' });
+  }
+
+  const householdUsers = allHouseholds
+    .map((h) => h.userId)
+    .filter(Boolean);
+  const paidUsers = await filterPaidResidents(householdUsers);
+  const paidUserIds = new Set(paidUsers.map((u) => u._id.toString()));
+
+  const households = allHouseholds.filter(
+    (h) => h.userId && paidUserIds.has(h.userId._id.toString())
+  );
+  if (households.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'No households with paid waste bills found in this zone',
+    });
   }
 
   const depot = { lat: 7.2571, lng: 5.2058 }; // Hardcoded depot

@@ -40,6 +40,7 @@ import { RouteScreen } from "../screens/driver/RouteScreen";
 import { StopDetailsScreen } from "../screens/driver/StopDetailsScreen";
 import { RouteCompletionSummaryScreen } from "../screens/driver/RouteCompletionSummaryScreen";
 import { DriverNotificationsScreen } from "../screens/driver/DriverNotificationsScreen";
+import { DriverAvailabilityScreen } from "../screens/driver/DriverAvailabilityScreen";
 import { AdminDashboard } from "../screens/admin/AdminDashboard";
 import { AdminAssignmentsScreen } from "../screens/admin/AdminAssignmentsScreen";
 import { AdminAssignmentDetailsScreen } from "../screens/admin/AdminAssignmentDetailsScreen";
@@ -58,11 +59,14 @@ import { AdminResidentsScreen } from "../screens/admin/AdminResidentsScreen";
 import { AdminResidentDetailsScreen } from "../screens/admin/AdminResidentDetailsScreen";
 import { AdminPaymentsScreen } from "../screens/admin/AdminPaymentsScreen";
 import { AdminPaymentDetailsScreen } from "../screens/admin/AdminPaymentDetailsScreen";
+import { AdminVerificationsScreen } from "../screens/admin/AdminVerificationsScreen";
+import { AdminDriverAvailabilityScreen } from "../screens/admin/AdminDriverAvailabilityScreen";
+import { ConfirmCollectionScreen } from "../screens/resident/ConfirmCollectionScreen";
 
 export type ResidentStackParamList = {
   ResidentTabs: undefined;
   RequestPickup: undefined;
-  PickupDetails: { reportId: string };
+  PickupDetails: { reportId: string; isSpecialPickup?: boolean };
   Payment: { reportId: string };
   PaystackCheckout: {
     amount: number;
@@ -73,6 +77,7 @@ export type ResidentStackParamList = {
   WasteBillPayment: undefined;
   TransactionDetails: { billId: string };
   EditProfile: undefined;
+  ConfirmCollection: undefined;
 };
 
 export type DriverStackParamList = {
@@ -82,6 +87,7 @@ export type DriverStackParamList = {
   StopDetails: { routeId: string; stopId: string };
   RequestDetails: { requestId: string };
   RouteSummary: { routeId: string };
+  DriverAvailability: undefined;
   EditProfile: undefined;
 };
 
@@ -103,6 +109,8 @@ export type AdminStackParamList = {
   AdminPickupsList: undefined;
   AdminPickupDetails: { pickupId: string };
   AdminStopDetails: { routeId: string; stopId: string };
+  AdminVerifications: undefined;
+  AdminDriverAvailability: undefined;
   EditProfile: undefined;
 };
 
@@ -148,6 +156,10 @@ const ResidentStackNav = () => (
       component={TransactionDetailsScreen}
     />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+    <Stack.Screen
+      name="ConfirmCollection"
+      component={ConfirmCollectionScreen}
+    />
   </Stack.Navigator>
 );
 
@@ -161,6 +173,8 @@ const DriverTabs = () => (
         if (route.name === "Dashboard")
           return <Home color={color} size={size} />;
         if (route.name === "Tasks") return <List color={color} size={size} />;
+        if (route.name === "Availability")
+          return <Calendar color={color} size={size} />;
         if (route.name === "Pickup Requests")
           return <Inbox color={color} size={size} />;
         if (route.name === "Alerts") return <Bell color={color} size={size} />;
@@ -171,6 +185,7 @@ const DriverTabs = () => (
   >
     <Tab.Screen name="Dashboard" component={DriverDashboard} />
     <Tab.Screen name="Tasks" component={DriverAssignmentsScreen} />
+    <Tab.Screen name="Availability" component={DriverAvailabilityScreen} />
     <Tab.Screen name="Pickup Requests" component={RequestedPickupsScreen} />
     <Tab.Screen name="Alerts" component={DriverNotificationsScreen} />
     <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -194,6 +209,10 @@ const DriverStackNav = () => (
       name="RouteSummary"
       component={RouteCompletionSummaryScreen}
     />
+    <Stack.Screen
+      name="DriverAvailability"
+      component={DriverAvailabilityScreen}
+    />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>
 );
@@ -208,6 +227,8 @@ const AdminTabs = () => (
         if (route.name === "Dashboard")
           return <Home color={color} size={size} />;
         if (route.name === "Tasks") return <List color={color} size={size} />;
+        if (route.name === "Availability")
+          return <Calendar color={color} size={size} />;
         if (route.name === "Profile")
           return <Settings color={color} size={size} />;
       },
@@ -215,6 +236,10 @@ const AdminTabs = () => (
   >
     <Tab.Screen name="Dashboard" component={AdminDashboard} />
     <Tab.Screen name="Tasks" component={AdminAssignmentsScreen} />
+    <Tab.Screen
+      name="Availability"
+      component={AdminDriverAvailabilityScreen}
+    />
     <Tab.Screen name="Profile" component={ProfileScreen} />
   </Tab.Navigator>
 );
@@ -256,6 +281,14 @@ const AdminStackNav = () => (
       component={AdminPickupDetailsScreen}
     />
     <Stack.Screen name="AdminStopDetails" component={AdminStopDetailsScreen} />
+    <Stack.Screen
+      name="AdminVerifications"
+      component={AdminVerificationsScreen}
+    />
+    <Stack.Screen
+      name="AdminDriverAvailability"
+      component={AdminDriverAvailabilityScreen}
+    />
     <Stack.Screen name="EditProfile" component={EditProfileScreen} />
   </Stack.Navigator>
 );

@@ -1,0 +1,323 @@
+[
+  {
+    "name": "Doctor Kinga",
+    "email": "mtkinga@futa.edu.ng",
+    "role": "resident",
+    "pollingUnit": "ALAKURE COMPREHENSIVE HIGH SCHOOL",
+    "password": "password123"
+  },
+  {
+    "name": "Mr Wale",
+    "email": "wale@gmail.com",
+    "role": "admin",
+    "password": "password123"
+  },
+  {
+    "name": "Olajide Tunde",
+    "email": "tunde@gmail.com",
+    "role": "driver",
+    "pollingUnit": "",
+    "password": "password123"
+  },
+  {
+    "name": "Mr Wale",
+    "email": "wale1@gmail.com",
+    "role": "driver",
+    "pollingUnit": "",
+    "password": "password123"
+  },
+  {
+    "name": "Olalekan Yekeen",
+    "email": "olalekan@gmail.com",
+    "role": "driver",
+    "pollingUnit": "",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 1",
+    "email": "futa1@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 1",
+    "email": "futa1_1784476232099@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 2",
+    "email": "futa2_1784476232115@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 3",
+    "email": "futa3_1784476232121@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 4",
+    "email": "futa4_1784476232125@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 5",
+    "email": "futa5_1784476232127@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 6",
+    "email": "futa6_1784476232132@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 7",
+    "email": "futa7_1784476232134@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 8",
+    "email": "futa8_1784476232137@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 9",
+    "email": "futa9_1784476232140@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 10",
+    "email": "futa10_1784476232142@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 11",
+    "email": "futa11_1784476232144@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 12",
+    "email": "futa12_1784476232147@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 13",
+    "email": "futa13_1784476232149@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 14",
+    "email": "futa14_1784476232151@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 15",
+    "email": "futa15_1784476232153@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 16",
+    "email": "futa16_1784476232155@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 17",
+    "email": "futa17_1784476232157@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 18",
+    "email": "futa18_1784476232160@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 19",
+    "email": "futa19_1784476232162@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 20",
+    "email": "futa20_1784476232164@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 1",
+    "email": "futa1_1784476273542@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 2",
+    "email": "futa2_1784476273555@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 3",
+    "email": "futa3_1784476273560@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 4",
+    "email": "futa4_1784476273564@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 5",
+    "email": "futa5_1784476273566@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 6",
+    "email": "futa6_1784476273570@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 7",
+    "email": "futa7_1784476273572@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 8",
+    "email": "futa8_1784476273574@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 9",
+    "email": "futa9_1784476273576@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 10",
+    "email": "futa10_1784476273578@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 11",
+    "email": "futa11_1784476273580@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 12",
+    "email": "futa12_1784476273582@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 13",
+    "email": "futa13_1784476273583@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 14",
+    "email": "futa14_1784476273585@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 15",
+    "email": "futa15_1784476273587@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 16",
+    "email": "futa16_1784476273588@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 17",
+    "email": "futa17_1784476273590@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 18",
+    "email": "futa18_1784476273591@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 19",
+    "email": "futa19_1784476273592@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  },
+  {
+    "name": "FUTA Resident 20",
+    "email": "futa20_1784476273594@example.com",
+    "role": "resident",
+    "pollingUnit": "FUTA Gate",
+    "password": "password123"
+  }
+]

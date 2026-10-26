@@ -7,9 +7,18 @@ const { logActivity } = require("../utils/logger");
 const asyncHandler = require("../utils/asyncHandler");
 const { validationResult } = require("express-validator");
 const Assignment = require("../models/Assignment");
+const { uploadImage } = require("../services/imageUpload");
+const { notifyPickupResident } = require("./verification");
+const {
+  getAvailableSlotsForResidentData,
+  getDriverCoverage,
+  normalizeStr,
+  escapeRegex,
+  getTodayStr,
+} = require("./availability");
 
 exports.createPickupRequest = asyncHandler(async (req, res) => {
-  const { type, notes, scheduledDate, scheduledTime, amount } = req.body;
+  const { type, notes, scheduledDate, scheduledTime, amount, image } = req.body;
   const user = req.user;
 
   // Instead of strict Household lookup, we use address/location from user profile
@@ -21,22 +30,55 @@ exports.createPickupRequest = asyncHandler(async (req, res) => {
     });
   }
 
+  if (!user.pollingUnit || !user.localGovt) {
+    return res.status(400).json({
+      success: false,
+      message:
+        "Please update your profile with your Local Government and Polling Unit before requesting a pickup.",
+    });
+  }
+
+  // Enforce that the resident selects one of the available days for the driver assigned to their Polling Unit & Local Govt
+  const availabilityInfo = await getAvailableSlotsForResidentData(user);
+  if (availabilityInfo.availableDates.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message:
+        availabilityInfo.message ||
+        "No available pickup days found for your Polling Unit and Local Government this month.",
+    });
+  }
+
+  const cleanDate = (scheduledDate || "").trim();
+  if (!cleanDate || !availabilityInfo.availableDates.includes(cleanDate)) {
+    return res.status(400).json({
+      success: false,
+      message: `Please select one of the available pickup days set by your assigned collector (${availabilityInfo.availableDates.join(", ")}).`,
+    });
+  }
+
+  const matchedSlot = availabilityInfo.availableSlots.find(
+    (s) => s.date === cleanDate
+  );
+
+  const imageUrl = await uploadImage(image, "smartenv/pickups");
+
   const pickup = await PickupRequest.create({
     userId: user._id,
     type: type || "General",
     notes: notes || "",
+    image: imageUrl,
     address: user.address,
     localGovt: user.localGovt,
     ward: user.ward,
     pollingUnit: user.pollingUnit,
-    scheduledDate,
-    scheduledTime,
+    scheduledDate: cleanDate,
+    scheduledTime: scheduledTime || matchedSlot?.timeSlot || "08:00 AM",
     householdId: null,
-    extraFee: amount || 1500,
+    extraFee: amount ? Number(amount) : 0,
   });
 
   // Try to find household for legacy tracking but don't fail if missing
-  const Household = require("../models/Household");
   const household = await Household.findOne({ userId: user._id });
   if (household) {
     pickup.householdId = household._id;
@@ -46,7 +88,7 @@ exports.createPickupRequest = asyncHandler(async (req, res) => {
   await logActivity(
     req.user._id,
     "Request Pickup",
-    `Requested a new ${type || "General"} pickup`,
+    `Requested a new ${type || "General"} pickup for ${cleanDate}`,
   );
 
   res.status(201).json({
@@ -58,60 +100,90 @@ exports.createPickupRequest = asyncHandler(async (req, res) => {
 
 // payPickupFee removed as payment is physical
 
+/**
+ * Polling units and Local Govts on the driver's assigned routes.
+ * Only the driver assigned to that Polling Unit and Local Govt can see and accept pickups.
+ */
+const getDriverAreaMatchers = async (driverId) => {
+  const coverage = await getDriverCoverage(driverId);
+
+  const puRegexes = coverage.pollingUnits.map(
+    (pu) => new RegExp(`^${escapeRegex(pu)}$`, "i"),
+  );
+  const lgaRegexes = coverage.localGovts.map(
+    (lga) => new RegExp(`^${escapeRegex(lga)}$`, "i"),
+  );
+
+  return {
+    puRegexes,
+    lgaRegexes,
+    normPUs: new Set(coverage.pollingUnits.map((p) => normalizeStr(p))),
+    normLgas: new Set(coverage.localGovts.map((l) => normalizeStr(l))),
+  };
+};
+
+const pickupOnRoute = (pickup, matchers) => {
+  const pPu = normalizeStr(pickup.pollingUnit || pickup.userId?.pollingUnit);
+  const pLga = normalizeStr(pickup.localGovt || pickup.userId?.localGovt);
+  if (!pPu || !matchers.normPUs.has(pPu)) return false;
+  if (pLga && matchers.normLgas.size > 0 && !matchers.normLgas.has(pLga)) {
+    return false;
+  }
+  return true;
+};
+
 exports.getAllAvailablePickups = asyncHandler(async (req, res) => {
-  const driverId = req.user._id; // or however you get the driver from the request
+  const matchers = await getDriverAreaMatchers(req.user._id);
 
-  // Step 1 — Get the driver's last assignment
-  const lastAssignment = await Assignment.findOne({ driverId })
-    .sort({ createdAt: -1 })
-    .lean();
-
-  if (!lastAssignment) {
+  if (matchers.puRegexes.length === 0) {
     return res.json({ success: true, data: [] });
   }
 
-  // Step 2 — Extract polling units from the assignment's stops
-  const pollingUnits = [
-    ...new Set(lastAssignment.stops.map((s) => s.pollingUnit).filter(Boolean)),
-  ];
-  const pollingUnitRegexes = pollingUnits.map(
-    (pu) => new RegExp(pu.replace(/\s+/g, "\\s+"), "i"),
-  );
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayStr();
 
-  const pickups = await PickupRequest.find({
+  const query = {
     status: "pending",
-    pollingUnit: { $in: pollingUnitRegexes },
+    pollingUnit: { $in: matchers.puRegexes },
     $or: [
       { scheduledDate: { $gte: today } },
       { scheduledDate: { $exists: false } },
       { scheduledDate: "" },
     ],
-  }).populate("userId", "name phone address localGovt ward pollingUnit");
-  console.log("pickups", pickups);
+  };
+
+  if (matchers.lgaRegexes.length > 0) {
+    query.localGovt = { $in: matchers.lgaRegexes };
+  }
+
+  const pickups = await PickupRequest.find(query)
+    .populate("userId", "name phone address localGovt ward pollingUnit")
+    .sort({ scheduledDate: 1, createdAt: -1 });
+
   res.json({
     success: true,
     data: pickups,
   });
 });
-exports.getDriverPickups = asyncHandler(async (req, res) => {
-  const driverId = req.user._id;
 
-  // Check if this driver has an active (accepted) pickup
-  const activePickup = await PickupRequest.findOne({
-    driverId: driverId,
+exports.getDriverPickups = asyncHandler(async (req, res) => {
+  // All pickups this driver has accepted and still needs to collect
+  const activePickups = await PickupRequest.find({
+    driverId: req.user._id,
     status: "accepted",
-  }).populate("userId", "name phone address localGovt ward pollingUnit");
+  })
+    .populate("userId", "name phone address localGovt ward pollingUnit")
+    .sort({ acceptedAt: 1 });
 
   res.json({
     success: true,
-    data: activePickup ? [activePickup] : [],
-    hasActive: !!activePickup,
+    data: activePickups,
+    hasActive: activePickups.length > 0,
+    count: activePickups.length,
   });
 });
 
 exports.getAllPickups = asyncHandler(async (req, res) => {
-  const { startDate, endDate } = req.query;
+  const { startDate, endDate, status } = req.query;
 
   const filter = {};
   if (startDate && endDate) {
@@ -120,9 +192,12 @@ exports.getAllPickups = asyncHandler(async (req, res) => {
       $lte: new Date(endDate),
     };
   }
+  if (status && status !== "all") {
+    filter.status = status;
+  }
 
   const pickups = await PickupRequest.find(filter)
-    .populate("userId", "name phone address localGovt ward pollingUnit")
+    .populate("userId", "name phone email address localGovt ward pollingUnit houseDescription")
     .populate("driverId", "name phone")
     .sort({ createdAt: -1 });
 
@@ -144,25 +219,12 @@ exports.respondToPickup = asyncHandler(async (req, res) => {
 
   const pickup = await PickupRequest.findById(id).populate(
     "userId",
-    "expoPushToken",
+    "expoPushToken localGovt ward pollingUnit",
   );
   if (!pickup) {
     return res
       .status(404)
       .json({ success: false, message: "Pickup request not found" });
-  }
-
-  // Check if driver already has an active pickup
-  const active = await PickupRequest.findOne({
-    driverId: req.user._id,
-    status: "accepted",
-  });
-  if (active) {
-    return res.status(400).json({
-      success: false,
-      message:
-        "You must complete your current pickup before accepting a new one.",
-    });
   }
 
   // Check if pickup is still pending
@@ -173,8 +235,19 @@ exports.respondToPickup = asyncHandler(async (req, res) => {
     });
   }
 
+  // Only the driver assigned to this polling unit and local govt may accept it
+  const matchers = await getDriverAreaMatchers(req.user._id);
+  if (!pickupOnRoute(pickup, matchers)) {
+    return res.status(403).json({
+      success: false,
+      message:
+        "This pickup is not in your assigned Polling Unit and Local Government.",
+    });
+  }
+
   pickup.status = "accepted";
   pickup.driverId = req.user._id;
+  pickup.acceptedAt = new Date();
   await pickup.save();
   if (pickup.userId.expoPushToken) {
     await notificationService.sendPushNotification(
@@ -203,12 +276,14 @@ exports.respondToPickup = asyncHandler(async (req, res) => {
   });
 });
 
-exports.completePickupByResident = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-
+/**
+ * Driver marks an accepted pickup as collected.
+ * It then waits for the resident to confirm and the admin to approve.
+ */
+exports.markPickupCollected = asyncHandler(async (req, res) => {
   const pickup = await PickupRequest.findOne({
-    _id: id,
-    userId: req.user._id,
+    _id: req.params.id,
+    driverId: req.user._id,
   });
 
   if (!pickup) {
@@ -220,22 +295,75 @@ exports.completePickupByResident = asyncHandler(async (req, res) => {
   if (pickup.status !== "accepted") {
     return res.status(400).json({
       success: false,
-      message: "Pickup must be accepted before completion",
+      message: "Only accepted pickups can be marked as collected",
     });
   }
 
-  pickup.status = "completed";
+  pickup.status = "collected";
+  pickup.collectedAt = new Date();
+  pickup.verificationStatus = "AwaitingResident";
   await pickup.save();
 
-  await logActivity(
-    req.user._id,
-    "Complete Pickup",
-    `Marked pickup as completed`,
+  await notifyPickupResident(
+    pickup,
+    "Please confirm your pickup",
+    "The driver marked your requested pickup as collected. Please confirm that your waste was collected.",
   );
+
+  await logActivity(req.user._id, "Collect Pickup", `Marked pickup as collected`);
 
   res.json({
     success: true,
-    message: "Pickup marked as completed",
+    message: "Pickup marked as collected",
+    data: pickup,
+  });
+});
+
+/**
+ * Driver could not collect (bin not out, wrong waste type, ...).
+ * The resident is notified and can re-request; the admin can see it.
+ */
+exports.rejectPickup = asyncHandler(async (req, res) => {
+  const { reason } = req.body;
+  if (!reason || !reason.trim()) {
+    return res
+      .status(400)
+      .json({ success: false, message: "A reason is required" });
+  }
+
+  const pickup = await PickupRequest.findOne({
+    _id: req.params.id,
+    driverId: req.user._id,
+  });
+
+  if (!pickup) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Pickup not found" });
+  }
+
+  if (pickup.status !== "accepted") {
+    return res.status(400).json({
+      success: false,
+      message: "Only accepted pickups can be rejected",
+    });
+  }
+
+  pickup.status = "rejected";
+  pickup.driverRejectReason = reason.trim();
+  await pickup.save();
+
+  await notifyPickupResident(
+    pickup,
+    "Pickup could not be completed",
+    `The driver could not collect your pickup: ${reason.trim()}. You can submit a new request.`,
+  );
+
+  await logActivity(req.user._id, "Reject Pickup", `Rejected pickup: ${reason.trim()}`);
+
+  res.json({
+    success: true,
+    message: "Pickup rejected",
     data: pickup,
   });
 });

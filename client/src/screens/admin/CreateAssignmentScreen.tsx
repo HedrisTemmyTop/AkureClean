@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -30,27 +30,37 @@ import { User, AssignmentRoute } from "../../types";
 import { adminService } from "../../services/adminService";
 import { assignmentService } from "../../services/routeService";
 import { parseApiError } from "../../services/api";
-import pollingUnitsData from "../../data/polling_units_structured.json";
-
-// ── static data ───────────────────────────────────────────────────────────────
-const data = pollingUnitsData as unknown as Record<
-  string,
-  Record<string, any[]>
->;
-const lgas = Object.keys(data);
-
-function getWards(lga: string) {
-  return Object.keys(data[lga] || {}).filter((w) => w !== "Unknown Ward");
-}
-
-function getPUs(lga: string, ward: string): string[] {
-  return (data[lga]?.[ward] || []).filter((p) => p.name).map((p) => p.name);
-}
+import {
+  locationService,
+  StructuredLocationsMap,
+} from "../../services/locationService";
 
 type ActiveModal = "lga" | "ward" | "pollingUnits" | null;
 
 export const CreateAssignmentScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const [locationsMap, setLocationsMap] = useState<StructuredLocationsMap>({});
+
+  useEffect(() => {
+    locationService
+      .getStructuredLocations()
+      .then((res) => setLocationsMap(res))
+      .catch((err) => console.error("Failed to fetch locations:", err));
+  }, []);
+
+  const lgas = Object.keys(locationsMap);
+
+  const getWards = (lga: string) => {
+    return Object.keys(locationsMap[lga] || {}).filter(
+      (w) => w !== "Unknown Ward"
+    );
+  };
+
+  const getPUs = (lga: string, ward: string): string[] => {
+    return (locationsMap[lga]?.[ward] || [])
+      .filter((p) => p.name)
+      .map((p) => p.name);
+  };
 
   // Flow State
   const [step, setStep] = useState<"SEARCH_DRIVER" | "CREATE_FORM">(
@@ -180,7 +190,7 @@ export const CreateAssignmentScreen: React.FC = () => {
             style={{ marginBottom: 16 }}
           />
           <AppText variant="h1" align="center" style={{ marginBottom: 8 }}>
-            Route Generated!
+            Task Created!
           </AppText>
           <AppText
             variant="body"
@@ -322,7 +332,7 @@ export const CreateAssignmentScreen: React.FC = () => {
               COLLECTOR EMAIL
             </AppText>
             <AppInput
-              placeholder="e.g. collector@akureclean.com"
+              placeholder="e.g. collector@smartenv.com"
               value={driverSearchEmail}
               onChangeText={setDriverSearchEmail}
               autoCapitalize="none"
