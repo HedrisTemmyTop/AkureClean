@@ -10,7 +10,12 @@ const options = {
     },
     servers: [
       {
+        url: 'https://akureclean.onrender.com',
+        description: 'Production Server',
+      },
+      {
         url: `http://localhost:${process.env.PORT || 5001}`,
+        description: 'Local Development Server',
       },
     ],
     components: {
