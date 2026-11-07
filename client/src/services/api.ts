@@ -14,10 +14,9 @@ import axios, {
 import { tokenStorage } from "../utils/tokenStorage";
 
 // ─── CONFIG ──────────────────────────────────────────────────────────────────
-// Change this to your machine's LAN IP when testing on a physical device,
+// Uses EXPO_PUBLIC_API_URL if defined, otherwise defaults to production backend on Render
 const rawApiUrl = (
-  process.env.EXPO_PUBLIC_API_URL ||
-  "http://localhost:5001/api"
+  process.env.EXPO_PUBLIC_API_URL || "https://akureclean.onrender.com/api"
 ).trim();
 export const BASE_URL = rawApiUrl
   .replace(/^h+ttps:\/\//i, "https://")

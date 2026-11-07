@@ -31,7 +31,6 @@ const broadcastSchema = new mongoose.Schema(
     },
     targetAudience: {
       type: String,
-      enum: ['all_residents', 'all_users', 'ward', 'pollingUnit', 'drivers'],
       default: 'all_residents',
     },
     targetFilter: {

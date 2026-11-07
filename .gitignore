@@ -23,6 +23,8 @@ client/yarn-error.*
 client/*.tsbuildinfo
 client/ios/
 client/android/
+client/.env
+client/.env*.local
 
 # Server
 server/node_modules/

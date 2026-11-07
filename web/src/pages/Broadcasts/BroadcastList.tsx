@@ -14,8 +14,11 @@ import {
   CheckCircle,
   Clock,
   Radio,
+  MapPin,
+  Globe,
 } from 'lucide-react';
 import { broadcastService, CreateBroadcastPayload } from '../../services/broadcastService';
+import { locationService } from '../../services/locationService';
 import { Broadcast } from '../../types';
 import DataTable from '../../components/common/DataTable';
 import Modal from '../../components/common/Modal';
@@ -58,11 +61,31 @@ export const BroadcastList: React.FC = () => {
   const [priority, setPriority] = useState<'normal' | 'urgent' | 'info'>('normal');
   const [targetAudience, setTargetAudience] = useState<'all_residents' | 'all_users' | 'drivers'>('all_residents');
 
+  // Location Targeting (Optional)
+  const [filterByLocation, setFilterByLocation] = useState(false);
+  const [selectedLga, setSelectedLga] = useState('');
+  const [selectedWard, setSelectedWard] = useState('');
+  const [selectedPu, setSelectedPu] = useState('');
+
   // Queries
   const { data: broadcasts = [], isLoading, error } = useQuery<Broadcast[]>({
     queryKey: ['broadcasts'],
     queryFn: broadcastService.getBroadcasts,
   });
+
+  const { data: locationsData } = useQuery({
+    queryKey: ['structured-locations'],
+    queryFn: locationService.getStructuredLocations,
+  });
+
+  const structuredMap = locationsData?.structured || {};
+  const lgaOptions = Object.keys(structuredMap);
+  const wardOptions = selectedLga
+    ? Object.keys(structuredMap[selectedLga] || {}).filter((w) => w !== 'Unknown Ward')
+    : [];
+  const puOptions = selectedLga && selectedWard
+    ? (structuredMap[selectedLga]?.[selectedWard] || []).map((p) => p.name)
+    : [];
 
   // Mutations
   const createMutation = useMutation({
@@ -94,6 +117,10 @@ export const BroadcastList: React.FC = () => {
     setMessage('');
     setPriority('normal');
     setTargetAudience('all_residents');
+    setFilterByLocation(false);
+    setSelectedLga('');
+    setSelectedWard('');
+    setSelectedPu('');
   };
 
   const handleApplyTemplate = (tmpl: typeof TEMPLATES[0]) => {
@@ -113,6 +140,13 @@ export const BroadcastList: React.FC = () => {
       message: message.trim(),
       priority,
       targetAudience,
+      targetFilter: filterByLocation
+        ? {
+            localGovt: selectedLga || undefined,
+            ward: selectedWard || undefined,
+            pollingUnit: selectedPu || undefined,
+          }
+        : undefined,
     });
   };
 
@@ -188,15 +222,33 @@ export const BroadcastList: React.FC = () => {
       },
       {
         accessorKey: 'targetAudience',
-        header: 'Audience',
+        header: 'Target & Scope',
         cell: (info) => {
           const row = info.row.original;
+          const hasLocation = Boolean(row.targetFilter?.localGovt);
           return (
-            <div className="flex items-center gap-1.5 text-xs text-slate-700 font-medium">
-              <Users className="w-3.5 h-3.5 text-slate-400" />
-              <span>
-                {row.targetAudience === 'all_residents' ? 'All Residents' : row.targetAudience}
-              </span>
+            <div className="flex flex-col gap-1 text-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-slate-800">
+                <Users className="w-3.5 h-3.5 text-slate-400" />
+                <span>
+                  {row.targetAudience === 'all_residents' ? 'All Residents' : row.targetAudience}
+                </span>
+              </div>
+              {hasLocation ? (
+                <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded w-fit border border-emerald-200">
+                  <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
+                  <span>
+                    {row.targetFilter?.localGovt}
+                    {row.targetFilter?.ward ? ` › ${row.targetFilter.ward}` : ''}
+                    {row.targetFilter?.pollingUnit ? ` › ${row.targetFilter.pollingUnit}` : ''}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                  <Globe className="w-3 h-3 text-slate-400 shrink-0" />
+                  <span>City-wide</span>
+                </div>
+              )}
             </div>
           );
         },
@@ -374,6 +426,135 @@ export const BroadcastList: React.FC = () => {
             </div>
           </div>
 
+          {/* Location Targeting (Optional) */}
+          <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={filterByLocation}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setFilterByLocation(checked);
+                    if (!checked) {
+                      setSelectedLga('');
+                      setSelectedWard('');
+                      setSelectedPu('');
+                    }
+                  }}
+                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
+                />
+                <span className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                  Target specific location (LGA, Ward, Polling Unit)
+                </span>
+              </label>
+
+              {filterByLocation && (selectedLga || selectedWard || selectedPu) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedLga('');
+                    setSelectedWard('');
+                    setSelectedPu('');
+                  }}
+                  className="text-[11px] font-semibold text-rose-600 hover:underline"
+                >
+                  Clear Selection
+                </button>
+              )}
+            </div>
+
+            {!filterByLocation ? (
+              <p className="text-[11px] text-slate-500 pl-6">
+                Unchecked: Broadcast is city-wide (sent to all residents). Check the box above if you want to target a specific LGA, Ward, or Polling Unit.
+              </p>
+            ) : (
+              <>
+                <p className="text-[11px] text-slate-500 pl-6">
+                  Select a Local Govt, Ward, or Polling Unit to limit recipients to that area.
+                </p>
+
+                <div className="grid grid-cols-1 gap-3 pt-1">
+                  {/* LGA */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Local Govt (LGA)</label>
+                    <select
+                      value={selectedLga}
+                      onChange={(e) => {
+                        setSelectedLga(e.target.value);
+                        setSelectedWard('');
+                        setSelectedPu('');
+                      }}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    >
+                      <option value="">All LGAs (City-wide)</option>
+                      {lgaOptions.map((lga) => (
+                        <option key={lga} value={lga}>
+                          {lga}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Ward */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Ward (Optional)</label>
+                    <select
+                      value={selectedWard}
+                      disabled={!selectedLga}
+                      onChange={(e) => {
+                        setSelectedWard(e.target.value);
+                        setSelectedPu('');
+                      }}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white disabled:bg-slate-100 disabled:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    >
+                      <option value="">{selectedLga ? `All Wards in ${selectedLga}` : 'Select LGA first'}</option>
+                      {wardOptions.map((w) => (
+                        <option key={w} value={w}>
+                          {w}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Polling Unit */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-600 mb-1">Polling Unit (Optional)</label>
+                    <select
+                      value={selectedPu}
+                      disabled={!selectedWard}
+                      onChange={(e) => setSelectedPu(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs bg-white disabled:bg-slate-100 disabled:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    >
+                      <option value="">{selectedWard ? `All Polling Units in Ward` : 'Select Ward first'}</option>
+                      {puOptions.map((pu) => (
+                        <option key={pu} value={pu}>
+                          {pu}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Scope Summary Preview */}
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <Globe className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>
+                    Scope:{' '}
+                    {selectedPu
+                      ? `${selectedLga} › ${selectedWard} › ${selectedPu}`
+                      : selectedWard
+                      ? `${selectedLga} › ${selectedWard} (All Polling Units)`
+                      : selectedLga
+                      ? `${selectedLga} (All Wards & Polling Units)`
+                      : 'All Registered Residents (City-wide)'}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+
           {/* Title */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1.5">Broadcast Title</label>
@@ -466,6 +647,17 @@ export const BroadcastList: React.FC = () => {
                 {viewingBroadcast.message}
               </p>
             </div>
+
+            {viewingBroadcast.targetFilter?.localGovt && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-medium text-emerald-800">
+                <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>
+                  Target Area: {viewingBroadcast.targetFilter.localGovt}
+                  {viewingBroadcast.targetFilter.ward ? ` › ${viewingBroadcast.targetFilter.ward}` : ''}
+                  {viewingBroadcast.targetFilter.pollingUnit ? ` › ${viewingBroadcast.targetFilter.pollingUnit}` : ''}
+                </span>
+              </div>
+            )}
 
             <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-500">
               <span>Audience: {viewingBroadcast.targetAudience}</span>

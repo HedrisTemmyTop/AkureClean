@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -23,6 +23,12 @@ import {
   Clock,
   Sparkles,
   ChevronLeft,
+  MapPin,
+  ChevronDown,
+  Globe,
+  Search,
+  Check,
+  Filter,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -30,6 +36,7 @@ import { ScreenContainer } from '../../components/ScreenContainer';
 import { AppText } from '../../components/AppText';
 import { theme } from '../../theme';
 import { broadcastService, CreateBroadcastPayload } from '../../services/broadcastService';
+import { locationService, StructuredLocationsMap } from '../../services/locationService';
 import { Broadcast } from '../../types';
 
 const TEMPLATES = [
@@ -66,11 +73,104 @@ export const AdminBroadcastScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Location Data for Optional Filtering
+  const [filterByLocation, setFilterByLocation] = useState(false);
+  const [locationsMap, setLocationsMap] = useState<StructuredLocationsMap>({});
+  const [selectedLga, setSelectedLga] = useState<string>('');
+  const [selectedWard, setSelectedWard] = useState<string>('');
+  const [selectedPu, setSelectedPu] = useState<string>('');
+  const [activePicker, setActivePicker] = useState<'lga' | 'ward' | 'pu' | null>(null);
+  const [pickerSearch, setPickerSearch] = useState('');
+
   // Form Fields
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [priority, setPriority] = useState<'normal' | 'urgent' | 'info'>('normal');
   const [targetAudience, setTargetAudience] = useState<'all_residents' | 'all_users' | 'drivers'>('all_residents');
+
+  useEffect(() => {
+    locationService
+      .getStructuredLocations()
+      .then((res) => {
+        if (res && Object.keys(res).length > 0) {
+          setLocationsMap(res);
+        } else {
+          setLocationsMap(require('../../data/polling_units_structured.json'));
+        }
+      })
+      .catch(() => {
+        setLocationsMap(require('../../data/polling_units_structured.json'));
+      });
+  }, []);
+
+  const lgas = Object.keys(locationsMap || {});
+
+  const getWards = (lga: string) => {
+    return Object.keys(locationsMap[lga] || {}).filter((w) => w !== 'Unknown Ward');
+  };
+
+  const getPUs = (lga: string, ward: string): string[] => {
+    return (locationsMap[lga]?.[ward] || []).map((p: any) =>
+      typeof p === 'string' ? p : p.name
+    );
+  };
+
+  const handleSelectLga = (lga: string) => {
+    setSelectedLga(lga);
+    setSelectedWard('');
+    setSelectedPu('');
+    setActivePicker(null);
+    setPickerSearch('');
+  };
+
+  const handleSelectWard = (ward: string) => {
+    setSelectedWard(ward);
+    setSelectedPu('');
+    setActivePicker(null);
+    setPickerSearch('');
+  };
+
+  const handleSelectPu = (pu: string) => {
+    setSelectedPu(pu);
+    setActivePicker(null);
+    setPickerSearch('');
+  };
+
+  const handleResetLocation = () => {
+    setSelectedLga('');
+    setSelectedWard('');
+    setSelectedPu('');
+  };
+
+  const pickerList = useMemo(() => {
+    if (activePicker === 'lga') {
+      const list = [
+        { label: '🌐 All Local Governments (City-wide)', value: '' },
+        ...lgas.map((l) => ({ label: l, value: l })),
+      ];
+      if (!pickerSearch.trim()) return list;
+      return list.filter((i) => i.label.toLowerCase().includes(pickerSearch.toLowerCase()));
+    }
+    if (activePicker === 'ward') {
+      const wards = selectedLga ? getWards(selectedLga) : [];
+      const list = [
+        { label: `🌐 All Wards in ${selectedLga}`, value: '' },
+        ...wards.map((w) => ({ label: w, value: w })),
+      ];
+      if (!pickerSearch.trim()) return list;
+      return list.filter((i) => i.label.toLowerCase().includes(pickerSearch.toLowerCase()));
+    }
+    if (activePicker === 'pu') {
+      const pus = selectedLga && selectedWard ? getPUs(selectedLga, selectedWard) : [];
+      const list = [
+        { label: `🌐 All Polling Units in ${selectedWard}`, value: '' },
+        ...pus.map((p) => ({ label: p, value: p })),
+      ];
+      if (!pickerSearch.trim()) return list;
+      return list.filter((i) => i.label.toLowerCase().includes(pickerSearch.toLowerCase()));
+    }
+    return [];
+  }, [activePicker, lgas, selectedLga, selectedWard, pickerSearch, locationsMap]);
 
   const loadBroadcasts = async () => {
     try {
@@ -99,6 +199,22 @@ export const AdminBroadcastScreen: React.FC = () => {
     setPriority(tmpl.priority);
   };
 
+  const getTargetSummary = () => {
+    if (!filterByLocation) {
+      return targetAudience === 'all_residents' ? 'All Residents (Entire City)' : 'All Selected Users';
+    }
+    if (selectedPu) {
+      return `${selectedLga} › ${selectedWard} › ${selectedPu}`;
+    }
+    if (selectedWard) {
+      return `${selectedLga} › ${selectedWard} (All Polling Units)`;
+    }
+    if (selectedLga) {
+      return `${selectedLga} (All Wards & Polling Units)`;
+    }
+    return 'All Registered Residents (City-wide)';
+  };
+
   const handleSendBroadcast = async () => {
     if (!title.trim()) {
       Alert.alert('Validation Error', 'Please provide a title for the broadcast.');
@@ -109,11 +225,15 @@ export const AdminBroadcastScreen: React.FC = () => {
       return;
     }
 
+    const scopeDesc = getTargetSummary();
+
     Alert.alert(
       'Confirm Broadcast',
-      `Are you sure you want to send this broadcast to ${
-        targetAudience === 'all_residents' ? 'all registered residents' : 'selected users'
-      }? They will receive in-app notifications and alerts immediately.`,
+      `Dispatch this announcement to:
+• Target: ${scopeDesc}
+• Priority: ${priority.toUpperCase()}
+
+Recipients will receive in-app notifications and alerts immediately.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -127,13 +247,22 @@ export const AdminBroadcastScreen: React.FC = () => {
                 message: message.trim(),
                 priority,
                 targetAudience,
+                targetFilter: filterByLocation
+                  ? {
+                      localGovt: selectedLga || undefined,
+                      ward: selectedWard || undefined,
+                      pollingUnit: selectedPu || undefined,
+                    }
+                  : undefined,
               };
               await broadcastService.createBroadcast(payload);
-              Alert.alert('Success', 'Broadcast message successfully dispatched to residents!');
+              Alert.alert('Success', 'Broadcast message successfully dispatched!');
               setModalVisible(false);
               setTitle('');
               setMessage('');
               setPriority('normal');
+              setFilterByLocation(false);
+              handleResetLocation();
               loadBroadcasts();
             } catch (err: any) {
               Alert.alert('Error', err.response?.data?.message || 'Failed to dispatch broadcast');
@@ -237,9 +366,27 @@ export const AdminBroadcastScreen: React.FC = () => {
           <View style={styles.recipientInfo}>
             <Users size={14} color={theme.colors.textSecondary} />
             <AppText variant="caption" color={theme.colors.textSecondary} style={{ marginLeft: 6 }}>
-              Dispatched to {item.recipientsCount} recipient(s) •{' '}
-              {item.targetAudience === 'all_residents' ? 'All Residents' : item.targetAudience}
+              {item.recipientsCount} recipient(s)
             </AppText>
+          </View>
+          <View style={styles.cardLocationTag}>
+            {item.targetFilter?.localGovt ? (
+              <>
+                <MapPin size={12} color={theme.colors.primary} />
+                <AppText variant="caption" weight="600" color={theme.colors.primary} style={{ marginLeft: 4 }}>
+                  {item.targetFilter.localGovt}
+                  {item.targetFilter.ward ? ` • ${item.targetFilter.ward}` : ''}
+                  {item.targetFilter.pollingUnit ? ` • PU` : ''}
+                </AppText>
+              </>
+            ) : (
+              <>
+                <Globe size={12} color="#64748b" />
+                <AppText variant="caption" color="#64748b" style={{ marginLeft: 4 }}>
+                  City-wide
+                </AppText>
+              </>
+            )}
           </View>
         </View>
       </View>
@@ -387,6 +534,143 @@ export const AdminBroadcastScreen: React.FC = () => {
               ))}
             </View>
 
+            {/* Optional Location Filter */}
+            <View style={styles.locationSection}>
+              <View style={styles.locationSectionHeader}>
+                <TouchableOpacity
+                  style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}
+                  onPress={() => {
+                    const nextVal = !filterByLocation;
+                    setFilterByLocation(nextVal);
+                    if (!nextVal) handleResetLocation();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <View style={[styles.checkboxSquare, filterByLocation && styles.checkboxSquareActive]}>
+                    {filterByLocation && <Check size={13} color="#fff" />}
+                  </View>
+                  <AppText variant="bodySmall" weight="700" style={{ marginLeft: 8 }}>
+                    Target Specific Location (Optional)
+                  </AppText>
+                </TouchableOpacity>
+
+                {filterByLocation && (selectedLga || selectedWard || selectedPu) ? (
+                  <TouchableOpacity onPress={handleResetLocation}>
+                    <AppText variant="caption" weight="600" color={theme.colors.error}>
+                      Clear
+                    </AppText>
+                  </TouchableOpacity>
+                ) : null}
+              </View>
+
+              {!filterByLocation ? (
+                <AppText variant="caption" color={theme.colors.textSecondary} style={{ marginTop: 4, marginLeft: 26 }}>
+                  Unchecked: Dispatches city-wide to all residents. Check the box above to target a specific LGA, Ward, or Polling Unit.
+                </AppText>
+              ) : (
+                <>
+                  <AppText variant="caption" color={theme.colors.textSecondary} style={{ marginBottom: 10, marginTop: 4, marginLeft: 26 }}>
+                    Select a Local Govt, Ward, or Polling Unit to limit recipients to that area.
+                  </AppText>
+
+                  {/* 1. LGA */}
+                  <AppText variant="caption" weight="600" style={styles.subFieldLabel}>
+                    1. LOCAL GOVERNMENT (LGA)
+                  </AppText>
+                  <TouchableOpacity
+                    style={styles.locationSelectBtn}
+                    onPress={() => {
+                      setPickerSearch('');
+                      setActivePicker('lga');
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      <MapPin size={15} color={selectedLga ? theme.colors.primary : '#94a3b8'} />
+                      <AppText
+                        variant="bodySmall"
+                        weight={selectedLga ? '600' : '400'}
+                        color={selectedLga ? theme.colors.text : '#64748b'}
+                        style={{ marginLeft: 8 }}
+                      >
+                        {selectedLga || 'All Local Governments in State'}
+                      </AppText>
+                    </View>
+                    <ChevronDown size={16} color="#94a3b8" />
+                  </TouchableOpacity>
+
+                  {/* 2. Ward */}
+                  <AppText variant="caption" weight="600" style={[styles.subFieldLabel, { marginTop: 10 }]}>
+                    2. WARD (OPTIONAL)
+                  </AppText>
+                  <TouchableOpacity
+                    style={[styles.locationSelectBtn, !selectedLga && styles.locationSelectDisabled]}
+                    disabled={!selectedLga}
+                    onPress={() => {
+                      setPickerSearch('');
+                      setActivePicker('ward');
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      <Filter size={15} color={selectedWard ? theme.colors.primary : '#94a3b8'} />
+                      <AppText
+                        variant="bodySmall"
+                        weight={selectedWard ? '600' : '400'}
+                        color={selectedWard ? theme.colors.text : '#64748b'}
+                        style={{ marginLeft: 8 }}
+                      >
+                        {!selectedLga
+                          ? 'Select an LGA first'
+                          : selectedWard || `All Wards in ${selectedLga}`}
+                      </AppText>
+                    </View>
+                    <ChevronDown size={16} color="#94a3b8" />
+                  </TouchableOpacity>
+
+                  {/* 3. Polling Unit */}
+                  <AppText variant="caption" weight="600" style={[styles.subFieldLabel, { marginTop: 10 }]}>
+                    3. POLLING UNIT / AREA (OPTIONAL)
+                  </AppText>
+                  <TouchableOpacity
+                    style={[styles.locationSelectBtn, !selectedWard && styles.locationSelectDisabled]}
+                    disabled={!selectedWard}
+                    onPress={() => {
+                      setPickerSearch('');
+                      setActivePicker('pu');
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                      <Users size={15} color={selectedPu ? theme.colors.primary : '#94a3b8'} />
+                      <AppText
+                        variant="bodySmall"
+                        weight={selectedPu ? '600' : '400'}
+                        color={selectedPu ? theme.colors.text : '#64748b'}
+                        style={{ marginLeft: 8 }}
+                        numberOfLines={1}
+                      >
+                        {!selectedWard
+                          ? 'Select a Ward first'
+                          : selectedPu || `All Polling Units in ${selectedWard}`}
+                      </AppText>
+                    </View>
+                    <ChevronDown size={16} color="#94a3b8" />
+                  </TouchableOpacity>
+
+                  {/* Scope preview pill */}
+                  <View style={styles.scopeBadge}>
+                    <Globe size={13} color={selectedLga ? theme.colors.primary : '#64748b'} />
+                    <AppText
+                      variant="caption"
+                      weight="600"
+                      color={selectedLga ? theme.colors.primary : '#64748b'}
+                      style={{ marginLeft: 6, flex: 1 }}
+                    >
+                      Scope: {getTargetSummary()}
+                    </AppText>
+                  </View>
+                </>
+              )}
+            </View>
+
             {/* Priority Selector */}
             <AppText variant="bodySmall" weight="600" style={styles.fieldLabel}>
               Priority Level
@@ -481,6 +765,95 @@ export const AdminBroadcastScreen: React.FC = () => {
                 </>
               )}
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Location Picker Modal */}
+      <Modal
+        visible={activePicker !== null}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setActivePicker(null)}
+      >
+        <View style={styles.pickerOverlay}>
+          <View style={styles.pickerCard}>
+            <View style={styles.pickerHeader}>
+              <View style={{ flex: 1 }}>
+                <AppText variant="h3">
+                  {activePicker === 'lga'
+                    ? 'Select Local Government'
+                    : activePicker === 'ward'
+                    ? `Select Ward (${selectedLga})`
+                    : `Select Polling Unit (${selectedWard})`}
+                </AppText>
+                <AppText variant="caption" color={theme.colors.textSecondary}>
+                  {activePicker === 'lga'
+                    ? 'Choose an LGA or keep City-wide'
+                    : activePicker === 'ward'
+                    ? 'Choose a Ward or keep All Wards'
+                    : 'Choose a PU or keep All Polling Units'}
+                </AppText>
+              </View>
+              <TouchableOpacity
+                onPress={() => setActivePicker(null)}
+                style={styles.pickerCloseBtn}
+              >
+                <X size={20} color="#64748b" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.searchBox}>
+              <Search size={16} color="#94a3b8" />
+              <TextInput
+                placeholder="Search..."
+                placeholderTextColor="#94a3b8"
+                value={pickerSearch}
+                onChangeText={setPickerSearch}
+                style={styles.searchInput}
+                autoCapitalize="none"
+              />
+              {pickerSearch ? (
+                <TouchableOpacity onPress={() => setPickerSearch('')}>
+                  <X size={16} color="#94a3b8" />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+
+            <FlatList
+              data={pickerList}
+              keyExtractor={(item) => item.value || 'all'}
+              style={{ maxHeight: 340 }}
+              renderItem={({ item }) => {
+                const isSelected =
+                  activePicker === 'lga'
+                    ? selectedLga === item.value
+                    : activePicker === 'ward'
+                    ? selectedWard === item.value
+                    : selectedPu === item.value;
+
+                return (
+                  <TouchableOpacity
+                    style={[styles.pickerItem, isSelected && styles.pickerItemActive]}
+                    onPress={() => {
+                      if (activePicker === 'lga') handleSelectLga(item.value);
+                      else if (activePicker === 'ward') handleSelectWard(item.value);
+                      else if (activePicker === 'pu') handleSelectPu(item.value);
+                    }}
+                  >
+                    <AppText
+                      variant="bodySmall"
+                      weight={isSelected ? '700' : '400'}
+                      color={isSelected ? theme.colors.primary : '#1e293b'}
+                      style={{ flex: 1 }}
+                    >
+                      {item.label}
+                    </AppText>
+                    {isSelected ? <Check size={16} color={theme.colors.primary} /> : null}
+                  </TouchableOpacity>
+                );
+              }}
+            />
           </View>
         </View>
       </Modal>
@@ -706,5 +1079,133 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
+  },
+  cardLocationTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f1f5f9',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    maxWidth: '55%',
+  },
+  locationSection: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    padding: 14,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  locationSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  checkboxSquare: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    borderWidth: 1.5,
+    borderColor: '#94a3b8',
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  checkboxSquareActive: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  subFieldLabel: {
+    color: '#64748b',
+    fontSize: 11,
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
+  locationSelectBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  locationSelectDisabled: {
+    backgroundColor: '#f1f5f9',
+    borderColor: '#e2e8f0',
+    opacity: 0.7,
+  },
+  scopeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ecfdf5',
+    borderWidth: 1,
+    borderColor: '#a7f3d0',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    marginTop: 12,
+  },
+  // Picker Modal Styles
+  pickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  pickerCard: {
+    width: '100%',
+    maxHeight: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  pickerCloseBtn: {
+    padding: 4,
+  },
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 12,
+  },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    fontSize: 14,
+    color: '#0f172a',
+  },
+  pickerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  pickerItemActive: {
+    backgroundColor: '#ecfdf5',
+    borderRadius: 8,
   },
 });

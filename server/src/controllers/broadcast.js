@@ -5,6 +5,88 @@ const ActivityLog = require('../models/ActivityLog');
 const asyncHandler = require('../utils/asyncHandler');
 const notificationService = require('../services/notification');
 
+function escapeRegex(text) {
+  if (!text) return '';
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+/**
+ * Build MongoDB filter for residents to ensure they only receive broadcasts
+ * that are either city-wide or match their localGovt / ward / pollingUnit.
+ */
+function buildResidentBroadcastQuery(user) {
+  if (!user || user.role === 'admin') {
+    return {};
+  }
+
+  // Audience condition: residents don't get driver-only dispatches
+  const conditions = [
+    { targetAudience: { $ne: 'drivers' } }
+  ];
+
+  // LocalGovt dimension
+  if (user.localGovt && user.localGovt.trim()) {
+    conditions.push({
+      $or: [
+        { 'targetFilter.localGovt': null },
+        { 'targetFilter.localGovt': '' },
+        { 'targetFilter.localGovt': { $exists: false } },
+        { 'targetFilter.localGovt': { $regex: new RegExp(`^${escapeRegex(user.localGovt.trim())}$`, 'i') } },
+      ],
+    });
+  } else {
+    conditions.push({
+      $or: [
+        { 'targetFilter.localGovt': null },
+        { 'targetFilter.localGovt': '' },
+        { 'targetFilter.localGovt': { $exists: false } },
+      ],
+    });
+  }
+
+  // Ward dimension
+  if (user.ward && user.ward.trim()) {
+    conditions.push({
+      $or: [
+        { 'targetFilter.ward': null },
+        { 'targetFilter.ward': '' },
+        { 'targetFilter.ward': { $exists: false } },
+        { 'targetFilter.ward': { $regex: new RegExp(`^${escapeRegex(user.ward.trim())}$`, 'i') } },
+      ],
+    });
+  } else {
+    conditions.push({
+      $or: [
+        { 'targetFilter.ward': null },
+        { 'targetFilter.ward': '' },
+        { 'targetFilter.ward': { $exists: false } },
+      ],
+    });
+  }
+
+  // Polling Unit dimension
+  if (user.pollingUnit && user.pollingUnit.trim()) {
+    conditions.push({
+      $or: [
+        { 'targetFilter.pollingUnit': null },
+        { 'targetFilter.pollingUnit': '' },
+        { 'targetFilter.pollingUnit': { $exists: false } },
+        { 'targetFilter.pollingUnit': { $regex: new RegExp(`^${escapeRegex(user.pollingUnit.trim())}$`, 'i') } },
+      ],
+    });
+  } else {
+    conditions.push({
+      $or: [
+        { 'targetFilter.pollingUnit': null },
+        { 'targetFilter.pollingUnit': '' },
+        { 'targetFilter.pollingUnit': { $exists: false } },
+      ],
+    });
+  }
+
+  return { $and: conditions };
+}
+
 /**
  * @desc    Create and send a broadcast message to residents / users
  * @route   POST /api/broadcasts
@@ -21,34 +103,56 @@ exports.createBroadcast = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Broadcast message content is required' });
   }
 
-  // Build user query based on audience & filter
+  // Build user query based on audience & location filters
   const query = {
     isDeleted: { $ne: true },
     isDeactivated: { $ne: true },
   };
 
   const audience = targetAudience || 'all_residents';
-  if (audience === 'all_residents') {
-    query.role = 'resident';
-  } else if (audience === 'drivers') {
+  if (audience === 'drivers') {
     query.role = 'driver';
   } else if (audience === 'all_users') {
-    // Both residents and drivers, not admin
     query.role = { $in: ['resident', 'driver'] };
-  } else if (audience === 'ward' && targetFilter?.ward) {
+  } else {
     query.role = 'resident';
-    query.ward = targetFilter.ward;
-  } else if (audience === 'pollingUnit' && targetFilter?.pollingUnit) {
-    query.role = 'resident';
-    query.pollingUnit = targetFilter.pollingUnit;
   }
 
-  if (targetFilter?.localGovt) {
-    query.localGovt = targetFilter.localGovt;
+  // Parse location filters (Optional: LGA, Ward, Polling Unit)
+  const lga = targetFilter?.localGovt && typeof targetFilter.localGovt === 'string' ? targetFilter.localGovt.trim() : null;
+  const ward = targetFilter?.ward && typeof targetFilter.ward === 'string' ? targetFilter.ward.trim() : null;
+  const pu = targetFilter?.pollingUnit && typeof targetFilter.pollingUnit === 'string' ? targetFilter.pollingUnit.trim() : null;
+
+  const cleanedFilter = {
+    localGovt: lga || null,
+    ward: ward || null,
+    pollingUnit: pu || null,
+  };
+
+  if (cleanedFilter.localGovt) {
+    query.localGovt = { $regex: new RegExp(`^${escapeRegex(cleanedFilter.localGovt)}$`, 'i') };
+  }
+
+  if (cleanedFilter.ward) {
+    query.ward = { $regex: new RegExp(`^${escapeRegex(cleanedFilter.ward)}$`, 'i') };
+  }
+
+  if (cleanedFilter.pollingUnit) {
+    query.pollingUnit = { $regex: new RegExp(`^${escapeRegex(cleanedFilter.pollingUnit)}$`, 'i') };
   }
 
   // Find target recipients
   const recipients = await User.find(query).select('_id name expoPushToken');
+
+  // Compute effective targetAudience label
+  let effectiveAudience = audience;
+  if (cleanedFilter.pollingUnit) {
+    effectiveAudience = 'pollingUnit';
+  } else if (cleanedFilter.ward) {
+    effectiveAudience = 'ward';
+  } else if (cleanedFilter.localGovt) {
+    effectiveAudience = 'localGovt';
+  }
 
   // Save the broadcast record
   const broadcast = await Broadcast.create({
@@ -57,8 +161,8 @@ exports.createBroadcast = asyncHandler(async (req, res) => {
     title: title.trim(),
     message: message.trim(),
     priority: priority || 'normal',
-    targetAudience: audience,
-    targetFilter: targetFilter || {},
+    targetAudience: effectiveAudience,
+    targetFilter: cleanedFilter,
     recipientsCount: recipients.length,
   });
 
@@ -91,22 +195,29 @@ exports.createBroadcast = asyncHandler(async (req, res) => {
     }
   }
 
-  // Log activity
+  // Build human-readable filter description for audit log
+  const filterDesc = [
+    cleanedFilter.localGovt ? `LGA: ${cleanedFilter.localGovt}` : null,
+    cleanedFilter.ward ? `Ward: ${cleanedFilter.ward}` : null,
+    cleanedFilter.pollingUnit ? `PU: ${cleanedFilter.pollingUnit}` : null,
+  ].filter(Boolean).join(' | ');
+
   await ActivityLog.create({
     user: req.user._id,
     action: 'Create Broadcast',
-    description: `Admin sent broadcast "${title.trim()}" to ${recipients.length} recipients`,
+    description: `Admin sent broadcast "${title.trim()}" to ${recipients.length} recipients${filterDesc ? ` (${filterDesc})` : ' (City-wide)'}`,
     details: {
       broadcastId: broadcast._id,
       recipientsCount: recipients.length,
-      audience,
+      audience: effectiveAudience,
       priority: priority || 'normal',
+      targetFilter: cleanedFilter,
     },
   }).catch((err) => console.error('[ActivityLog Error]:', err.message));
 
   res.status(201).json({
     success: true,
-    message: `Broadcast successfully dispatched to ${recipients.length} resident(s)`,
+    message: `Broadcast successfully dispatched to ${recipients.length} resident(s)${filterDesc ? ` in ${filterDesc}` : ''}`,
     data: broadcast,
   });
 });
@@ -117,7 +228,9 @@ exports.createBroadcast = asyncHandler(async (req, res) => {
  * @access  Private
  */
 exports.getBroadcasts = asyncHandler(async (req, res) => {
-  const broadcasts = await Broadcast.find()
+  const query = buildResidentBroadcastQuery(req.user);
+
+  const broadcasts = await Broadcast.find(query)
     .sort({ createdAt: -1 })
     .populate('senderId', 'name email role')
     .lean();
@@ -135,7 +248,9 @@ exports.getBroadcasts = asyncHandler(async (req, res) => {
  * @access  Private
  */
 exports.getLatestBroadcast = asyncHandler(async (req, res) => {
-  const latest = await Broadcast.findOne()
+  const query = buildResidentBroadcastQuery(req.user);
+
+  const latest = await Broadcast.findOne(query)
     .sort({ createdAt: -1 })
     .lean();
 
