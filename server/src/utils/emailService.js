@@ -5,7 +5,7 @@ try {
   nodemailer = require("nodemailer");
 } catch (err) {
   console.warn(
-    "Warning: nodemailer package not found. Falling back to console email logging."
+    "Warning: nodemailer package not found. Falling back to HTTP/console email logging."
   );
 }
 
@@ -32,13 +32,138 @@ const createTransporter = () => {
 };
 
 /**
+ * Send email via Google Apps Script HTTPS Relay (port 443 - works on Render Free Tier)
+ */
+const sendViaGoogleAppsScript = async ({ to, subject, text, html }) => {
+  const response = await fetch(env.GOOGLE_SCRIPT_URL.trim(), {
+    method: "POST",
+    redirect: "follow",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8",
+    },
+    body: JSON.stringify({
+      to,
+      subject,
+      text,
+      html,
+      fromName: "AkureClean",
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Google Apps Script HTTP ${response.status}`);
+  }
+
+  const result = await response.json().catch(() => ({ success: true }));
+  if (result && result.success === false) {
+    throw new Error(result.error || "Google Apps Script returned failure");
+  }
+
+  console.log(`[emailService] Email sent to ${to} via Google Apps Script HTTPS relay`);
+  return { delivered: true, provider: "google-script" };
+};
+
+/**
+ * Send email via Brevo HTTPS API (port 443 - works on Render Free Tier)
+ */
+const sendViaBrevo = async ({ to, recipientName, subject, text, html }) => {
+  const senderEmail = env.EMAIL_USER || "hedristemitope2001@gmail.com";
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "api-key": env.BREVO_API_KEY.trim(),
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: "AkureClean", email: senderEmail },
+      to: [{ email: to, name: recipientName }],
+      subject,
+      textContent: text,
+      htmlContent: html,
+    }),
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text();
+    throw new Error(`Brevo API HTTP ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  console.log(
+    `[emailService] Email sent to ${to} via Brevo API | messageId: ${data.messageId}`
+  );
+  return { delivered: true, messageId: data.messageId, provider: "brevo" };
+};
+
+/**
+ * Unified email dispatcher:
+ * 1. Google Apps Script HTTPS Relay (GOOGLE_SCRIPT_URL) — bypasses Render SMTP block
+ * 2. Brevo HTTPS API (BREVO_API_KEY) — bypasses Render SMTP block
+ * 3. Nodemailer SMTP (EMAIL_USER + EMAIL_PASS) — works locally or on unblocked hosts
+ */
+const dispatchEmail = async ({ to, recipientName, subject, text, html, otp }) => {
+  // 1. Try Google Apps Script HTTPS relay first (ideal for Render Free Tier + Gmail)
+  if (env.GOOGLE_SCRIPT_URL) {
+    try {
+      return await sendViaGoogleAppsScript({ to, subject, text, html });
+    } catch (err) {
+      console.error(
+        "[emailService] Google Apps Script relay failed:",
+        err.message
+      );
+    }
+  }
+
+  // 2. Try Brevo HTTPS API if configured
+  if (env.BREVO_API_KEY) {
+    try {
+      return await sendViaBrevo({ to, recipientName, subject, text, html });
+    } catch (err) {
+      console.error("[emailService] Brevo API failed:", err.message);
+    }
+  }
+
+  // 3. Fallback to Nodemailer SMTP
+  const transporter = createTransporter();
+  if (!transporter) {
+    console.warn(
+      "[emailService] No email transport configured (set GOOGLE_SCRIPT_URL, BREVO_API_KEY, or EMAIL_USER/EMAIL_PASS). Using console OTP above."
+    );
+    return { delivered: false, devOtp: otp };
+  }
+
+  const fromAddress = `AkureClean <${env.EMAIL_USER}>`;
+
+  try {
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      replyTo: env.EMAIL_USER,
+      to,
+      subject,
+      text,
+      html,
+    });
+    console.log(
+      `[emailService] Email sent to ${to} via SMTP | messageId: ${info.messageId} | response: ${info.response}`
+    );
+    return { delivered: true, messageId: info.messageId, provider: "smtp" };
+  } catch (error) {
+    console.error(
+      "[emailService] Failed to send email via SMTP (Note: Render free tier blocks port 465/587; set GOOGLE_SCRIPT_URL to send over HTTPS):",
+      error.message
+    );
+    return { delivered: false, devOtp: otp, error: error.message };
+  }
+};
+
+/**
  * Send a 6-digit verification code for registration
  */
 exports.sendVerificationOtpEmail = async (email, name, otp) => {
   const recipientName = name || "Resident";
   const subject = `Your AkureClean verification code is ${otp}`;
 
-  // Plain-text version (critical for avoiding Gmail Spam folder)
   const text = [
     `Hello ${recipientName},`,
     ``,
@@ -52,7 +177,6 @@ exports.sendVerificationOtpEmail = async (email, name, otp) => {
     `AkureClean Team`,
   ].join("\n");
 
-  // Clean, minimal transactional HTML (avoids CSS gradients/dashed boxes that trigger spam filters)
   const html = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px; color: #1e293b; line-height: 1.6;">
       <h2 style="margin: 0 0 16px; font-size: 18px; color: #0f172a;">AkureClean Account Verification</h2>
@@ -78,41 +202,14 @@ exports.sendVerificationOtpEmail = async (email, name, otp) => {
   console.log(`OTP: ${otp} (Expires in 10 mins)`);
   console.log(`========================================\n`);
 
-  const transporter = createTransporter();
-  if (!transporter) {
-    console.warn(
-      "[emailService] EMAIL_USER or EMAIL_PASS not configured in .env. Using console OTP above for development."
-    );
-    return { delivered: false, devOtp: otp };
-  }
-
-  const fromAddress = `AkureClean <${env.EMAIL_USER}>`;
-
-  try {
-    const info = await transporter.sendMail({
-      from: fromAddress,
-      replyTo: env.EMAIL_USER,
-      to: email,
-      subject,
-      text,
-      html,
-    });
-    console.log(
-      `[emailService] Verification email sent to ${email} | messageId: ${info.messageId} | response: ${info.response}`
-    );
-    return { delivered: true, messageId: info.messageId };
-  } catch (error) {
-    console.error(
-      "[emailService] Failed to send verification email via SMTP:",
-      error.message
-    );
-    if (env.NODE_ENV !== "production") {
-      return { delivered: false, devOtp: otp };
-    }
-    throw new Error(
-      "Could not send verification email. Please check email configuration."
-    );
-  }
+  return dispatchEmail({
+    to: email,
+    recipientName,
+    subject,
+    text,
+    html,
+    otp,
+  });
 };
 
 /**
@@ -160,39 +257,12 @@ exports.sendPasswordResetOtpEmail = async (email, name, otp) => {
   console.log(`OTP: ${otp} (Expires in 10 mins)`);
   console.log(`========================================\n`);
 
-  const transporter = createTransporter();
-  if (!transporter) {
-    console.warn(
-      "[emailService] EMAIL_USER or EMAIL_PASS not configured in .env. Using console OTP above for development."
-    );
-    return { delivered: false, devOtp: otp };
-  }
-
-  const fromAddress = `AkureClean <${env.EMAIL_USER}>`;
-
-  try {
-    const info = await transporter.sendMail({
-      from: fromAddress,
-      replyTo: env.EMAIL_USER,
-      to: email,
-      subject,
-      text,
-      html,
-    });
-    console.log(
-      `[emailService] Password reset email sent to ${email} | messageId: ${info.messageId} | response: ${info.response}`
-    );
-    return { delivered: true, messageId: info.messageId };
-  } catch (error) {
-    console.error(
-      "[emailService] Failed to send password reset email via SMTP:",
-      error.message
-    );
-    if (env.NODE_ENV !== "production") {
-      return { delivered: false, devOtp: otp };
-    }
-    throw new Error(
-      "Could not send password reset email. Please check email configuration."
-    );
-  }
+  return dispatchEmail({
+    to: email,
+    recipientName,
+    subject,
+    text,
+    html,
+    otp,
+  });
 };

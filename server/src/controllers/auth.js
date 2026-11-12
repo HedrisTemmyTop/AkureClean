@@ -112,9 +112,7 @@ exports.register = asyncHandler(async (req, res) => {
     existingUser.emailVerificationExpires = otpExpires;
     await existingUser.save();
 
-    sendVerificationOtpEmail(existingUser.email, existingUser.name, otp).catch(
-      (err) => console.error("[Register Resend OTP Error]:", err.message)
-    );
+    await sendVerificationOtpEmail(existingUser.email, existingUser.name, otp);
 
     return res.status(200).json({
       success: true,
@@ -169,9 +167,7 @@ exports.register = asyncHandler(async (req, res) => {
     });
   }
 
-  sendVerificationOtpEmail(user.email, user.name, otp).catch((err) =>
-    console.error("[Register OTP Error]:", err.message)
-  );
+  await sendVerificationOtpEmail(user.email, user.name, otp);
   await logActivity(user._id, "Register", `User registered as ${user.role} (pending email verification)`);
 
   res.status(201).json({
@@ -288,9 +284,7 @@ exports.resendVerificationOtp = asyncHandler(async (req, res) => {
   user.emailVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
   await user.save();
 
-  sendVerificationOtpEmail(user.email, user.name, otp).catch((err) =>
-    console.error("[Resend OTP Error]:", err.message)
-  );
+  await sendVerificationOtpEmail(user.email, user.name, otp);
 
   res.json({
     success: true,
@@ -331,9 +325,7 @@ exports.forgotPassword = asyncHandler(async (req, res) => {
   user.resetPasswordExpires = new Date(Date.now() + 10 * 60 * 1000);
   await user.save();
 
-  sendPasswordResetOtpEmail(user.email, user.name, otp).catch((err) =>
-    console.error("[Forgot Password OTP Error]:", err.message)
-  );
+  await sendPasswordResetOtpEmail(user.email, user.name, otp);
   await logActivity(user._id, "Forgot Password", "Password reset OTP sent to email");
 
   res.json({

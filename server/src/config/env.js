@@ -30,5 +30,7 @@ module.exports = {
   EMAIL_USER: process.env.EMAIL_USER || '',
   EMAIL_PASS: process.env.EMAIL_PASS || '',
   EMAIL_FROM: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'AkureClean <no-reply@akureclean.ng>',
+  GOOGLE_SCRIPT_URL: process.env.GOOGLE_SCRIPT_URL || '',
+  BREVO_API_KEY: process.env.BREVO_API_KEY || '',
   NODE_ENV: process.env.NODE_ENV || 'development'
 };
